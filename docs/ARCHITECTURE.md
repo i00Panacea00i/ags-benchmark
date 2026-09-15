@@ -70,6 +70,9 @@ pytest+envd，digest 固定）→ 每题镜像 `FROM base + COPY benchmark 内�
 
 > 数据流总纲：`单元清单 →(L1 去重)→ 池 acquire → agent 沙箱执行 →(跨 AGS/
 > 镜像构建)→ 产物 →(L2 去重)→ 外置存储`。三条横向流互不共享本地状态。
+>
+> （图 2-1 中 ②/③ 为 v1 注入模式遗留示意；v2 下 ② 为 CVM 驱动器、③ 为每题
+> 临时工具 `bench-u-*` 内容烧入镜像，编排/状态层不变。）
 
 ---
 
@@ -77,22 +80,18 @@ pytest+envd，digest 固定）→ 每题镜像 `FROM base + COPY benchmark 内�
 
 ### 3.1 时序图
 
-**图 3-1：跨 AGS 验证流（validator_driver → agent2 沙箱 → 题目沙箱）**
+**图 3-1：跨 AGS 验证流（v2：validator_driver(CVM) → 每题临时工具实例）**
 
 ```
-driver          agent2 沙箱           题目沙箱(bench-base)      外置存储
+CVM validator_driver        外置存储          AGS（每题）
   │ claim L1 ───────────────────────────────────────────────▶ claims/
-  │ pool.acquire() → validator 实例
-  │── files.write(单元包 /work/) ──▶
-  │── commands.run(validator_agent, envs={E2B_KEY, BENCH_TOOL}) ─▶
-  │                                  │ Sandbox.create(bench-base) ──▶ ①拉起
-  │                                  │ files.write(内容注入) ───────▶ ②注入
-  │                                  │ run_tests answer×N ─────────▶ ③验证
-  │                                  │ run_tests baseline ─────────▶ ④负向
-  │                                  │ kill() ─────────────────────▶ ⑤销毁
-  │◀── files.read(verdict) ──────────│
-  │── L2 去重 → 结果分片 ───────────────────────────────────────▶ results/
-  │ pool.release()
+  │ tccli CreateSandboxTool(bench-u-*, 题目镜像) ──▶ 临时工具 ACTIVE     ①建工具
+  │ Sandbox.create(bench-u-*) ──────────────────▶ 题目实例(内容烧入)    ②拉起
+  │── commands.run(run_tests answer×N) ─────────▶ ③验证（SANDBOX 隔离）
+  │── commands.run(run_tests baseline) ──────────▶ ④负向对照
+  │（可选 Phase B：DeepSeek solver 循环，工具调用→commands.run）
+  │── L2 去重 → 结果分片 ───────────────────────────────────▶ results/
+  │ Sandbox.kill + tccli DeleteSandboxTool ──────▶ ⑤销毁（配额归还）
 ```
 
 ### 3.2 网络模式矩阵
@@ -100,21 +99,21 @@ driver          agent2 沙箱           题目沙箱(bench-base)      外置存�
 | 沙箱 | 模式 | 出网需求 | 入向控制 |
 |---|---|---|---|
 | agent1 maker | PUBLIC | GitHub / PyPI / TCR 公网端点 | 仅数据面 API |
-| agent2 validator | PUBLIC | **E2B 数据面域名**（拉起题目沙箱） | 仅数据面 API |
-| 题目 bench | **SANDBOX** | **无**（内容已注入，验证语义全离线） | 仅 files/commands 控制面 |
+| agent2 validator | —（v2 运行于 CVM） | tccli 控制面 + E2B 数据面 | — |
+| 题目 bench | **SANDBOX** | **无**（内容已烧入镜像，验证语义全离线） | 仅 files/commands 控制面 |
 
 关键点：SANDBOX 隔离的是**数据面出网**；`files.write`/`commands.run` 走 envd 控制面
-（49983），**不受隔离影响**——这正是内容注入模式在离线验证下可行的原理。
+（49983），**不受隔离影响**——题目实例离线执行 harness 的原理所在。
 
 ### 3.3 凭据最小化矩阵
 
 | 凭据 | 持有者 | 注入方式 | 生命周期 |
 |---|---|---|---|
-| E2B_API_KEY | driver → agent2 沙箱 | `commands.run(envs=...)` 命令级 | 随命令进程 |
-| TCR 令牌 | driver → agent1 沙箱 | 同上；每批经 `CreateInstanceToken` 刷新 | ~1.5h（实测） |
-| GITHUB_TOKEN | driver → agent1 沙箱 | 同上 | PAT 有效期 |
-| COS 密钥 | **仅 driver**（多副本模式） | 不入沙箱 | — |
-| CAM RoleArn | AGS 平台侧（工具属性） | 工具创建时绑定 | 工具级 |
+| E2B_API_KEY | CVM driver → 命令级注入 | `commands.run(envs=...)` | 随命令进程 |
+| TCR 令牌 | CVM driver → agent1 沙箱 | 同上；每批经 `CreateInstanceToken` 刷新 | ~1.5h（实测） |
+| GITHUB_TOKEN | CVM driver → agent1 沙箱 | 同上 | PAT 有效期 |
+| COS 密钥 | **仅 CVM driver**（多副本模式） | 不入沙箱 | — |
+| CAM RoleArn | **仅 CVM**（tccli 建删工具）；工具属性绑定 | 不入沙箱 | 工具级 |
 
 ---
 
@@ -131,8 +130,8 @@ L1 任务互斥   ClaimStore.claim()：flock（单机）或 COS 条件写（多�
      │          in-flight 租约 + 3h 陈旧锁自动回收（崩溃 Worker 自愈）
 L2 结果双键   instance_id 唯一 + issue_url 唯一（跨实例重复防线）
      │          分片模式下由 registry 预检 + 离线合并兜底
-L3 镜像层复用  内容注入模式下题目镜像唯一（基座 digest 固定），
-              天然杜绝「同题多镜像」冗余
+L3 镜像层复用  共享基座 digest 固定 + 每题镜像 digest 回填 manifest，
+              同题重制镜像内容层幂等（TCR 以 digest 去重存储）
 ```
 
 | 层 | 防什么 | 后端 | 代码 |
@@ -140,7 +139,7 @@ L3 镜像层复用  内容注入模式下题目镜像唯一（基座 digest 固�
 | L0 | 键生成歧义 | 确定性拼接 | manifest 生成协议 |
 | L1 | 同单元并发/重复执行 | flock / COS `If-None-Match:*` | `src/dedup/claim.py` |
 | L2 | 结果重复入库 | 双键集合 + 原子追加 | `src/dedup/dataset.py` |
-| L3 | 镜像冗余 | 基座 digest 固定 | `images/Dockerfile.bench_base` |
+| L3 | 镜像冗余 | 基座 digest 固定 | `images/Dockerfile.base` |
 
 多副本语义：L1 切 `CLAIM_BACKEND=cos` 后，N 个 driver 副本对同一单元只有一方
 claim 成功，其余立即跳过——**无需任何副本间协调协议**。
@@ -151,12 +150,12 @@ claim 成功，其余立即跳过——**无需任何副本间协调协议**。
 
 ```
 maker 批量:      实例峰值 = concurrency(maker)
-validator 批量:  实例峰值 = concurrency(validator) × 2   ← validator + 其拉起的 bench
-                 （例：并发 8 → 16 实例，配额边界 50 内）
+validator 批量:  并发临时工具 ≤8（工具配额 10/账号 − 固定工具 1 − 余量）
+                 （v2 约束：单题周期 ≈4-5min → ≈90 题/小时；提升需扩工具配额）
 ```
 
 **扩展操作**（零代码改动）：
-1. 单机纵向：调大 `--concurrency`（≤40，标定值）；
+1. 单机纵向：调大 `--concurrency`（maker ≤40 标定值；validator ≤8 工具配额值）；
 2. 多机横向：任意新机器/Pod 跑同一 driver 命令（换 `--worker` 名），
    `CLAIM_BACKEND=cos` 即全局去重；
 3. 配额提升后：`ramp_test.py` 重新标定 → 更新并发上限常量。
@@ -184,6 +183,7 @@ validator 批量:  实例峰值 = concurrency(validator) × 2   ← validator + 
 | 单元包（产物） | COS / artifacts 目录 | 临时 | manifest 可重放 |
 | 镜像 | TCR（digest 固定） | 无 | 不可变 |
 | 沙箱内一切 | 实例内存/临时盘 | **无**（用完即毁） | 无需恢复 |
+| 临时工具（v2） | AGS 工具列表 | 无 | 驱动启动时孤儿清扫回收 |
 
 **幂等协议**：任意环节崩溃 → 重跑同命令即可。L1 租约过期自动回池；L2 双键保证
 不重复入库；TCR push 以 digest 幂等。**"重试即恢复"，无人工介入。**
@@ -198,29 +198,29 @@ validator 批量:  实例峰值 = concurrency(validator) × 2   ← validator + 
 | 并发标定 | `src/pool/ramp_test.py` | 阶梯压测（扩容后复用） |
 | L1 去重 | `src/dedup/claim.py` | FlockClaimStore / CosClaimStore |
 | L2 去重 | `src/dedup/dataset.py` | LocalDataset / CosShardWriter |
-| agent2 验证器 | `src/agents/validator_agent.py` | 跨 AGS Phase A 判定（沙箱内运行） |
+| agent2 驱动 | `src/drivers/validator_driver.py` | CVM 中心化编排：工具生命周期（tccli）+ Phase A/B + DeepSeek 解题链（无状态） |
 | agent1 驱动 | `src/drivers/maker_driver.py` | 池化制作编排（无状态） |
-| agent2 驱动 | `src/drivers/validator_driver.py` | 池化跨 AGS 验证编排（无状态） |
-| agent2 镜像 | `images/Dockerfile.validator` | 基座 + e2b SDK + 验证 agent |
-| 题目基座镜像 | `images/Dockerfile.bench_base` | 基座 + 工具链 + harness（内容注入） |
-| 工具部署 | `deploy/create_tools.sh` | 三工具一键创建 + 预热 |
+| agent1 镜像 | `images/dsharness/` | maker agent（每题镜像构建：kaniko 出 tar + crane 推送） |
+| 共享基座镜像 | `images/Dockerfile.base` | benchmark-ds-base（digest 固定，题目镜像 FROM 此层） |
+| 工具部署 | `deploy/create_tools.sh` | 固定工具一键创建 + 预热（临时工具由驱动按题创建/删除） |
 | 配置模板 | `deploy/env.example` | 全量环境变量 |
 
 ---
 
 ## 6. 容量规划
 
-| 场景 | 公式 | 当前配额（50 并发实例）下 |
+| 场景 | 公式 | 当前配额下 |
 |---|---|---|
-| maker 吞吐 | 40 并发 ÷ 10min/单元 | ~240 单元/小时 |
-| validator 吞吐 | C 并发 → 2C 实例 → C≤25 | ~300 单元/小时（5min/单元） |
-| 更高目标 | 商务提升并发实例配额 → 重标定 | ramp_test.py 复用即可 |
+| maker 吞吐 | 40 并发 ÷ ~10min/单元 | ~240 单元/小时 |
+| validator 吞吐（v2） | 8 并发临时工具 × 4-5min/题 | **≈90 题/小时**（工具配额 10/账号约束） |
+| 更高目标 | 商务提升 AGS 工具配额（10/账号）→ 重标定 | ramp_test.py 复用即可 |
 
 ---
 
 ## 7. 安全边界
 
-- 沙箱凭据面：agent2 仅 E2B key；agent1 另持 TCR/GitHub；**COS 永不进沙箱**；
+- 沙箱凭据面：v2 下 agent2 逻辑在 CVM，**沙箱仅 agent1 持 TCR/GitHub 令牌（命令级注入）**；
+  COS 永不进沙箱；CAM 凭据仅 CVM（tccli）持有，**零进入沙箱**；
 - 所有凭据经 `commands.run(envs=...)` 命令级注入，随进程生命周期销毁，不落盘；
 - 题目沙箱（不可信内容执行体）运行于 SANDBOX 隔离网络，无出网能力；
 - TCR 镜像一律 digest 固定引用，防 tag 漂移。
@@ -239,4 +239,4 @@ validator 批量:  实例峰值 = concurrency(validator) × 2   ← validator + 
 ---
 
 *维护说明：图表（图 2-1/3-1/4-1）与正文 §2/§3/§4.1 一一对应；组件变更需同步
-§5 映射表与 docs/TROUBLESHOOTING.md。*
+§5 映射表与 docs/TROUBLESHOOTING.md。README.md 收录本文全文，修订时两处同步更新。*
