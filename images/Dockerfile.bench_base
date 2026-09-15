@@ -1,0 +1,21 @@
+# 题目基座沙箱镜像（内容注入模式 / D1 决策）
+# 职责：承载任意单元的题目内容（运行时经 files API 注入 KB-MB 级包），
+#       自包含工具链 + harness 协议，单镜像服务全部单元 → 工具数不随单元数增长。
+# 对比旧模式（每单元全量镜像 500MB×2）：存储与 TCR 推送压力下降两个数量级。
+# 约束（AGS 红线）：不覆盖 WORKDIR/USER/ENTRYPOINT；启动命令 /init + sleep/infinity
+FROM ccr.ccs.tencentyun.com/ags-image/sandbox-code:benchmark-20260625
+
+# 工具链：harness 需要 git/jq；python3-venv 供 agent 预检；pytest 固定 <9
+#（pytest 9 将旧式测试构造升级为收集错误 → 0 收集，26.x 时代仓库实测）
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        git jq python3-venv ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip3 install --no-cache-dir 'pytest<9' pytest-json-report
+
+# harness 协议（run_tests.sh <id> --reset --apply-tests [--apply-golden]）
+# 从主项目 benchmark-builder-sandbox/harness/ 复制（构建前 cp 至本目录）
+COPY harness/ /benchmark/harness/
+RUN chmod +x /benchmark/harness/*.sh && mkdir -p /benchmark/repos /benchmark/results
+
+# 工具网络模式须为 SANDBOX（Phase A 验证语义全离线）；
+# 内容注入走 files 控制面，不受数据面隔离影响

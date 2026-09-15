@@ -1,0 +1,18 @@
+# agent2（跨 AGS 验证器）沙箱镜像
+# 基座：AGS 官方 benchmark 精简基座（含 envd/s6 平台组件，332MB）
+# 叠加：e2b SDK（跨 AGS 拉起题目沙箱）+ 验证 agent
+# 约束（AGS 红线）：不覆盖 WORKDIR/USER/ENTRYPOINT；启动命令 /init + sleep/infinity
+FROM ccr.ccs.tencentyun.com/ags-image/sandbox-code:benchmark-20260625
+
+# 工具链：基座无 git/jq（agent 内部处理 tar/json 用 python，git 供调试）
+RUN apt-get update && apt-get install -y --no-install-recommends git jq ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# e2b SDK：validator_agent 以其跨实例拉起题目沙箱（E2B_API_KEY 由驱动方命令级注入）
+RUN pip3 install --no-cache-dir e2b-code-interpreter==2.9.2
+
+COPY src/agents/validator_agent.py /opt/validator/validator_agent.py
+RUN chmod +x /opt/validator/validator_agent.py
+
+# 工具网络模式须为 PUBLIC（需触达 E2B 数据面域名拉起题目沙箱）
+# 题目沙箱（BENCH_TOOL）为 SANDBOX 隔离模式——验证语义离线，两者经数据面 API 通信
