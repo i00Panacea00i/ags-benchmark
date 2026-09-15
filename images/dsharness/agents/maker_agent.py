@@ -123,7 +123,6 @@ def build_images(manifest, repo_dir):
     repo_short = WORK_REPO.split("/")[-1].replace(".", "-")
     tag = f"{datetime.now():%Y%m%d-%H%M}"
     bench_dst = f"{registry}/{ns}/benchmark-{repo_short}:{tag}"
-    ags_dst = f"{registry}/{ns}/benchmark-ags:{repo_short}-{tag}"
 
     # TCR 公网端点强制（沙箱 DNS 解析到 VPC 内网 IP，不可达）
     pub_ip = os.environ.get("TCR_PUBLIC_IP", "")
@@ -144,31 +143,19 @@ def build_images(manifest, repo_dir):
     open(os.path.join(ctx, "manifest.jsonl"), "w").write(
         json.dumps(manifest, ensure_ascii=False) + "\n")
 
-    # 模板 A：benchmark 基础镜像。
-    # 环境复现契约：依赖按 env-lock.txt 固化（第⑤步验证通过时的精确版本集），
-    # 工具链版本随 lock 走，杜绝「验证环境 ≠ 镜像环境」的漂移。
-    python_base = os.environ.get("PYTHON_BASE", "python:3.10-slim")
-    open(os.path.join(pkg, "Dockerfile.bench"), "w").write(
-        "ARG PYTHON_BASE=" + python_base + "\n"
-        "FROM ${PYTHON_BASE}\n"
+    # 模板：每题单元镜像（内容烧入，AGS 可启动——基座含 envd）
+    # 两层结构：benchmark-ds-base（共享固定层，digest 固定）+ 本题内容层。
+    # 构建即 COPY + 依赖固化（env-lock 环境复现契约）+ 仓库可编辑安装。
+    base_image = os.environ.get("BASE_IMAGE", "")
+    if not base_image:
+        raise RuntimeError("未配置 BASE_IMAGE（benchmark-ds-base 的 digest 引用）")
+    open(os.path.join(pkg, "Dockerfile.unit"), "w").write(
+        "ARG BASE_IMAGE=" + base_image + "\n"
+        "FROM ${BASE_IMAGE}\n"
         "COPY benchmark /benchmark\n"
-        "RUN apt-get update && apt-get install -y --no-install-recommends git jq \\\n"
-        " && rm -rf /var/lib/apt/lists/* \\\n"
-        " && pip3 install --no-cache-dir -r /benchmark/env-lock.txt \\\n"
+        "RUN pip3 install --no-cache-dir -r /benchmark/env-lock.txt \\\n"
         f" && pip3 install --no-cache-dir -e /benchmark/repos/{WORK_REPO.replace('/', '__')} \\\n"
         " && chmod +x /benchmark/harness/*.sh\n")
-    # 模板 B：AGS 变体（全局 ARG + 多阶段 FROM）
-    open(os.path.join(pkg, "Dockerfile.ags"), "w").write(
-        "ARG BENCH_IMAGE=" + bench_dst + "\n"
-        "FROM ccr.ccs.tencentyun.com/ags-image/sandbox-code:benchmark-20260625 AS agsbase\n"
-        "FROM ${BENCH_IMAGE}\n"
-        "COPY --from=agsbase /init /init\n"
-        "COPY --from=agsbase /package /package\n"
-        "COPY --from=agsbase /command /command\n"
-        "COPY --from=agsbase /etc/s6-overlay /etc/s6-overlay\n"
-        "COPY --from=agsbase /usr/bin/envd /usr/bin/envd\n"
-        "RUN chmod +x /init /usr/bin/envd /benchmark/harness/*.sh\n"
-        "ENTRYPOINT [\"/init\"]\n")
 
     # 凭据落盘 /root/.docker（kaniko 拉取阶段读取；勿放 /kaniko——社区版 kaniko
     # 把它用作自身快照工作区，且 /tmp 会被其构建过程清理，均不安全）
@@ -184,19 +171,6 @@ def build_images(manifest, repo_dir):
     # 由 crane 完成 auth login + push + digest 查询。
     sh(f"/opt/builder/crane/crane auth login {registry} "
        f"-u \"$TCR_PUSH_USER\" -p \"$TCR_PUSH_PASS\"", check=True)
-
-    # ★ 快照基线去污染（关键）：kaniko 在富容器内运行时，其快照基线=沙箱根文件系统；
-    # 沙箱预置的 git/jq 及其依赖库与模板 A 将要 apt 安装的同版本同路径文件在 RUN 后
-    # "无变化"，会被 diff 判定未修改而静默丢弃 → 产物镜像缺件（实测：二进制缺失、
-    # 依赖库 libjq.so.1 缺失两例）。对策：purge 主包 + autoremove 清依赖闭包。
-    # （此后 agent 不再需要 git/jq：F2P 验证已完成，后续仅 kaniko/crane/tar）
-    sh("apt-get purge -y git jq libjq1 libonig5 libcurl3t64-gnutls "
-       "liberror-perl patch git-man > /dev/null 2>&1; "
-       "apt-get autoremove --purge -y > /dev/null 2>&1; "
-       "rm -rf /usr/lib/git-core /usr/share/doc/git* /usr/share/doc/jq* "
-       "/usr/lib/x86_64-linux-gnu/libjq.so* /usr/lib/x86_64-linux-gnu/libonig.so*",
-       check=False)
-    print("[builder] 快照基线已净化（git/jq 及依赖闭包已从沙箱清除）")
 
     def build_and_push(dockerfile, tar_path, dst, build_args=()):
         cmd = ["/opt/builder/kaniko/executor", "--context", f"dir://{pkg}",
@@ -214,37 +188,20 @@ def build_images(manifest, repo_dir):
         os.remove(tar_path)   # 推送成功后清理（避免进入单元归档 tar）
         return d
 
-    d1 = build_and_push(os.path.join(pkg, "Dockerfile.bench"), "/output/bench.tar", bench_dst)
+    d1 = build_and_push(os.path.join(pkg, "Dockerfile.unit"), "/output/bench.tar", bench_dst)
 
-    # ★ 产物自检：harness 依赖（git/jq 二进制 + jq 依赖库）必须在镜像内
-    #   （防快照基线污染类静默漏件——依赖库也要查，实测 libjq.so.1 曾被丢弃）
+    # ★ 产物自检：题目内容必须在镜像内（防快照基线污染类静默漏件）
     sh(f"/opt/builder/crane/crane export {bench_dst} /tmp/fs.tar", timeout=600, check=True)
-    n = int(sh("tar -tf /tmp/fs.tar | grep -cE "
-               "'^usr/bin/(git|jq)$|^usr/lib/x86_64-linux-gnu/libjq\\.so'").stdout.strip() or 0)
+    safe = WORK_REPO.replace("/", "__")
+    n = int(sh(f"tar -tf /tmp/fs.tar | grep -cE "
+               f"'^benchmark/repos/{safe}/.*\\.py$|^benchmark/manifest\\.jsonl$'").stdout.strip() or 0)
     os.path.exists("/tmp/fs.tar") and os.remove("/tmp/fs.tar")
-    if n < 3:   # git + jq 二进制 + libjq.so ≥3 命中
-        raise RuntimeError(f"镜像自检失败：git/jq/libjq 命中 {n}/3（快照基线污染？）")
-    print(f"[builder] 镜像自检通过：git/jq/libjq 命中 {n}")
-
-    # 模板 B（AGS 变体）不走 kaniko——同沙箱内第二次 kaniko 会因基础镜像二次解包
-    # 叠加而中断（实测）。改用 crane 纯 registry 组合：
-    #   append：基础镜像 + 平台组件层（组件取自本沙箱根文件系统，与官方基座同源：
-    #           init/package/command/etc/s6-overlay/usr/bin/envd，权限随 tar 保留）
-    #   mutate ：设置 ENTRYPOINT ["/init"]（AGS 平台入口要求）
-    sh("tar -cf /output/ags-layer.tar -C / init package command "
-       "etc/s6-overlay usr/bin/envd", check=True)
-    sh(f"/opt/builder/crane/crane append -t {ags_dst} "
-       f"-f /output/ags-layer.tar -b {bench_dst}", timeout=1200, check=True)
-    sh(f"/opt/builder/crane/crane mutate {ags_dst} --entrypoint /init "
-       f"-t {ags_dst}", timeout=600, check=True)
-    d2 = sh(f"/opt/builder/crane/crane digest {ags_dst}").stdout.strip()
-    if not d2.startswith("sha256:"):
-        raise RuntimeError(f"crane digest 查询失败(ags): {d2[:120]}")
-    os.path.exists("/output/ags-layer.tar") and os.remove("/output/ags-layer.tar")
+    if n < 2:   # 仓库源码 + manifest ≥2 命中
+        raise RuntimeError(f"镜像自检失败：内容命中 {n}/2（快照基线污染？）")
+    print(f"[builder] 镜像自检通过：内容命中 {n}")
 
     manifest["image"], manifest["image_digest"] = bench_dst, d1
-    manifest["ags_image"], manifest["ags_image_digest"] = ags_dst, d2   # 向后兼容：只增字段
-    return manifest, {"bench": bench_dst + "@" + d1[:19], "ags": ags_dst + "@" + d2[:19]}
+    return manifest, {"bench": bench_dst + "@" + d1[:19]}
 
 
 def main():
@@ -472,18 +429,8 @@ def main():
             ("solution", f"solutions/{INSTANCE_ID}.md")]},
         "created_at": datetime.now().astimezone().isoformat(timespec="seconds"),
     }
-    # ⑧ 产物模式：DS_HARNESS_MODE=1 → 内容注入包（D1：题目沙箱共享基座 + 运行时注入）
-    #    产出 repo.tar.gz（与 harness 的 /benchmark/repos/<repo__name> 布局一致），
-    #    跳过 per-unit 镜像构建（bench-ds 共享载体，TCR 不随单元数增长）
-    images = {}
-    if os.environ.get("DS_HARNESS_MODE") == "1":
-        sh(f"tar -czf {OUT}/repo.tar.gz -C {WORKDIR} "
-           f"{WORK_REPO.replace('/', '__')}", timeout=600, check=True)
-        manifest["image"] = f"content-injection:{os.environ.get('BENCH_TOOL', 'bench-ds')}"
-        manifest["image_digest"] = "shared-carrier"
-        print("[builder] DS Harness 模式：已产出内容注入包（repo.tar.gz）")
-    else:
-        manifest, images = build_images(manifest, repo_dir)
+    # ⑧ 产物模式：每题单元镜像（内容烧入，AGS 可启动）——镜像构建推送 TCR + digest 回填
+    manifest, images = build_images(manifest, repo_dir)
 
     with open(f"{OUT}/manifest.jsonl", "w") as f:
         f.write(json.dumps(manifest, ensure_ascii=False) + "\n")

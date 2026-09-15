@@ -1,16 +1,16 @@
 #!/bin/bash
-# 示例：agent2 跨 AGS 批量验证（每个 validator 实例内部再拉起题目沙箱）
+# 示例：agent2 批量验证（v2 架构：CVM 中心化编排）
+#   CVM: tccli 创建每题临时工具 bench-u-* → E2B 实例 → Phase A(/B) → tccli 删除
+# 用法前确保 output/maker/dataset.jsonl 中单元含 image_digest（每题镜像模式产物）
 set -euo pipefail
 cd "$(dirname "$0")/.."
 set -a; source deploy/.env; set +a
 
-# bundles-dir = agent1 产物目录（含 <instance_id>/<instance_id>/{manifest.jsonl,
-# tests.patch, golden.patch, repo.tar.gz}）
-python3 src/drivers/validator_driver.py \
-    --bundles-dir output/maker/units \
-    --batch b001 --worker "$(hostname)-$$" \
-    --concurrency 8 --warm 3 \
-    --rounds 2
+python3 venv/bin/python src/drivers/validator_driver.py \
+    --units-file output/maker/dataset.jsonl \
+    --rounds 2 \
+    --phase-b \
+    --concurrency 3    # 并发临时工具 ≤8（配额 10 − 固定工具 1 − 余量）
 
-# 跨 AGS 拓扑（并发 8 时实际实例数 = 8 validator + 8 bench = 16，
-# 距配额边界 50 仍有余量；更高并发见 ARCHITECTURE.md §6 容量公式）
+# 吞吐约束（实测标定）：单题周期 ≈4-5min（建工具~25s+预热~60s+验证~2-3min+清理），
+# 8 并发槽 ≈ 90 题/小时。孤儿工具由驱动启动时自动清扫（bench-u-* 前缀回收）。

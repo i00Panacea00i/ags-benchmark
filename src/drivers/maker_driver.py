@@ -50,8 +50,8 @@ def unit_envs(repo, issue, tcr_user, tcr_pass):
           "TCR_REGISTRY": os.environ["TCR_REGISTRY"],
           "TCR_NAMESPACE": os.environ.get("TCR_NAMESPACE", "benchmark-repo"),
           "TCR_PUSH_USER": tcr_user, "TCR_PUSH_PASS": tcr_pass,
-          "DS_HARNESS_MODE": os.environ.get("DS_HARNESS_MODE", "1"),
-          "BENCH_TOOL": os.environ.get("BENCH_TOOL", "bench-ds")}
+          # 每题单元镜像的共享基座（digest 固定引用，防 tag 漂移）
+          "BASE_IMAGE": os.environ["BASE_IMAGE"]}
     for k in ("GITHUB_TOKEN", "OPENAI_BASE_URL", "OPENAI_API_KEY", "LLM_MODEL"):
         if os.environ.get(k):
             ev[k] = os.environ[k]          # LLM 就绪时启用 DeepSeek 改写链，否则模板降级
@@ -133,7 +133,7 @@ async def main():
     ap.add_argument("--dataset", default=None)
     args = ap.parse_args()
 
-    for k in ("E2B_DOMAIN", "E2B_API_KEY", "TCR_REGISTRY"):
+    for k in ("E2B_DOMAIN", "E2B_API_KEY", "TCR_REGISTRY", "BASE_IMAGE"):
         if not os.environ.get(k):
             sys.exit(f"缺少环境变量: {k}")
 

@@ -2,11 +2,27 @@
 
 | 项 | 值 |
 |---|---|
-| 日期 | 2026-09-15 |
-| 版本 | benchmark-dsharness **1.0.8**（三工具：bench-maker-ds / bench-validator-ds / bench-ds） |
+| 日期 | 2026-09-15（v2 架构修订） |
+| 版本 | benchmark-dsharness **1.1.0** + benchmark-ds-base 1.0.0（共享基座） |
+| v2 架构 | **CVM 中心化编排**：tccli 建删每题临时工具；agent1 每题镜像烧入 TCR；agent2 逻辑在 CVM |
 | 运行环境 | ubuntu:22.04 + Python 3.11 + Git + Docker CLI + 官方 envd（AGS 兼容层） |
-| LLM | TokenHub（国内站）→ deepseek-v4-flash，DeepSeek Harness 双协议（function-calling + 文本协议） |
-| 执行位置 | 全部于 ags-benchmark-architecture 仓库内（venv + src/drivers） |
+| LLM | TokenHub → deepseek-v4-flash（改写 85-100% 标识符保留；Phase B 文本协议解题） |
+
+---
+
+## 〇、v2 架构修订（应项目要求）
+
+| 修订 | 内容 | 动机 |
+|---|---|---|
+| 撤销内容注入 | agent1 直接制作每题完整镜像并上传 TCR（两层：共享基座+内容层） | 项目要求 |
+| 每题临时工具 | agent2 验证时为每题创建 `bench-u-*` 沙箱工具（含题目镜像），验证后删除 | 项目要求 |
+| 编排中心化 | 工具创建/销毁由 CVM 上的 tccli 执行，沙箱只与 CVM 通信（E2B 数据面） | 凭据零进入沙箱 |
+
+**v2 E2E 实证**：click#3145 全链（DeepSeek 改写 85% → 每题镜像构建推送 → CVM 建临时
+工具 → Phase A validated → Phase B solver 10 轮 → 工具删除，配额归还 1/10）。
+
+**v2 吞吐约束（实测标定，须汇报）**：工具配额 10/账号 → 固定 1 + 临时 ≤8 并发；
+单题周期 ≈4-5min → **≈90 题/小时上限**（v1 注入模式无此限）。孤儿工具清扫已内置。
 
 ---
 

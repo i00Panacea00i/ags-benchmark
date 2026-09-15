@@ -1,0 +1,33 @@
+# benchmark-ds-base：每题 benchmark 镜像的共享基座（一次构建，digest 固定引用）
+# 内容（领导要求运行环境）：ubuntu:22.04 + Python 3.11 + Git + Docker CLI
+# 叠加：harness 工具链（jq/pytest<9/pytest-json-report/常见测试依赖）+ envd（AGS 兼容）
+# 每题镜像 = FROM 本镜像 + COPY benchmark 内容层（见 maker_agent 的 Dockerfile.unit）
+FROM ubuntu:22.04
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        ca-certificates curl gnupg git jq unzip xz-utils \
+        software-properties-common \
+    && add-apt-repository -y ppa:deadsnakes/ppa \
+    && apt-get update && apt-get install -y --no-install-recommends \
+        python3.11 python3.11-venv python3.11-distutils \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
+        | gpg --dearmor -o /usr/share/keyrings/docker.gpg \
+    && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu jammy stable" \
+        > /etc/apt/sources.list.d/docker.list \
+    && apt-get update && apt-get install -y --no-install-recommends docker-ce-cli \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN ln -sf /usr/bin/python3.11 /usr/local/bin/python3 \
+    && ln -sf /usr/bin/python3.11 /usr/local/bin/python \
+    && curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11
+
+# 测试栈：pytest<9（9.x 对旧式测试构造收集报错，实测）+ 常见仓库测试依赖预装
+RUN pip3 install --no-cache-dir 'pytest<9' pytest-json-report \
+        pretend hypothesis flit_core
+
+# AGS 数据面守护进程 + E2B 约定 user 账户（裸 ubuntu 无，实测坑位 N1）
+COPY --from=ccr.ccs.tencentyun.com/ags-image/envd:v0.5.14 /usr/bin/envd /usr/bin/envd
+RUN chmod +x /usr/bin/envd && useradd -m -s /bin/bash user
