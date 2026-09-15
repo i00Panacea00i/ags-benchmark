@@ -38,7 +38,7 @@ def refresh_tcr_token():
     """TCR 实例令牌每批刷新（实测 ~1.5h 过期）。"""
     r = subprocess.run(["tccli", "tcr", "CreateInstanceToken", "--region",
                         os.environ.get("TCR_REGION", "ap-singapore"),
-                        "--RegistryId", os.environ.get("TCR_REGISTRY_ID", "tcr-lrkp9ac1")],
+                        "--RegistryId", os.environ.get("TCR_REGISTRY_ID", "tcr-xxxxxxxx")],
                        capture_output=True, text=True, timeout=60)
     d = json.loads(r.stdout[r.stdout.find("{"):])
     return d["Username"], d["Token"]
