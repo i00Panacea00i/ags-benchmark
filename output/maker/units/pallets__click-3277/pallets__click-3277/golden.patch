@@ -1,0 +1,28 @@
+--- a/CHANGES.rst
++++ b/CHANGES.rst
+@@ -5,6 +5,7 @@ Version 8.4.1
+ 
+ Unreleased
+ 
++-   Zsh completion scripts parse correctly on Windows. :issue:`3277`
+ 
+ 
+ Version 8.4.0
+--- a/src/click/shell_completion.py
++++ b/src/click/shell_completion.py
+@@ -43,12 +43,13 @@ def shell_complete(
+ 
+     comp = comp_cls(cli, ctx_args, prog_name, complete_var)
+ 
++    # Write bytes, otherwise Windows text stdout translates LF to CRLF and breaks.
+     if instruction == "source":
+-        echo(comp.source())
++        echo(comp.source().encode(), nl=False)
+         return 0
+ 
+     if instruction == "complete":
+-        echo(comp.complete())
++        echo(comp.complete().encode())
+         return 0
+ 
+     return 1

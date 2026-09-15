@@ -59,7 +59,11 @@ async def validate_unit(pool, claim, results, bundles_dir, instance_id, cfg):
         envs = {"E2B_API_KEY": os.environ["E2B_API_KEY"],
                 "E2B_DOMAIN": os.environ.get("E2B_DOMAIN", ""),
                 "BENCH_TOOL": cfg["bench_tool"],
-                "VERIFY_ROUNDS": str(cfg["rounds"])}
+                "VERIFY_ROUNDS": str(cfg["rounds"]),
+                "PHASE_B": os.environ.get("PHASE_B", "1")}
+        for k in ("OPENAI_BASE_URL", "OPENAI_API_KEY", "LLM_MODEL"):
+            if os.environ.get(k):
+                envs[k] = os.environ[k]    # Phase B 解题链凭据（命令级注入，不落盘）
         r = await run_remote(handle.sb, "python3 /opt/validator/validator_agent.py",
                              timeout=2400, envs=envs)
         m = VERDICT_RE.search((r.stdout or "") + (r.stderr or ""))

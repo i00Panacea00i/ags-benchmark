@@ -1,0 +1,31 @@
+--- a/CHANGES.rst
++++ b/CHANGES.rst
+@@ -59,6 +59,11 @@ Unreleased
+ -   :class:`~click.formatting.TextWrapper` and
+     :func:`~click.formatting.wrap_text` now measure line width in visible
+     characters, ignoring ANSI escape sequences. :pr:`3420`
++-   Fix :meth:`HelpFormatter.write_usage` emitting only a blank line when
++    called without ``args``. The usage prefix and program name are now
++    written even when no arguments follow, and the trailing separator
++    space is stripped so the line ends at the program name.
++    :issue:`3360` :pr:`3434`
+ -   Show custom error messages from types when :func:`prompt` with
+     ``hide_input=True`` fails validation, instead of always showing a
+     generic message. Built-in type messages mask the input value.
+--- a/src/click/formatting.py
++++ b/src/click/formatting.py
+@@ -164,6 +164,14 @@ def write_usage(self, prog: str, args: str = "", prefix: str | None = None) -> N
+         usage_prefix = f"{prefix:>{self.current_indent}}{prog} "
+         text_width = self.width - self.current_indent
+ 
++        if not args:
++            # Without args, the prefix's trailing space and the wrap_text
++            # call that would normally place args on the line are both
++            # unnecessary. Emit just the prefix line.
++            self.write(usage_prefix.rstrip(" "))
++            self.write("\n")
++            return
++
+         if text_width >= (term_len(usage_prefix) + 20):
+             # The arguments will fit to the right of the prefix.
+             indent = " " * term_len(usage_prefix)

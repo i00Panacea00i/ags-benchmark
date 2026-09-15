@@ -1,6 +1,7 @@
 __pycache__/
 *.pyc
-.env
-output/
-*.tar.gz
 venv/
+.env
+*.tar.gz
+unit.tar.gz
+env-lock.txt

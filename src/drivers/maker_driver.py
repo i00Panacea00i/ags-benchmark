@@ -49,9 +49,12 @@ def unit_envs(repo, issue, tcr_user, tcr_pass):
           "DOCKER_CONFIG": "/root/.docker",
           "TCR_REGISTRY": os.environ["TCR_REGISTRY"],
           "TCR_NAMESPACE": os.environ.get("TCR_NAMESPACE", "benchmark-repo"),
-          "TCR_PUSH_USER": tcr_user, "TCR_PUSH_PASS": tcr_pass}
-    if os.environ.get("GITHUB_TOKEN"):
-        ev["GITHUB_TOKEN"] = os.environ["GITHUB_TOKEN"]
+          "TCR_PUSH_USER": tcr_user, "TCR_PUSH_PASS": tcr_pass,
+          "DS_HARNESS_MODE": os.environ.get("DS_HARNESS_MODE", "1"),
+          "BENCH_TOOL": os.environ.get("BENCH_TOOL", "bench-ds")}
+    for k in ("GITHUB_TOKEN", "OPENAI_BASE_URL", "OPENAI_API_KEY", "LLM_MODEL"):
+        if os.environ.get(k):
+            ev[k] = os.environ[k]          # LLM 就绪时启用 DeepSeek 改写链，否则模板降级
     ip = subprocess.run(["dig", "+short", os.environ["TCR_REGISTRY"], "@8.8.8.8"],
                         capture_output=True, text=True).stdout.split()
     if ip:
@@ -153,7 +156,7 @@ async def main():
     tcr_user, tcr_pass = await asyncio.to_thread(refresh_tcr_token)
     concurrency = min(args.concurrency, 40)
     pool = SandboxPool(args.maker_tool, warm_size=min(args.warm, concurrency),
-                       max_concurrency=concurrency, instance_timeout=3600)
+                       max_concurrent=concurrency, instance_timeout=3600)
     await pool.start()
     try:
         outs = await asyncio.gather(*[
