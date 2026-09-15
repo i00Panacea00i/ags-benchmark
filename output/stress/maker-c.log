@@ -1,0 +1,12 @@
+[make] 8 个单元 | maker=bench-maker-ds | 并发 12
+[make/aio-libs/aiohttp#13348] agent: {"result": "error", "instance_id": "aio-libs__aiohttp-13348", "error": "RuntimeError: 命令失败(1): /tmp/build/venv/bin/python -m pip install --q
+[make/aio-libs/aiohttp#13580] agent: {"result": "error", "instance_id": "aio-libs__aiohttp-13580", "error": "RuntimeError: 命令失败(1): /tmp/build/venv/bin/python -m pip install --q
+[make/aio-libs/aiohttp#13499] agent: {"result": "error", "instance_id": "aio-libs__aiohttp-13499", "error": "RuntimeError: 命令失败(1): /tmp/build/venv/bin/python -m pip install --q
+[make/aio-libs/aiohttp#13432] agent: {"result": "error", "instance_id": "aio-libs__aiohttp-13432", "error": "RuntimeError: 命令失败(1): /tmp/build/venv/bin/python -m pip install --q
+[make/aio-libs/aiohttp#13329] agent: {"result": "error", "instance_id": "aio-libs__aiohttp-13329", "error": "RuntimeError: 命令失败(1): /tmp/build/venv/bin/python -m pip install --q
+[make/aio-libs/aiohttp#13274] agent: {"result": "error", "instance_id": "aio-libs__aiohttp-13274", "error": "RuntimeError: 命令失败(1): /tmp/build/venv/bin/python -m pip install --q
+[make/psf/requests#6643] agent: {"result": "success", "instance_id": "psf__requests-6643", "f2p": 1, "p2p": 0, "rewrite": "deepseek-harness(deepseek-v4-flash,标识符保留89%)", "i
+[make/psf/requests#6643] ✅ 入库: F2P 1 / P2P 0
+
+[make] 完成: {'crash': 1, 'success': 1, 'error': 6}
+[make] 池指标: {'created': 12, 'killed': 9, 'failures': 0, 'retries': 0, 'create_p50_s': 4.14, 'create_p90_s': 4.31, 'create_max_s': 4.85, 'acquire_wait_p50_ms': 0.0}

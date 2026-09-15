@@ -71,6 +71,7 @@ bash examples/run_validator_batch.sh       # agent2 批量验证（CVM 建删每
 - 架构设计：[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)（全文收录于下方「架构设计」章节）
 - 使用手册：[docs/USER_GUIDE.md](docs/USER_GUIDE.md)
 - 排查指南：[docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
+- 压测报告：[docs/STRESS_TEST_REPORT_20260915.md](docs/STRESS_TEST_REPORT_20260915.md)（12 并发实测：25 单元/114 秒，单单元 90 秒）
 
 ---
 

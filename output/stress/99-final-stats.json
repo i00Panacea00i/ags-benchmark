@@ -1,0 +1,38 @@
+{
+ "dataset_total": 21,
+ "v2_images": 17,
+ "v2_units": [
+  "Textualize__rich-3295",
+  "Textualize__rich-3517",
+  "Textualize__rich-3569",
+  "Textualize__rich-3881",
+  "pallets__click-2819",
+  "pallets__click-2832",
+  "pallets__click-2836",
+  "pallets__click-2897",
+  "pallets__click-2968",
+  "pallets__click-2983",
+  "pallets__click-3059",
+  "pallets__click-3071",
+  "pallets__click-3084",
+  "pallets__click-3105",
+  "pallets__click-3107",
+  "pallets__click-3145",
+  "psf__requests-6643"
+ ],
+ "f2p_total": 68,
+ "p2p_total": 278,
+ "discovery_round1": {
+  "scanned": 144,
+  "no_paired_pr": 73,
+  "structure": 41,
+  "size": 6,
+  "done": 244,
+  "elapsed_s": 372.6,
+  "picked": 24
+ },
+ "claims_states": {
+  "done": 38,
+  "failed": 8
+ }
+}

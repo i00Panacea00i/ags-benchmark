@@ -263,7 +263,7 @@ async def validate_unit(sem, rec, results, phase_b_on, rounds):
     image = rec.get("image")
     digest = rec.get("image_digest", "")
     if not image or not digest.startswith("sha256:"):
-        print(f"[{iid}] ⏭ 无镜像记录（旧模式产物），跳过")
+        print(f"[{time.strftime('%H:%M:%S')}] [{iid}] ⏭ 无镜像记录（旧模式产物），跳过")
         return "skipped"
     image_ref = f"{image}@{digest}"
     tool_name = TOOL_PREFIX + re.sub(r"[^a-z0-9-]", "-", iid.lower())[:40]
@@ -276,20 +276,20 @@ async def validate_unit(sem, rec, results, phase_b_on, rounds):
             # ① CVM: tccli 建工具 + 预热 + 等 ACTIVE
             create_unit_tool(image_ref, tool_name)
             wait_tool_active(tool_name)
-            print(f"[{iid}] 临时工具 {tool_name} ACTIVE")
+            print(f"[{time.strftime('%H:%M:%S')}] [{iid}] 临时工具 {tool_name} ACTIVE")
             # ② 实例（内容已烧入镜像）
             sb = Sandbox.create(template=tool_name, timeout=1800)
             # ③ Phase A
             verdict["phase_a"] = phase_a(sb, rec, rounds)
-            print(f"[{iid}] Phase A: {verdict['phase_a'].get('result')}")
+            print(f"[{time.strftime('%H:%M:%S')}] [{iid}] Phase A: {verdict['phase_a'].get('result')}")
             # ④ Phase B（可选）
             if phase_b_on and verdict["phase_a"]["result"] == "validated":
                 verdict["phase_b"] = phase_b(sb, rec)
-                print(f"[{iid}] Phase B: {verdict['phase_b'].get('result')} "
+                print(f"[{time.strftime('%H:%M:%S')}] [{iid}] Phase B: {verdict['phase_b'].get('result')} "
                       f"({verdict['phase_b'].get('f2p_passed')})")
         except Exception as e:
             verdict["error"] = f"{type(e).__name__}: {str(e)[:200]}"
-            print(f"[{iid}] ❌ {verdict['error']}")
+            print(f"[{time.strftime('%H:%M:%S')}] [{iid}] ❌ {verdict['error']}")
         finally:
             if sb is not None:
                 try:
@@ -297,7 +297,7 @@ async def validate_unit(sem, rec, results, phase_b_on, rounds):
                 except Exception:
                     pass
             ok = delete_unit_tool(tool_name)      # ⑤ CVM: tccli 删工具
-            print(f"[{iid}] 工具{'已删' if ok else '删除失败(留待清扫)'}")
+            print(f"[{time.strftime('%H:%M:%S')}] [{iid}] 工具{'已删' if ok else '删除失败(留待清扫)'}")
         results.append(verdict)
         return verdict.get("phase_a", {}).get("result", "error")
 
@@ -323,7 +323,7 @@ async def main():
         p = os.path.join("output/maker/units", r["instance_id"], r["instance_id"], "problem.md")
         if os.path.exists(p):
             r["_problem_md"] = p
-    print(f"[validate] {len(recs)} 个单元 | 并发 {args.concurrency} | "
+    print(f"[{time.strftime('%H:%M:%S')}] [validate] {len(recs)} 个单元 | 并发 {args.concurrency} | "
           f"Phase B {'开' if args.phase_b else '关'}")
 
     if not args.no_sweep:
@@ -347,7 +347,7 @@ async def main():
 
     outs = await asyncio.gather(*[_one(r) for r in recs])
     from collections import Counter
-    print(f"\n[validate] 完成: {dict(Counter(outs))}")
+    print(f"\n[{time.strftime('%H:%M:%S')}] [validate] 完成: {dict(Counter(outs))}")
 
 
 if __name__ == "__main__":

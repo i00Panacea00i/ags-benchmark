@@ -1,0 +1,43 @@
+[make] 25 个单元 | maker=bench-maker-ds | 并发 12
+[make/pallets/click#2865] agent: {"result": "filtered", "stage": "patch_too_large", "reason": "612 > 500 行", "instance_id": "pallets__click-2865"}
+[make/pallets/click#3700] agent: {"result": "filtered", "stage": "patch_too_large", "reason": "672 > 500 行", "instance_id": "pallets__click-3700"}
+[make/pallets/click#2869] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/0 用例）", "instance_id": "pallets__click-2869"}
+[make/marshmallow-code/marshmallow#2936] agent: {"result": "filtered", "stage": "harness_crash", "reason": "pytest 异常: {'__harness__': 'crash', '__stderr__': \"ImportError while loading co
+[make/marshmallow-code/marshmallow#2985] agent: {"result": "filtered", "stage": "harness_crash", "reason": "pytest 异常: {'__harness__': 'crash', '__stderr__': \"ImportError while loading co
+[make/marshmallow-code/marshmallow#2870] agent: {"result": "filtered", "stage": "harness_crash", "reason": "pytest 异常: {'__harness__': 'crash', '__stderr__': \"ImportError while loading co
+[make/pallets/click#2906] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 4/47 用例）", "instance_id": "pallets__click-2906"}
+[make/marshmallow-code/marshmallow#2868] agent: {"result": "filtered", "stage": "harness_crash", "reason": "pytest 异常: {'__harness__': 'crash', '__stderr__': \"ImportError while loading co
+[make/marshmallow-code/marshmallow#2249] agent: {"result": "filtered", "stage": "harness_crash", "reason": "pytest 异常: {'__harness__': 'crash', '__stderr__': \"ImportError while loading co
+[make/marshmallow-code/marshmallow#2270] agent: {"result": "filtered", "stage": "harness_crash", "reason": "pytest 异常: {'__harness__': 'crash', '__stderr__': \"ImportError while loading co
+[make/marshmallow-code/marshmallow#2900] agent: {"result": "filtered", "stage": "harness_crash", "reason": "pytest 异常: {'__harness__': 'crash', '__stderr__': \"ImportError while loading co
+[make/pallets/click#3084] agent: {"result": "success", "instance_id": "pallets__click-3084", "f2p": 2, "p2p": 20, "rewrite": "deepseek-harness(deepseek-v4-flash,标识符保留80%)", 
+[make/pallets/click#3084] ✅ 入库: F2P 2 / P2P 20
+[make/pallets/click#3071] agent: {"result": "success", "instance_id": "pallets__click-3071", "f2p": 1, "p2p": 5, "rewrite": "deepseek-harness(deepseek-v4-flash,标识符保留50%)", "
+[make/pallets/click#3071] ✅ 入库: F2P 1 / P2P 5
+[make/pallets/click#2897] agent: {"result": "success", "instance_id": "pallets__click-2897", "f2p": 5, "p2p": 20, "rewrite": "deepseek-harness(deepseek-v4-flash,标识符保留50%)", 
+[make/pallets/click#2897] ✅ 入库: F2P 5 / P2P 20
+[make/pallets/click#3059] agent: {"result": "success", "instance_id": "pallets__click-3059", "f2p": 2, "p2p": 20, "rewrite": "deepseek-harness(deepseek-v4-flash,标识符保留83%)", 
+[make/pallets/click#3059] ✅ 入库: F2P 2 / P2P 20
+[make/pallets/click#2968] agent: {"result": "success", "instance_id": "pallets__click-2968", "f2p": 6, "p2p": 20, "rewrite": "deepseek-harness(deepseek-v4-flash,标识符保留100%)",
+[make/pallets/click#2968] ✅ 入库: F2P 6 / P2P 20
+[make/pallets/click#3105] agent: {"result": "success", "instance_id": "pallets__click-3105", "f2p": 1, "p2p": 20, "rewrite": "deepseek-harness(deepseek-v4-flash,标识符保留100%)",
+[make/pallets/click#3105] ✅ 入库: F2P 1 / P2P 20
+[make/Textualize/rich#3881] agent: {"result": "success", "instance_id": "Textualize__rich-3881", "f2p": 1, "p2p": 7, "rewrite": "deepseek-harness(deepseek-v4-flash,标识符保留83%)",
+[make/Textualize/rich#3881] ✅ 入库: F2P 1 / P2P 7
+[make/Textualize/rich#3295] agent: {"result": "success", "instance_id": "Textualize__rich-3295", "f2p": 1, "p2p": 15, "rewrite": "deepseek-harness(deepseek-v4-flash,标识符保留88%)"
+[make/Textualize/rich#3295] ✅ 入库: F2P 1 / P2P 15
+[make/pallets/click#2832] agent: {"result": "success", "instance_id": "pallets__click-2832", "f2p": 3, "p2p": 20, "rewrite": "deepseek-harness(deepseek-v4-flash,标识符保留100%)",
+[make/Textualize/rich#3569] agent: {"result": "success", "instance_id": "Textualize__rich-3569", "f2p": 1, "p2p": 12, "rewrite": "deepseek-harness(deepseek-v4-flash,标识符保留86%)"
+[make/pallets/click#2832] ✅ 入库: F2P 3 / P2P 20
+[make/Textualize/rich#3569] ✅ 入库: F2P 1 / P2P 12
+[make/pallets/click#2983] agent: {"result": "success", "instance_id": "pallets__click-2983", "f2p": 17, "p2p": 20, "rewrite": "deepseek-harness(deepseek-v4-flash,标识符保留100%)"
+[make/pallets/click#2983] ✅ 入库: F2P 17 / P2P 20
+[make/pallets/click#3107] agent: {"result": "success", "instance_id": "pallets__click-3107", "f2p": 7, "p2p": 20, "rewrite": "deepseek-harness(deepseek-v4-flash,标识符保留88%)", 
+[make/pallets/click#3107] ✅ 入库: F2P 7 / P2P 20
+[make/pallets/click#2819] agent: {"result": "success", "instance_id": "pallets__click-2819", "f2p": 10, "p2p": 20, "rewrite": "deepseek-harness(deepseek-v4-flash,标识符保留80%)",
+[make/pallets/click#2819] ✅ 入库: F2P 10 / P2P 20
+[make/Textualize/rich#3517] agent: {"result": "success", "instance_id": "Textualize__rich-3517", "f2p": 1, "p2p": 19, "rewrite": "deepseek-harness(deepseek-v4-flash,标识符保留100%)
+[make/Textualize/rich#3517] ✅ 入库: F2P 1 / P2P 19
+
+[make] 完成: {'success': 14, 'filtered': 11}
+[make] 池指标: {'created': 26, 'killed': 26, 'failures': 0, 'retries': 0, 'create_p50_s': 4.25, 'create_p90_s': 4.37, 'create_max_s': 4.44, 'acquire_wait_p50_ms': 0.0}

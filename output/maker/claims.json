@@ -28,5 +28,205 @@
   "state": "done",
   "note": "validated-dataset",
   "ts": "2026-09-15T11:19:02+00:00"
+ },
+ "make/pallets/click#3107": {
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-15T12:15:31+00:00"
+ },
+ "make/pallets/click#3105": {
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-15T12:15:14+00:00"
+ },
+ "make/pallets/click#3084": {
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-15T12:15:08+00:00"
+ },
+ "make/pallets/click#2897": {
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-15T12:15:10+00:00"
+ },
+ "make/pallets/click#3071": {
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-15T12:15:08+00:00"
+ },
+ "make/pallets/click#2869": {
+  "state": "done",
+  "note": "filtered@untestable",
+  "ts": "2026-09-15T12:14:33+00:00"
+ },
+ "make/pallets/click#3059": {
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-15T12:15:11+00:00"
+ },
+ "make/pallets/click#2983": {
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-15T12:15:30+00:00"
+ },
+ "make/pallets/click#2906": {
+  "state": "done",
+  "note": "filtered@untestable",
+  "ts": "2026-09-15T12:14:36+00:00"
+ },
+ "make/pallets/click#2819": {
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-15T12:15:32+00:00"
+ },
+ "make/pallets/click#2832": {
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-15T12:15:26+00:00"
+ },
+ "make/pallets/click#2968": {
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-15T12:15:12+00:00"
+ },
+ "make/marshmallow-code/marshmallow#2985": {
+  "state": "done",
+  "note": "filtered@harness_crash",
+  "ts": "2026-09-15T12:14:35+00:00"
+ },
+ "make/marshmallow-code/marshmallow#2900": {
+  "state": "done",
+  "note": "filtered@harness_crash",
+  "ts": "2026-09-15T12:14:40+00:00"
+ },
+ "make/marshmallow-code/marshmallow#2936": {
+  "state": "done",
+  "note": "filtered@harness_crash",
+  "ts": "2026-09-15T12:14:35+00:00"
+ },
+ "make/marshmallow-code/marshmallow#2868": {
+  "state": "done",
+  "note": "filtered@harness_crash",
+  "ts": "2026-09-15T12:14:36+00:00"
+ },
+ "make/marshmallow-code/marshmallow#2870": {
+  "state": "done",
+  "note": "filtered@harness_crash",
+  "ts": "2026-09-15T12:14:35+00:00"
+ },
+ "make/python-attrs/attrs#1575": {
+  "state": "failed",
+  "note": "压测崩溃恢复重置",
+  "ts": "2026-09-15T11:55:10+00:00"
+ },
+ "make/pallets/click#2836": {
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-15T11:56:13+00:00"
+ },
+ "make/pallets/click#2860": {
+  "state": "done",
+  "note": "filtered@no_code_change",
+  "ts": "2026-09-15T11:55:14+00:00"
+ },
+ "make/python-attrs/attrs#1479": {
+  "state": "done",
+  "note": "filtered@harness_crash",
+  "ts": "2026-09-15T11:55:30+00:00"
+ },
+ "make/python-attrs/attrs#1427": {
+  "state": "done",
+  "note": "filtered@harness_crash",
+  "ts": "2026-09-15T11:55:25+00:00"
+ },
+ "make/python-attrs/attrs#1416": {
+  "state": "done",
+  "note": "filtered@harness_crash",
+  "ts": "2026-09-15T11:55:29+00:00"
+ },
+ "make/python-attrs/attrs#1400": {
+  "state": "done",
+  "note": "filtered@harness_crash",
+  "ts": "2026-09-15T11:55:29+00:00"
+ },
+ "make/Textualize/rich#3881": {
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-15T12:15:22+00:00"
+ },
+ "make/pallets/click#2865": {
+  "state": "done",
+  "note": "filtered@patch_too_large",
+  "ts": "2026-09-15T12:14:25+00:00"
+ },
+ "make/marshmallow-code/marshmallow#2249": {
+  "state": "done",
+  "note": "filtered@harness_crash",
+  "ts": "2026-09-15T12:14:39+00:00"
+ },
+ "make/pallets/click#3700": {
+  "state": "done",
+  "note": "filtered@patch_too_large",
+  "ts": "2026-09-15T12:14:29+00:00"
+ },
+ "make/Textualize/rich#3569": {
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-15T12:15:26+00:00"
+ },
+ "make/Textualize/rich#3517": {
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-15T12:15:39+00:00"
+ },
+ "make/Textualize/rich#3295": {
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-15T12:15:24+00:00"
+ },
+ "make/marshmallow-code/marshmallow#2270": {
+  "state": "done",
+  "note": "filtered@harness_crash",
+  "ts": "2026-09-15T12:14:40+00:00"
+ },
+ "make/psf/requests#7432": {
+  "state": "failed",
+  "note": "Error reading content: The sandbox was killed or reached its end of life while the request was in flight.",
+  "ts": "2026-09-15T12:37:21+00:00"
+ },
+ "make/aio-libs/aiohttp#13580": {
+  "state": "failed",
+  "note": "RuntimeError: 命令失败(1): /tmp/build/venv/bin/python -m pip install --quiet -e /tmp/build/aio-libs__aiohttp 'pytest<9' pytest-json-report\n  error: subprocess-exited-with-error\n  \n  × Getting requirements",
+  "ts": "2026-09-15T12:27:49+00:00"
+ },
+ "make/psf/requests#6643": {
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-15T12:28:43+00:00"
+ },
+ "make/aio-libs/aiohttp#13348": {
+  "state": "failed",
+  "note": "RuntimeError: 命令失败(1): /tmp/build/venv/bin/python -m pip install --quiet -e /tmp/build/aio-libs__aiohttp 'pytest<9' pytest-json-report\n  error: subprocess-exited-with-error\n  \n  × Getting requirements",
+  "ts": "2026-09-15T12:27:49+00:00"
+ },
+ "make/aio-libs/aiohttp#13499": {
+  "state": "failed",
+  "note": "RuntimeError: 命令失败(1): /tmp/build/venv/bin/python -m pip install --quiet -e /tmp/build/aio-libs__aiohttp 'pytest<9' pytest-json-report\n  error: subprocess-exited-with-error\n  \n  × Getting requirements",
+  "ts": "2026-09-15T12:27:50+00:00"
+ },
+ "make/aio-libs/aiohttp#13329": {
+  "state": "failed",
+  "note": "RuntimeError: 命令失败(1): /tmp/build/venv/bin/python -m pip install --quiet -e /tmp/build/aio-libs__aiohttp 'pytest<9' pytest-json-report\n  error: subprocess-exited-with-error\n  \n  × Getting requirements",
+  "ts": "2026-09-15T12:27:53+00:00"
+ },
+ "make/aio-libs/aiohttp#13432": {
+  "state": "failed",
+  "note": "RuntimeError: 命令失败(1): /tmp/build/venv/bin/python -m pip install --quiet -e /tmp/build/aio-libs__aiohttp 'pytest<9' pytest-json-report\n  error: subprocess-exited-with-error\n  \n  × Getting requirements",
+  "ts": "2026-09-15T12:27:53+00:00"
+ },
+ "make/aio-libs/aiohttp#13274": {
+  "state": "failed",
+  "note": "RuntimeError: 命令失败(1): /tmp/build/venv/bin/python -m pip install --quiet -e /tmp/build/aio-libs__aiohttp 'pytest<9' pytest-json-report\n  error: subprocess-exited-with-error\n  \n  × Getting requirements",
+  "ts": "2026-09-15T12:27:56+00:00"
  }
 }

@@ -1,0 +1,26 @@
+[
+ {
+  "repo": "psf/requests",
+  "issue": 7432
+ },
+ {
+  "repo": "pypa/packaging",
+  "issue": 1087,
+  "pr": 1092
+ },
+ {
+  "repo": "pypa/packaging",
+  "issue": 781,
+  "pr": 1346
+ },
+ {
+  "repo": "pallets/click",
+  "issue": 3700,
+  "pr": 3704
+ },
+ {
+  "repo": "pallets/click",
+  "issue": 2865,
+  "pr": 3391
+ }
+]

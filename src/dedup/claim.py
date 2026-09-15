@@ -23,12 +23,24 @@ STALE_S = 3 * 3600      # 陈旧 in-flight 回收阈值（> 单元最长处理�
 class FlockClaimStore:
     def __init__(self, path):
         os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
-        if not os.path.isfile(path):
+        if not os.path.isfile(path) or os.path.getsize(path) == 0:
             open(path, "w").write("{}")
         self.path = path
 
     def _now(self):
         return datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+    @staticmethod
+    def _load_json(f):
+        """容错读取：空文件/损坏 JSON 视作空表（防崩溃残留截断态毒化后续全部运行）。"""
+        f.seek(0)
+        raw = f.read().strip()
+        if not raw:
+            return {}
+        try:
+            return json.loads(raw)
+        except ValueError:
+            return {}
 
     def _load(self):
         return json.load(open(self.path))
@@ -37,7 +49,7 @@ class FlockClaimStore:
         with open(self.path, "r+", encoding="utf-8") as f:
             fcntl.flock(f.fileno(), fcntl.LOCK_EX)
             try:
-                data = json.load(f)
+                data = self._load_json(f)
                 rec = data.get(key)
                 if rec and rec.get("state") in ("in-flight", "done"):
                     if rec["state"] == "in-flight":
@@ -54,6 +66,8 @@ class FlockClaimStore:
                              "meta": meta or {}}
                 f.seek(0), f.truncate()
                 f.write(json.dumps(data, ensure_ascii=False, indent=1))
+                f.flush()   # ★ 必须在解锁前落盘：否则并发读者在 unlock→close(flush)
+                            #   间隙读到 truncate 后的空文件 → json 崩溃（压测实测）
                 return True, data[key]
             finally:
                 fcntl.flock(f.fileno(), fcntl.LOCK_UN)
@@ -62,10 +76,11 @@ class FlockClaimStore:
         with open(self.path, "r+", encoding="utf-8") as f:
             fcntl.flock(f.fileno(), fcntl.LOCK_EX)
             try:
-                data = json.load(f)
+                data = self._load_json(f)
                 data[key] = {"state": state, "note": note, "ts": self._now()}
                 f.seek(0), f.truncate()
                 f.write(json.dumps(data, ensure_ascii=False, indent=1))
+                f.flush()   # 同上：解锁前落盘，杜绝并发空读
             finally:
                 fcntl.flock(f.fileno(), fcntl.LOCK_UN)
 
