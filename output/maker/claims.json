@@ -228,5 +228,25 @@
   "state": "failed",
   "note": "RuntimeError: 命令失败(1): /tmp/build/venv/bin/python -m pip install --quiet -e /tmp/build/aio-libs__aiohttp 'pytest<9' pytest-json-report\n  error: subprocess-exited-with-error\n  \n  × Getting requirements",
   "ts": "2026-09-15T12:27:56+00:00"
+ },
+ "make/Textualize/rich#3176": {
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-16T09:23:01+00:00"
+ },
+ "make/pypa/packaging#733": {
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-16T09:23:03+00:00"
+ },
+ "make/pytest-dev/pytest#14953": {
+  "state": "failed",
+  "note": "RuntimeError: 命令失败(1): /tmp/build/venv/bin/python -m pip install --quiet -e /tmp/build/pytest-dev__pytest 'pytest<9' pytest-json-report\nERROR: Cannot install pytest 9.2.0.dev279+geadb5a625 (from edita",
+  "ts": "2026-09-16T09:19:26+00:00"
+ },
+ "make/pypa/packaging#727": {
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-16T09:22:52+00:00"
  }
 }

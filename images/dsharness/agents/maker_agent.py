@@ -121,7 +121,10 @@ def build_images(manifest, repo_dir):
         return manifest, None
     ns = os.environ.get("TCR_NAMESPACE", "benchmark-repo")
     repo_short = WORK_REPO.split("/")[-1].replace(".", "-")
-    tag = f"{datetime.now():%Y%m%d-%H%M}"
+    # ★ tag 唯一化（回归修复）：秒级时间 + 题号后缀——分钟级 tag 在同仓库并发
+    #   制作时会碰撞，后推覆盖先推 → 先完成单元的 tag↔digest 失配 → 其验证
+    #   工具创建稳定 FAILED（实测 packaging#727/#733 同分钟碰撞）
+    tag = f"{datetime.now():%Y%m%d-%H%M%S}-{WORK_ISSUE}"
     bench_dst = f"{registry}/{ns}/benchmark-{repo_short}:{tag}"
 
     # TCR 公网端点强制（沙箱 DNS 解析到 VPC 内网 IP，不可达）
@@ -406,8 +409,9 @@ def main():
             print(f"[builder][WARN] LLM 改写失败，模板降级: {e}")
 
     # ⑦ 产物落盘（目录布局对齐 DATA_CONTRACT §2）
-    os.makedirs(f"{OUT}/problems"), os.makedirs(f"{OUT}/answers")
-    os.makedirs(f"{OUT}/solutions"), os.makedirs(f"{OUT}/tests/{INSTANCE_ID}")
+    # exist_ok：⑥ LLM 证据段可能已预建 problems 目录（回归修复）
+    os.makedirs(f"{OUT}/problems", exist_ok=True), os.makedirs(f"{OUT}/answers", exist_ok=True)
+    os.makedirs(f"{OUT}/solutions", exist_ok=True), os.makedirs(f"{OUT}/tests/{INSTANCE_ID}", exist_ok=True)
     open(f"{OUT}/problems/{INSTANCE_ID}.md", "w").write(problem)
     open(f"{OUT}/answers/{INSTANCE_ID}.patch", "w").write(golden_patch)
     open(f"{OUT}/tests/{INSTANCE_ID}/tests.patch", "w").write(test_patch)

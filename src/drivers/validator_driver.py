@@ -314,8 +314,20 @@ async def validate_unit(sem, rec, results, agent_on, rounds):
         verdict = {"instance_id": iid}
         try:
             # ① CVM: tccli 建工具 + 预热 + 等 ACTIVE；拉起 bench 实例（题目烧入）
-            create_unit_tool(image_ref, tool_name)
-            wait_tool_active(tool_name)
+            #    偶发 FAILED（实测：同镜像本地冒烟正常仍 FAILED，平台侧调度异常）
+            #    → 换名重试一次（v2 命名与原工具名不冲突，配额占用相同）
+            import random
+            for attempt, tn in enumerate([tool_name,
+                                          f"{tool_name}-r{random.randint(10, 99)}"]):
+                try:
+                    create_unit_tool(image_ref, tn)
+                    wait_tool_active(tn)
+                    tool_name = tn
+                    break
+                except RuntimeError:
+                    delete_unit_tool(tn)
+                    if attempt == 1:
+                        raise
             sb = Sandbox.create(template=tool_name, timeout=3600)
             print(f"[{time.strftime('%H:%M:%S')}] [{iid}] bench 实例就绪")
 

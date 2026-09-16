@@ -1,0 +1,12 @@
+{
+ "purpose": "题面改写（防模型背答案）",
+ "model": "deepseek-v4-flash",
+ "base_url": "https://tokenhub.tencentmaas.com/v1",
+ "identifier_keep_ratio": 0.8333,
+ "orig_sha256": "16745c3ce1761593",
+ "rewritten_sha256": "f9b2f9a3fae39c1d",
+ "evidence_files": [
+  "problems/pypa__packaging-727.orig.md",
+  "problems/pypa__packaging-727.md"
+ ]
+}

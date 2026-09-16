@@ -1,0 +1,53 @@
+--- a/tests/test_metadata.py
++++ b/tests/test_metadata.py
+@@ -378,12 +378,6 @@ def test_metadata_version_field_introduction_mismatch(self, meta_version):
+         with pytest.raises(ExceptionGroup):
+             metadata.Metadata.from_raw(raw, validate=True)
+ 
+-    @pytest.mark.parametrize("field", metadata._DICT_FIELDS)
+-    def test_dict_default(self, field):
+-        empty_meta = metadata.Metadata.from_raw({}, validate=False)
+-
+-        assert getattr(empty_meta, field) == {}
+-
+     @pytest.mark.parametrize(
+         "attribute",
+         [
+@@ -403,10 +397,6 @@ def test_single_value_unvalidated_attribute(self, attribute):
+ 
+         assert getattr(meta, attribute) == value
+ 
+-        empty_meta = metadata.Metadata.from_raw({}, validate=False)
+-
+-        assert getattr(empty_meta, attribute) == ""
+-
+     @pytest.mark.parametrize(
+         "attribute",
+         [
+@@ -426,14 +416,6 @@ def test_multi_value_unvalidated_attribute(self, attribute):
+ 
+         assert getattr(meta, attribute) == values
+ 
+-        empty_meta = metadata.Metadata.from_raw({}, validate=False)
+-        assert getattr(empty_meta, attribute) == []
+-
+-    def test_mapping_default_attribute(self):
+-        empty_meta = metadata.Metadata.from_raw({}, validate=False)
+-
+-        assert empty_meta.project_urls == {}
+-
+     @pytest.mark.parametrize("version", ["1.0", "1.1", "1.2", "2.1", "2.2", "2.3"])
+     def test_valid_metadata_version(self, version):
+         meta = metadata.Metadata.from_raw({"metadata_version": version}, validate=False)
+@@ -628,3 +610,11 @@ def test_disallowed_dynamic(self, field_name):
+ 
+         with pytest.raises(metadata.InvalidMetadata):
+             meta.dynamic
++
++    @pytest.mark.parametrize(
++        "field_name",
++        sorted(metadata._RAW_TO_EMAIL_MAPPING.keys() - metadata._REQUIRED_ATTRS),
++    )
++    def test_optional_defaults_to_none(self, field_name):
++        meta = metadata.Metadata.from_raw({}, validate=False)
++        assert getattr(meta, field_name) is None

@@ -18,9 +18,12 @@ import urllib.request
 TOK = os.environ["GITHUB_TOKEN"]
 TARGET = int(sys.argv[1]) if len(sys.argv) > 1 else 24
 
-REPOS = ["pallets/click", "pypa/packaging", "marshmallow-code/marshmallow",
-         "python-attrs/attrs", "pallets/werkzeug", "pallets/jinja", "tqdm/tqdm"]
-DONE = set()   # 从数据集与历史扫描载入
+REPOS = ["pallets/click", "Textualize/rich", "psf/requests", "pypa/packaging",
+         "pytest-dev/pytest"]
+SINCE = "2023-10-01"   # Python 3.12 GA（兼容窗口下界）
+# 注：marshmallow/attrs（测试环境 ImportError）、aiohttp（C 扩展构建失败）、
+# werkzeug/jinja/tqdm（closing keywords 文化缺失，实测 0 配对）已移出池
+DONE = set()   # 从 claims 全终局 + 数据集 + 历史扫描载入
 
 
 def gh(path):
@@ -42,6 +45,16 @@ def search(q, n=100):
 
 
 def load_done():
+    # ① claims.json 全终局（关键：含被漏斗过滤的单元——done(filtered) 与 failed
+    #    都算"已处理"，否则重复发现 → L1 拦截 → 批次空转，实测 bug）
+    try:
+        for key, rec in json.load(open("output/maker/claims.json")).items():
+            if key.startswith("make/") and "#" in key:
+                repo, issue = key[5:].rsplit("#", 1)
+                DONE.add(f"{repo.replace('/', '__')}-{issue}")
+    except FileNotFoundError:
+        pass
+    # ② 数据集（成功入库的 instance_id）
     try:
         for l in open("output/maker/dataset.jsonl"):
             if l.strip():
@@ -49,10 +62,13 @@ def load_done():
                 DONE.add(r["instance_id"])
     except FileNotFoundError:
         pass
-    # 历史已扫描/已制作号段（click / packaging 等）
+    # 历史已扫描/已制作号段（跨会话保险：含其他仓库/旧仓库时代的制作记录）
     for repo, nums in {
-        "pallets__click": [3572, 3822, 2582, 3740, 3571, 3145, 3360, 3277, 3298, 3242, 3237, 3449],
-        "pypa__packaging": [1204, 1333, 1067, 1315, 1318, 1178, 1162, 1154, 1066, 945, 909, 885, 859, 831],
+        "pallets__click": [3572, 3822, 2582, 3740, 3571, 3145, 3360, 3277, 3298, 3242, 3237, 3449,
+                           2865, 3700],
+        "pypa__packaging": [1204, 1333, 1067, 1315, 1318, 1178, 1162, 1154, 1066, 945, 909, 885, 859, 831, 1087, 781],
+        "Textualize__rich": [3881, 3569, 3517, 3295],
+        "psf__requests": [6643, 7432],
     }.items():
         for n in nums:
             DONE.add(f"{repo}-{n}")
@@ -99,7 +115,7 @@ def main():
             print(f"[{repo}] search err: {str(e)[:60]}")
             continue
         pool = [it for it in items
-                if it["created_at"] >= "2024-06-01"
+                if it["created_at"] >= SINCE
                 and f"{repo.replace('/', '__')}-{it['number']}" not in DONE]
         stats["done"] += len(items) - len(pool)
         print(f"[{repo}] 池 {len(items)}，时间窗内未做 {len(pool)}")
