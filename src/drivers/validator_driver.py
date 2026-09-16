@@ -239,6 +239,21 @@ def phase_agent(agent_sb, bench_sb, rec):
     m = re.findall(r"RESULT (\{.*\})", out)
     solver = json.loads(m[-1]) if m else {"result": "error", "error": out[-300:]}
 
+    # ★ LLM 使用证据收集：完整对话轨迹落盘（agent 沙箱 → CVM 审计档案）
+    tr = sh_sbx(agent_sb, "base64 -w0 /output/transcript.json 2>/dev/null", timeout=120)
+    if (tr.stdout or "").strip():
+        try:
+            import base64 as _b64
+            transcript = json.loads(_b64.b64decode((tr.stdout or "").strip()))
+            os.makedirs("output/validate-transcripts", exist_ok=True)
+            with open(f"output/validate-transcripts/{iid}.json", "w") as f:
+                json.dump(transcript, f, ensure_ascii=False, indent=1)
+            solver["llm_evidence"] = (f"model={transcript.get('model')} "
+                                     f"turns={transcript.get('turns')} "
+                                     f"transcript_bytes={len((tr.stdout or ''))}")
+        except Exception as e:
+            solver["llm_evidence"] = f"collect_failed: {str(e)[:80]}"
+
     f2p_map, all_ok = run_tests(bench_sb, iid, "")     # pass@1 裸判定
     passed = sum(1 for v in f2p_map.values() if v == "passed")
     total = len(rec["FAIL_TO_PASS"])

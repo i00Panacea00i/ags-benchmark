@@ -145,6 +145,21 @@ def main():
                      max_turns=int(os.environ.get("MAX_TURNS", "20")))
 
     changed = bsh(f"cd {REPO} && git diff --name-only 2>/dev/null").strip()
+
+    # ★ LLM 使用证据留痕：完整对话轨迹（每轮 LLM 输出 + 工具调用 + 执行结果）
+    #   + 模型名 + 最终答复全文，供审计与回归分析（由 CVM 收集落盘）
+    try:
+        os.makedirs("/output", exist_ok=True)
+        with open("/output/transcript.json", "w") as f:
+            json.dump({
+                "instance_id": IID, "model": h.model,
+                "base_url": os.environ.get("OPENAI_BASE_URL", ""),
+                "turns": out["turns"], "final_answer": out.get("answer") or "",
+                "transcript": out.get("transcript", []),
+            }, f, ensure_ascii=False, indent=1)
+    except Exception:
+        pass
+
     print("RESULT " + json.dumps({
         "result": "done", "turns": out["turns"], "status": out["status"],
         "files_changed": changed.splitlines()[:20],

@@ -389,6 +389,19 @@ def main():
                 h, issue["title"], body, WORK_REPO, touched, f2p)
             rewrite_method = f"deepseek-harness({h.model},标识符保留{keep_ratio:.0%})"
             print(f"[builder] DeepSeek Harness 改写完成: {rewrite_method}")
+            # ★ LLM 使用证据留痕：原始/改写题面双留存 + 结构化调用档案
+            import hashlib
+            os.makedirs(f"{OUT}/problems", exist_ok=True)
+            open(f"{OUT}/problems/{INSTANCE_ID}.orig.md", "w").write(
+                f"# {issue['title']}\n\n{body}")
+            json.dump({
+                "purpose": "题面改写（防模型背答案）", "model": h.model,
+                "base_url": llm_base, "identifier_keep_ratio": round(keep_ratio, 4),
+                "orig_sha256": hashlib.sha256(body.encode()).hexdigest()[:16],
+                "rewritten_sha256": hashlib.sha256(problem.encode()).hexdigest()[:16],
+                "evidence_files": [f"problems/{INSTANCE_ID}.orig.md",
+                                   f"problems/{INSTANCE_ID}.md"],
+            }, open(f"{OUT}/llm-evidence.json", "w"), ensure_ascii=False, indent=1)
         except Exception as e:
             print(f"[builder][WARN] LLM 改写失败，模板降级: {e}")
 
