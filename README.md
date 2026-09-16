@@ -155,6 +155,7 @@ F2P 双向验证 ×2 轮 + 跨轮稳定性筛选（防 flaky 误入库）→ Dee
 
 ## 文档
 
+- **AGS 调用教学文档：[docs/AGENT_RUNTIME_GUIDE.md](docs/AGENT_RUNTIME_GUIDE.md)**（tccli 控制面 + E2B 数据面，含 17 条实测坑位速查表）
 - **压测报告：[docs/STRESS_TEST_REPORT_20260915.md](docs/STRESS_TEST_REPORT_20260915.md)**
 - 架构设计详档：[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - 零基础入门：[docs/BEGINNER_GUIDE.md](docs/BEGINNER_GUIDE.md)
