@@ -344,6 +344,8 @@ delete_unit_tool("my-tool")             # 内部：失败时先 kill_all_instanc
 | 18 | 沙箱互访用开源 URL 格式 `<id>-49983.<domain>` | invalid host format | AGS 格式是 **`49983-<id>.<domain>`**（端口在前） |
 | 19 | sit_ Token 当 SDK api_key 传 connect | 401 Invalid API key（connect 端点只认账号级 e2b key） | Token 放 `X-Access-Token` 头，经 monkey-patch 拦截器注入 |
 | 20 | 跨沙箱用 files API 读写 | `/files` 独立端点不吃拦截器头 → 401 | 命令封装：`base64 -d` 写 / `base64 -w0` 读 |
+| 21 | **批量拉实例不预热**（把 CreateSandboxTool 当慢） | 工具注册其实仅 ~0.4-2s；真瓶颈是 Sandbox.create 阶段 N 实例并发拉新内容层抢节点带宽（实测 61-219s/个） | **批次级预热前置**：先 CreatePreCacheImageTask 全部镜像 + DescribePreCacheImageTask 轮询 Success，再建工具拉实例（实测 29min → 3.4min，8.6x） |
+| 22 | 探针周期用默认 3000ms | 就绪检测多等 ~2.5s/工具 | `ProbePeriodMs/ProbeTimeoutMs` 调 1000（下限 100，ReadyTimeoutMs 上限 30000） |
 
 ---
 

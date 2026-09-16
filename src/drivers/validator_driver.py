@@ -57,7 +57,12 @@ def list_tools():
 
 
 def create_unit_tool(image_ref, tool_name):
-    """创建每题临时工具（SANDBOX 隔离网络；镜像=题目镜像；envd 启动）。"""
+    """创建每题临时工具（SANDBOX 隔离网络；镜像=题目镜像；envd 启动）。
+
+    耗时实测（2026-09-16 对照实验）：工具注册仅 ~0.4-2s（元数据操作），
+    真正的镜像拉取发生在 Sandbox.create 实例阶段——并发批量拉取会共享
+    节点带宽（实测 61-219s/个）→ 预热必须前置到批次级（见 preheat_batch）。
+    """
     r = tccli("CreateSandboxTool", "--cli-unfold-argument",
               "--ToolName", tool_name, "--ToolType", "custom",
               "--NetworkConfiguration.NetworkMode", "SANDBOX",
@@ -71,8 +76,8 @@ def create_unit_tool(image_ref, tool_name):
               "--CustomConfiguration.Probe.HttpGet.Port", "49983",
               "--CustomConfiguration.Probe.HttpGet.Scheme", "HTTP",
               "--CustomConfiguration.Probe.ReadyTimeoutMs", "30000",
-              "--CustomConfiguration.Probe.ProbeTimeoutMs", "3000",
-              "--CustomConfiguration.Probe.ProbePeriodMs", "3000",
+              "--CustomConfiguration.Probe.ProbeTimeoutMs", "1000",
+              "--CustomConfiguration.Probe.ProbePeriodMs", "1000",
               "--CustomConfiguration.Probe.SuccessThreshold", "1",
               "--CustomConfiguration.Probe.FailureThreshold", "100",
               "--CustomConfiguration.Resources.CPU", "1",
@@ -82,10 +87,43 @@ def create_unit_tool(image_ref, tool_name):
               "--Description", "ephemeral per-unit bench tool")
     if r.returncode != 0:
         raise RuntimeError(f"工具创建失败: {r.stderr[-200:]}")
-    # 预热（内容层小，但基座层预热可大幅缩短实例冷启动）
-    tccli("CreatePreCacheImageTask", "--cli-unfold-argument",
-          "--Image", image_ref.split("@")[0], "--ImageRegistryType", "enterprise")
     return tool_name
+
+
+def preheat_batch(recs, timeout_s=900):
+    """批次级镜像预热（加速关键路径）。
+
+    在任何工具/实例创建前，把全部题目镜像经 CreatePreCacheImageTask 分发到
+    节点池并等待 Success——避免 Sandbox.create 阶段 N 个实例并发拉取新内容层
+    互相抢占带宽（实测瓶颈 61-219s/个即源于此；工具注册本身仅 ~0.4s）。
+    """
+    imgs = {(r["image"], r["image_digest"]) for r in recs
+            if r.get("image") and r.get("image_digest", "").startswith("sha256:")}
+    t0 = time.time()
+    for image, digest in imgs:
+        tccli("CreatePreCacheImageTask", "--cli-unfold-argument",
+              "--Image", image, "--ImageDigest", digest,
+              "--ImageRegistryType", "enterprise")
+    pending = set(imgs)
+    while pending and time.time() - t0 < timeout_s:
+        still = set()
+        for image, digest in pending:
+            r = tccli("DescribePreCacheImageTask", "--cli-unfold-argument",
+                      "--Image", image, "--ImageDigest", digest,
+                      "--ImageRegistryType", "enterprise")
+            try:
+                d = json.loads(r.stdout[r.stdout.find("{"):])
+                if d.get("Status") != "Success":
+                    still.add((image, digest))
+            except Exception:
+                still.add((image, digest))
+        pending = still
+        if pending:
+            time.sleep(10)
+    print(f"[{time.strftime('%H:%M:%S')}] [preheat] 镜像预热 {len(imgs) - len(pending)}"
+          f"/{len(imgs)} 完成，耗时 {round(time.time() - t0)}s"
+          f"{'（超时余 ' + str(len(pending)) + ' 个未确认）' if pending else ''}")
+    return len(imgs) - len(pending)
 
 
 def wait_tool_active(tool_name, deadline_s=300):
@@ -194,6 +232,12 @@ def phase_a(sb, manifest, rounds_n):
 AGENTS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..",
                          "images", "dsharness", "agents")
 AGENT_TOOL = os.environ.get("AGENT_TOOL", "bench-solver")
+
+# 满并发约束（配额 30 工具版，2026-09-16 工单提升后）：
+#   工具：临时 bench-u-* ≤ 27（30 − 常驻 2 − 余量 1）
+#   实例：每题一对（agent + bench）→ 50 实例配额 → ≤25 对
+#   → 双重约束取小：25 对 = 50 实例顶格，建议留余量跑 ≤24
+MAX_CONCURRENT_UNITS = int(os.environ.get("VALIDATE_MAX_CONCURRENCY", "25"))
 
 
 def acquire_instance_token(instance_id):
@@ -374,10 +418,13 @@ async def main():
     ap.add_argument("--rounds", type=int, default=2)
     ap.add_argument("--no-agent", action="store_true",
                     help="跳过 agent 解题阶段（仅标准答案核验）")
-    ap.add_argument("--concurrency", type=int, default=3, help="并发临时工具数（配额内 ≤8）")
+    ap.add_argument("--concurrency", type=int, default=8,
+                    help="并发核验对数（agent+bench 沙箱对；上限 25=实例配额/2")
     ap.add_argument("--claims", default="output/validate-claims.json")
     ap.add_argument("--results", default="output/validate-results.jsonl")
     ap.add_argument("--no-sweep", action="store_true")
+    ap.add_argument("--no-preheat", action="store_true",
+                    help="跳过批次级镜像预热（调试用）")
     args = ap.parse_args()
 
     for k in ("E2B_DOMAIN", "E2B_API_KEY", "ROLE_ARN"):
@@ -395,10 +442,15 @@ async def main():
     if not args.no_sweep:
         sweep_orphan_tools()
 
+    # ★ 批次级预热：镜像分发与实例拉起分离，避免 N 实例并发拉取抢带宽
+    #   （实测：未预热批次 Sandbox.create 61-219s/个；预热后预期 <10s）
+    if not args.no_preheat:
+        await asyncio.to_thread(preheat_batch, recs)
+
     claim = make_claim_store(None, path=args.claims, bucket="",
                             prefix="validate/claims")
     results = LocalDataset(args.results)
-    sem = asyncio.Semaphore(min(args.concurrency, 8))
+    sem = asyncio.Semaphore(min(args.concurrency, MAX_CONCURRENT_UNITS))
 
     async def _one(r):
         key = f"validate/{r['instance_id']}"
