@@ -72,18 +72,27 @@ pytest+envd，digest 固定）→ 每题镜像 `FROM base + COPY benchmark 内�
 
 ### 3.1 时序图
 
-**图 3-1：跨 AGS 验证流（v2：validator_driver(CVM) → 每题临时工具实例）**
+**图 3-1：跨 AGS 验证流（v3：双沙箱——agent 沙箱经实例 Token 直访题目沙箱）**
 
 ```
-CVM validator_driver        外置存储          AGS（每题）
-  │ claim L1 ───────────────────────────────────────────────▶ claims/
-  │ tccli CreateSandboxTool(bench-u-*, 题目镜像) ──▶ 临时工具 ACTIVE     ①建工具
-  │ Sandbox.create(bench-u-*) ──────────────────▶ 题目实例(内容烧入)    ②拉起
-  │── commands.run(run_tests answer×N) ─────────▶ ③验证（SANDBOX 隔离）
-  │── commands.run(run_tests baseline) ──────────▶ ④负向对照
-  │（可选 Phase B：DeepSeek solver 循环，工具调用→commands.run）
-  │── L2 去重 → 结果分片 ───────────────────────────────────▶ results/
-  │ Sandbox.kill + tccli DeleteSandboxTool ──────▶ ⑤销毁（配额归还）
+CVM validator_driver                    AGS（每题一对实例）
+  │ claim L1 ─────────────────────────────────────────────▶ claims/
+  │ tccli CreateSandboxTool(bench-u-*, 题目镜像) ──▶ 临时工具 ACTIVE       ①建工具
+  │ Sandbox.create(bench-u-*) ──────────────────▶ 题目实例(内容烧入)      ②bench
+  │ Sandbox.create(bench-solver) ───────────────▶ agent 实例              ③agent
+  │ tccli AcquireSandboxInstanceToken(bench) ──▶ sit_ Token（实例级，~24h）
+  │── files.write(solver) + envs{sit, 题面, F2P} ─▶ agent 实例
+  │                                                │
+  │                                                │ ④agent 解题（DeepSeek 循环）
+  │                                                │   e2b SDK 直访 bench：
+  │                                                │   https://49983-<id>.<dom>
+  │                                                │   X-Access-Token: sit_
+  │◀── RESULT JSON（轮次/修改清单/结论）────────────│
+  │── commands.run(run_tests 裸判) ──▶ bench ──▶ ⑤pass@1 记录
+  │── run_tests answer×N + baseline ──▶ bench ──▶ ⑥标准答案核验（Phase A）
+  │（agent 答错时：agent diff vs golden patch + 失败清单 + LLM 归因）      ⑦分析
+  │── L2 去重 → 结果分片 ──────────────────────────────────▶ results/
+  │ kill(agent+bench) + tccli DeleteSandboxTool ──▶ ⑧销毁（配额归还）
 ```
 
 ### 3.2 网络模式矩阵

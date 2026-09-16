@@ -153,10 +153,10 @@ def sweep_orphan_tools(keep_batch=None):
     return swept
 
 
-# ─────────────────── Phase A / Phase B（沙箱执行体驱动） ───────────────────
-def sh_sbx(sb, cmd, timeout=900):
+# ─────────────────── Phase A / agent 解题（沙箱执行体驱动） ───────────────────
+def sh_sbx(sb, cmd, timeout=900, envs=None):
     try:
-        return sb.commands.run(cmd, timeout=timeout, user="root")
+        return sb.commands.run(cmd, timeout=timeout, user="root", envs=envs)
     except CommandExitException as e:
         return e
 
@@ -190,75 +190,100 @@ def phase_a(sb, manifest, rounds_n):
     return {"result": "validated", "rounds": rounds_n}
 
 
-SOLVER_TOOLS = [
-    {"type": "function", "function": {
-        "name": "run_command",
-        "description": "在题目仓库内执行 shell 命令（查看代码/跑测试/任意操作）",
-        "parameters": {"type": "object", "properties": {
-            "command": {"type": "string", "description": "bash 命令"}},
-            "required": ["command"]}}},
-    {"type": "function", "function": {
-        "name": "read_file",
-        "description": "读取题目仓库中的文件内容",
-        "parameters": {"type": "object", "properties": {
-            "path": {"type": "string", "description": "仓库内相对路径"}},
-            "required": ["path"]}}},
-    {"type": "function", "function": {
-        "name": "write_file",
-        "description": "覆写题目仓库中的文件（实施修复）",
-        "parameters": {"type": "object", "properties": {
-            "path": {"type": "string"}, "content": {"type": "string"}},
-            "required": ["path", "content"]}}}]
+# ─────────────────── agent 解题阶段（沙箱互访 + pass@1） ───────────────────
+AGENTS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..",
+                         "images", "dsharness", "agents")
+AGENT_TOOL = os.environ.get("AGENT_TOOL", "bench-solver")
 
 
-def phase_b(sb, manifest, max_turns=20):
-    """DeepSeek 解题链：reset 到 base+tests → solver 循环 → 裸判定 resolved 率。"""
-    iid = manifest["instance_id"]
-    problem = manifest.get("problem_statement") or iid
-    if os.path.exists(manifest.get("_problem_md", "")):
-        problem = open(manifest["_problem_md"]).read()
-    run_tests(sb, iid, "--reset --apply-tests")     # 起点：base+tests，无 golden
+def acquire_instance_token(instance_id):
+    """实例级访问 Token（AGS 官方互访机制：AcquireSandboxInstanceToken，~24h）。
 
-    def exec_fn(name, args):
-        repo = f"/benchmark/repos/{manifest['repo'].replace('/', '__')}"
-        if name == "run_command":
-            r = sh_sbx(sb, f"cd {repo} && {args['command']}", timeout=600)
-            return ((r.stdout or "") + (r.stderr or ""))[:8000]
-        if name == "read_file":
-            r = sh_sbx(sb, f"cat {repo}/{args['path']}", timeout=60)
-            return (r.stdout or "")[:16000]
-        if name == "write_file":
-            sb.files.write(f"{repo}/{args['path']}", args["content"], user="root")
-            return f"written {len(args['content'])} bytes"
-        return f"unknown tool {name}"
+    该 Token 即 envd 层 X-Access-Token 凭证（与 SDK connect 换回的
+    envd_access_token 同源，实测），agent 沙箱凭它直访 bench 沙箱。
+    """
+    r = tccli("AcquireSandboxInstanceToken", "--InstanceId", instance_id)
+    if r.returncode != 0 or "Token" not in r.stdout:
+        raise RuntimeError(f"获取实例 Token 失败: {r.stderr[-150:] or r.stdout[-150:]}")
+    return json.loads(r.stdout)["Token"]
 
-    system = ("你是一名资深 Python 工程师，在仓库中修复一个 bug。\n"
-              "执行命令的方式：输出 <execute command=\"你的命令\"/>\n"
-              "流程建议：先 cat/grep 探索相关代码 → 运行评分测试复现失败 → "
-              "定位根因 → 用命令修改文件（如 python -c 或 sed）实施最小修复 → "
-              "再次运行相关测试确认通过 → 最后输出简要修复说明（不再执行命令）。")
-    task = (f"【任务】修复以下问题并让指定测试通过。\n\n{problem}\n\n"
-            f"【通过的判据】这些测试全部通过即算成功：\n"
-            + "\n".join(f"- {t}" for t in manifest["FAIL_TO_PASS"][:10]))
+
+def phase_agent(agent_sb, bench_sb, rec):
+    """独立 agent 沙箱解题（经 sit Token 直访 bench 沙箱），返回 pass@1 结果。
+
+    流程：上传 solver → envs 注入 Token/题面/F2P → agent 沙箱内运行
+    solver_agent.py（monkey-patch e2b + 直连 bench）→ CVM 在 bench 上
+    裸判定（solver 已将仓库置于其修复后状态）。
+    """
+    iid = rec["instance_id"]
+    sit = acquire_instance_token(bench_sb.sandbox_id)
+    for fn in ("solver_agent.py", "deepseek_harness.py"):
+        agent_sb.files.write(f"/opt/solver/{fn}",
+                             open(os.path.join(AGENTS_DIR, fn)).read(), user="root")
+    problem = rec.get("problem") or iid
+    if rec.get("_problem_md") and os.path.exists(rec["_problem_md"]):
+        problem = open(rec["_problem_md"]).read()
+    envs = {
+        "BENCH_SIT_TOKEN": sit, "BENCH_SANDBOX_ID": bench_sb.sandbox_id,
+        "E2B_DOMAIN": os.environ["E2B_DOMAIN"], "INSTANCE_ID": iid,
+        "REPO": rec["repo"], "PROBLEM": problem[:12000],
+        "F2P_TESTS": "\n".join(rec["FAIL_TO_PASS"]),
+        "MAX_TURNS": os.environ.get("AGENT_MAX_TURNS", "20"),
+    }
+    for k in ("OPENAI_BASE_URL", "OPENAI_API_KEY", "LLM_MODEL"):
+        if os.environ.get(k):
+            envs[k] = os.environ[k]
+    r = sh_sbx(agent_sb, "python3 /opt/solver/solver_agent.py",
+               timeout=3600, envs=envs)
+    out = (r.stdout or "") + "\n" + (r.stderr or "")
+    m = re.findall(r"RESULT (\{.*\})", out)
+    solver = json.loads(m[-1]) if m else {"result": "error", "error": out[-300:]}
+
+    f2p_map, all_ok = run_tests(bench_sb, iid, "")     # pass@1 裸判定
+    passed = sum(1 for v in f2p_map.values() if v == "passed")
+    total = len(rec["FAIL_TO_PASS"])
+    solver["pass_at_1"] = bool(all_ok)
+    solver["f2p_passed"] = f"{passed}/{total}"
+    return solver
+
+
+def analyze_failure(bench_sb, rec, agent_out):
+    """agent 答案错误时的对比分析：agent 修改 vs 标准答案 + 失败清单 + LLM 归因。"""
+    iid = rec["instance_id"]
+    repo = f"/benchmark/repos/{rec['repo'].replace('/', '__')}"
+    agent_diff = (sh_sbx(bench_sb, f"cd {repo} && git diff", timeout=120).stdout or "")[:6000]
+    f2p_map, _ = run_tests(bench_sb, iid, "")
+    failed = [k.split("::")[-1][:60] for k, v in f2p_map.items() if v != "passed"][:10]
+    golden = (rec.get("golden_patch") or "")[:4000]
+    analysis = {
+        "failed_tests": failed,
+        "agent_touched": agent_out.get("files_changed", [])[:10],
+        "agent_diff_lines": len(agent_diff.splitlines()),
+        "golden_diff_lines": len(golden.splitlines()),
+    }
     try:
         h = DeepSeekHarness()
-    except HarnessError as e:
-        return {"result": "skipped", "reason": f"no_llm: {e}"}
-    out = h.run_task(system, task, SOLVER_TOOLS, exec_fn, max_turns=max_turns)
-
-    f2p_map, all_ok = run_tests(sb, iid, "")       # 裸判定：当前状态直接跑
-    passed = sum(1 for v in f2p_map.values() if v == "passed")
-    total = len(manifest["FAIL_TO_PASS"])
-    return {"result": "solved" if all_ok else "unsolved",
-            "resolved_ratio": round(passed / total, 3) if total else 0,
-            "f2p_passed": f"{passed}/{total}", "solver_turns": out["turns"],
-            "solver_status": out["status"],
-            "fix_summary": (out["answer"] or "")[:400]}
+        task = (f"【agent 尝试的修复 diff】\n{agent_diff or '(无任何修改)'}\n\n"
+                f"【标准答案 diff（golden patch）】\n{golden or '(空)'}\n\n"
+                f"【agent 修复后仍未通过的测试】\n" + "\n".join(f"- {t}" for t in failed) +
+                "\n\n请从三个维度分析：① agent 是否定位到了正确根因；"
+                "② 与标准答案的差距本质（方向性错误/边界遗漏/精度不足）；"
+                "③ 该题难度评级（简单/中等/困难）。200 字内。")
+        out = h.run_task("你是资深代码评审专家，对比分析两个修复尝试的差异。",
+                         task, [], lambda n, a: "", max_turns=1)
+        analysis["llm_analysis"] = (out.get("answer") or "")[:800]
+    except Exception as e:
+        analysis["llm_analysis"] = f"unavailable: {str(e)[:100]}"
+    return analysis
 
 
 # ─────────────────── 单元验证编排 ───────────────────
-async def validate_unit(sem, rec, results, phase_b_on, rounds):
-    """一个单元的完整验证：建工具→实例→Phase A/B→销毁。受全局信号量背压。"""
+async def validate_unit(sem, rec, results, agent_on, rounds):
+    """一个单元的完整核验（v2 双沙箱）：
+    建临时工具 → bench 实例 → agent 实例 → ①agent 解题(pass@1)
+    → ②标准答案核验(Phase A) → ③agent 答错时对比分析 → 销毁。
+    每题同时占用 2 个实例（agent + bench），受全局信号量背压。
+    """
     iid = rec["instance_id"]
     image = rec.get("image")
     digest = rec.get("image_digest", "")
@@ -270,33 +295,47 @@ async def validate_unit(sem, rec, results, phase_b_on, rounds):
 
     async with sem:
         from e2b_code_interpreter import Sandbox
-        sb = None
+        sb = agent_sb = None
         verdict = {"instance_id": iid}
         try:
-            # ① CVM: tccli 建工具 + 预热 + 等 ACTIVE
+            # ① CVM: tccli 建工具 + 预热 + 等 ACTIVE；拉起 bench 实例（题目烧入）
             create_unit_tool(image_ref, tool_name)
             wait_tool_active(tool_name)
-            print(f"[{time.strftime('%H:%M:%S')}] [{iid}] 临时工具 {tool_name} ACTIVE")
-            # ② 实例（内容已烧入镜像）
-            sb = Sandbox.create(template=tool_name, timeout=1800)
-            # ③ Phase A
+            sb = Sandbox.create(template=tool_name, timeout=3600)
+            print(f"[{time.strftime('%H:%M:%S')}] [{iid}] bench 实例就绪")
+
+            # ② agent 沙箱（独立实例）解题 → pass@1
+            if agent_on:
+                agent_sb = Sandbox.create(template=AGENT_TOOL, timeout=3600)
+                verdict["agent"] = phase_agent(agent_sb, sb, rec)
+                print(f"[{time.strftime('%H:%M:%S')}] [{iid}] agent 解题: "
+                      f"pass@1={'✅' if verdict['agent'].get('pass_at_1') else '❌'} "
+                      f"({verdict['agent'].get('f2p_passed')}, "
+                      f"{verdict['agent'].get('turns')} 轮)")
+                agent_sb.kill()
+                agent_sb = None
+
+            # ③ 标准答案核验（原流程：answer×N 轮一致 + baseline 负向）
             verdict["phase_a"] = phase_a(sb, rec, rounds)
-            print(f"[{time.strftime('%H:%M:%S')}] [{iid}] Phase A: {verdict['phase_a'].get('result')}")
-            # ④ Phase B（可选）
-            if phase_b_on and verdict["phase_a"]["result"] == "validated":
-                verdict["phase_b"] = phase_b(sb, rec)
-                print(f"[{time.strftime('%H:%M:%S')}] [{iid}] Phase B: {verdict['phase_b'].get('result')} "
-                      f"({verdict['phase_b'].get('f2p_passed')})")
+            print(f"[{time.strftime('%H:%M:%S')}] [{iid}] Phase A: "
+                  f"{verdict['phase_a'].get('result')}")
+
+            # ④ agent 答案错误 → 对比分析（agent 修改 vs 标准答案）
+            if agent_on and not verdict.get("agent", {}).get("pass_at_1"):
+                verdict["failure_analysis"] = analyze_failure(sb, rec, verdict["agent"])
+                print(f"[{time.strftime('%H:%M:%S')}] [{iid}] 失败分析: "
+                      f"{verdict['failure_analysis'].get('llm_analysis', '')[:80]}")
         except Exception as e:
             verdict["error"] = f"{type(e).__name__}: {str(e)[:200]}"
             print(f"[{time.strftime('%H:%M:%S')}] [{iid}] ❌ {verdict['error']}")
         finally:
-            if sb is not None:
-                try:
-                    sb.kill()
-                except Exception:
-                    pass
-            ok = delete_unit_tool(tool_name)      # ⑤ CVM: tccli 删工具
+            for x in (sb, agent_sb):
+                if x is not None:
+                    try:
+                        x.kill()
+                    except Exception:
+                        pass
+            ok = delete_unit_tool(tool_name)      # CVM: tccli 删工具（配额归还）
             print(f"[{time.strftime('%H:%M:%S')}] [{iid}] 工具{'已删' if ok else '删除失败(留待清扫)'}")
         results.append(verdict)
         return verdict.get("phase_a", {}).get("result", "error")
@@ -306,7 +345,8 @@ async def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--units-file", default="output/maker/dataset.jsonl")
     ap.add_argument("--rounds", type=int, default=2)
-    ap.add_argument("--phase-b", action="store_true", help="启用 Phase B（DeepSeek 解题）")
+    ap.add_argument("--no-agent", action="store_true",
+                    help="跳过 agent 解题阶段（仅标准答案核验）")
     ap.add_argument("--concurrency", type=int, default=3, help="并发临时工具数（配额内 ≤8）")
     ap.add_argument("--claims", default="output/validate-claims.json")
     ap.add_argument("--results", default="output/validate-results.jsonl")
@@ -318,13 +358,12 @@ async def main():
             sys.exit(f"缺少环境变量: {k}（ROLEArn 为工具创建所需 CAM 角色）")
 
     recs = [json.loads(l) for l in open(args.units_file) if l.strip()]
-    # 附带 problem.md 路径（Phase B 题面）
-    for r in recs:
+    for r in recs:                                   # 附带 problem.md 路径（题面）
         p = os.path.join("output/maker/units", r["instance_id"], r["instance_id"], "problem.md")
         if os.path.exists(p):
             r["_problem_md"] = p
     print(f"[{time.strftime('%H:%M:%S')}] [validate] {len(recs)} 个单元 | 并发 {args.concurrency} | "
-          f"Phase B {'开' if args.phase_b else '关'}")
+          f"agent 解题 {'关' if args.no_agent else '开'} | 模式：双沙箱（agent + bench）")
 
     if not args.no_sweep:
         sweep_orphan_tools()
@@ -340,7 +379,7 @@ async def main():
         if not ok:
             print(f"[{r['instance_id']}] L1 拦截（已验证过）")
             return "blocked"
-        st = await validate_unit(sem, r, results, args.phase_b, args.rounds)
+        st = await validate_unit(sem, r, results, not args.no_agent, args.rounds)
         await asyncio.to_thread(claim.finish, key,
                                  "done" if st in ("validated", "rejected") else "failed", st)
         return st

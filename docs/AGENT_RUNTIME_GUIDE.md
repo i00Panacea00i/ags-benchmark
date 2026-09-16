@@ -227,7 +227,55 @@ data = bytes(blob)          # 统一转 bytes 再使用
 
 适用：小文件（KB 级）。大文件（>10MB）走 `tar + base64` 或对象存储中转更稳。
 
-### 3.4 实例管理：list / connect / kill（清理三件套）
+### 3.4 沙箱互访：实例级 Token（一个沙箱直访另一个沙箱）
+
+官方机制：CVM 调 `AcquireSandboxInstanceToken` 为沙箱 B 签发实例级访问 Token
+（`sit_…`，**~24h 有效**），该 Token 即 envd 层 `X-Access-Token` 凭证（实测与 SDK
+connect 换回的 envd_access_token 同源）——把它交给沙箱 A，A 就能直访 B：
+
+```python
+# ① CVM：拉起 B 并签发实例 Token
+b = Sandbox.create(template="bench-tool", timeout=3600)
+r = subprocess.run(["tccli", "ags", "AcquireSandboxInstanceToken",
+                    "--region", "ap-singapore", "--InstanceId", b.sandbox_id],
+                   capture_output=True, text=True, timeout=60)
+sit = json.loads(r.stdout)["Token"]        # 返回平铺结构（无 Response 包装）
+
+# ② A 内（envs 注入 sit + b.sandbox_id）：三件套直连 B
+import e2b.envd.client_sync as cs
+import e2b.envd.client_async as ca
+from e2b.envd.interceptors import DefaultHeadersInterceptor
+
+def _with_token(orig):
+    def patched(config, base_url):
+        lst = orig(config, base_url)
+        lst.insert(0, DefaultHeadersInterceptor({"X-Access-Token": SIT}))
+        return lst
+    return patched
+cs.build_interceptors = _with_token(cs.build_interceptors)
+ca.build_interceptors = _with_token(ca.build_interceptors)
+
+from e2b_code_interpreter import Sandbox
+b = Sandbox.connect(BENCH_ID, debug=True, domain=DOMAIN,
+                    sandbox_url=f"https://49983-{BENCH_ID}.{DOMAIN}")
+b.commands.run("echo hello", user="root")     # ← A 直达 B
+```
+
+三条实测铁律（逆向验证所得）：
+
+| # | 规则 | 说明 |
+|---|---|---|
+| 1 | **URL 格式 `https://49983-<sandbox_id>.<domain>`**（端口在前） | 与开源 E2B 的 `<id>-<port>` **相反**；`sandbox.<domain>`、`<id>.<domain>` 均报 invalid host format |
+| 2 | **Token 放 `X-Access-Token` 头** | 不能作为 SDK `api_key` 传 `Sandbox.connect`（API 网关 connect 端点只认账号级 e2b key，报 401 Invalid API key） |
+| 3 | **files API 不走拦截器** | `files.read/write` 走独立 `/files` HTTP 端点，Token 头不生效（401）→ 跨沙箱文件操作用命令封装（`base64 -d > path` 写、`base64 -w0 path` 读），commands 通道完全可用 |
+
+> 必须用 `debug=True` + `sandbox_url` 覆盖：debug 分支跳过 API 网关换票
+> （connect 需要账号级 key，agent 沙箱没有也不该有）；`sandbox_url` 指定
+> AGS 的 `49983-<id>` 路由格式。Token 头经 monkey-patch `build_interceptors`
+> 在构造期注入（拦截器构造时求值，connect 后再改 config 无效）。
+> 生产实现：`images/dsharness/agents/solver_agent.py`（已 E2E 验证）。
+
+### 3.5 实例管理：list / connect / kill（清理三件套）
 
 ```python
 from e2b_code_interpreter import Sandbox
@@ -251,7 +299,7 @@ def kill_all_instances():
 单实例销毁就是 `sb.kill()`——**务必放在 `finally` 里**，否则异常路径会漏杀，
 实例要等到 DefaultTimeout（最长 2h）才自动回收。
 
-### 3.5 把两个平面串起来：标准生命周期五步
+### 3.6 把两个平面串起来：标准生命周期五步
 
 ```python
 # ① 控制面：建工具（镜像必须已推送！）→ 等 ACTIVE
@@ -293,6 +341,9 @@ delete_unit_tool("my-tool")             # 内部：失败时先 kill_all_instanc
 | 15 | 长任务无心跳 | commands.run 偶发超时 | 命令内后台化 + 轮询产出文件 |
 | 16 | 在沙箱里再跑 kaniko 之类重活 | 覆盖根文件系统关键文件 | 重活独立成镜像/工具，别在运行实例上做 |
 | 17 | nohup 跑驱动随会话死 | 后台任务被杀留孤儿实例 | `setsid`/systemd-run 脱离会话 |
+| 18 | 沙箱互访用开源 URL 格式 `<id>-49983.<domain>` | invalid host format | AGS 格式是 **`49983-<id>.<domain>`**（端口在前） |
+| 19 | sit_ Token 当 SDK api_key 传 connect | 401 Invalid API key（connect 端点只认账号级 e2b key） | Token 放 `X-Access-Token` 头，经 monkey-patch 拦截器注入 |
+| 20 | 跨沙箱用 files API 读写 | `/files` 独立端点不吃拦截器头 → 401 | 命令封装：`base64 -d` 写 / `base64 -w0` 读 |
 
 ---
 
@@ -301,6 +352,7 @@ delete_unit_tool("my-tool")             # 内部：失败时先 kill_all_instanc
 | 教学点 | 生产实现 |
 |---|---|
 | 工具生命周期五步 | `src/drivers/validator_driver.py`（tccli 封装 + 临时工具编排） |
+| **沙箱互访（实例 Token）** | `images/dsharness/agents/solver_agent.py`（solver agent，已 E2E 验证） |
 | 沙箱池（预热 + 背压 + 指标） | `src/pool/sandbox_pool.py`（AsyncSandbox 批量管理） |
 | 并发标定方法 | `src/pool/ramp_test.py`（5→40 阶梯压测） |
 | 命令级凭据注入 | `src/drivers/maker_driver.py`（envs 下发 TCR/GitHub 令牌） |

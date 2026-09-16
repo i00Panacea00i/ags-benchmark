@@ -15,18 +15,19 @@
 │                                                                        │
 │   maker_driver（制作编排）              validator_driver（验证编排）        │
 │   · SandboxPool  异步沙箱池（预热+背压）    · tccli 创建/销毁每题临时工具       │
-│   · ClaimStore   L1 任务互斥              · Phase A 双向判定（answer/baseline）│
-│   · Dataset      L2 双键去重              · Phase B DeepSeek 解题链（可选）    │
-│                                                                        │
+│   · ClaimStore   L1 任务互斥              · AcquireSandboxInstanceToken    │
+│   · Dataset      L2 双键去重              · ① agent 解题 → pass@1           │
+│                                        · ② 标准答案核验（Phase A）        │
+│                                        · ③ agent 答错 → 对比分析          │
 └────────┬─────────────────────────────────────────┬─────────────────────┘
    E2B 数据面│（commands / files）          tccli 控制面 + E2B 数据面│
              ▼                                       ▼
 ┌───────────────────────────┐       ┌────────────────────────────────────┐
-│ ① agent1 制作沙箱（固定工具）   │       │ ④ 题目沙箱 bench-u-*（每题临时工具）    │
-│    bench-maker-ds × N 并发   │       │    SANDBOX 隔离网络 · 验证后即删        │
-│    PUBLIC 网络                │       │    题目内容已烧入镜像（/benchmark）       │
-│                             │       └──────────────────▲─────────────────┘
-│    制作漏斗：                 │                        │ 每题镜像
+│ ① agent1 制作沙箱（固定工具）   │       │ ④ agent 沙箱 bench-solver（固定工具）    │
+│    bench-maker-ds × N 并发   │       │    ⑤ 题目沙箱 bench-u-*（每题临时）      │
+│    PUBLIC 网络                │       │      SANDBOX 隔离 · 验证后即删           │
+│                             │       └──────┬──────────────▲──────────────┘
+│    制作漏斗：                 │              │实例Token(sit_)│ 直访（X-Access-Token）
 │    issue–PR 配对              │      ┌─────────────────┴──────────────┐
 │    → clone + venv            │      │ ③ TCR 镜像仓库（两层结构）           │
 │    → F2P 双向验证 ×2 轮       │─────▶│   共享基座 benchmark-ds-base      │
@@ -69,11 +70,17 @@ F2P 双向验证 ×2 轮 + 跨轮稳定性筛选（防 flaky 误入库）→ Dee
 + 每题内容层（完整仓库 + tests/golden patch + harness，仅 30–100 MB）。
 同构题共享基座 → 构建秒级、存储不随题数线性膨胀、天然防 tag 漂移。
 
-**④ 题目沙箱（每题临时工具 `bench-u-*`，SANDBOX 隔离网络）**
+**④ agent 沙箱 + 题目沙箱（双沙箱核验单元）**
 
-题目内容物理烧入镜像，验证语义全离线（无出网面）；envd 控制面（49983 端口）
-不受隔离影响，CVM 通过 commands/files 双向驱动；验证完成即删，配额归还。
-孤儿工具由驱动启动时自动清扫回收。
+核验每题时 CVM 同时拉起一对沙箱：**agent 沙箱**（固定工具 `bench-solver`，PUBLIC）承载
+AI 解题 agent；**题目沙箱**（每题临时工具 `bench-u-*`，SANDBOX 隔离）承载题目镜像。
+CVM 经 `tccli AcquireSandboxInstanceToken` 为题目沙箱签发实例级访问 Token（`sit_`，
+~24h），注入 agent 沙箱后，agent 通过 e2b SDK **直访并操作题目沙箱**（URL
+`https://49983-<实例ID>.<域名>` + `X-Access-Token` 头）。核验流程：
+**① agent 解题 → 记录 pass@1**（在 agent 修复后的仓库状态上裸判定）→
+**② 按原流程核验标准答案**（answer ×N 轮一致 + baseline 负向对照）→
+**③ agent 答错时对比分析**（agent 修改 vs golden patch diff + 失败测试清单 +
+LLM 归因：根因定位/差距本质/难度评级）。实测单题周期 ≈2.5 分钟。
 
 **⑤ 数据存储层（关键数据文件，全部在 GitHub 仓库版本控制内）**
 
