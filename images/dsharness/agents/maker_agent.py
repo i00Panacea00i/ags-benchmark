@@ -28,7 +28,7 @@ WORK_ISSUE = int(os.environ["WORK_ISSUE"])
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
 OUTPUT_DIR = os.environ.get("OUTPUT_DIR", "/output")
 WORKDIR = os.environ.get("WORKDIR", "/tmp/build")
-MAX_PATCH_LINES = 500
+MAX_PATCH_LINES = 700
 P2P_CAP = 20
 INSTANCE_ID = f"{WORK_REPO.replace('/', '__')}-{WORK_ISSUE}"
 OUT = os.path.join(OUTPUT_DIR, INSTANCE_ID)
@@ -225,20 +225,29 @@ def main():
     is_bug = bool(re.search(r"\bbug\b|🐛|crash|error|fails|broken|regression", labels + " " + title))
     issue_type = "bug" if is_bug else "feature_request"
 
-    # ② solution 配对：timeline 找 cross-referenced merged PR
-    #    closing keywords 对齐 GitHub 官方全集：close(s|d)/fix(es|ed)/resolve(s|d)
-    timeline = gh(f"/repos/{WORK_REPO}/issues/{WORK_ISSUE}/timeline?per_page=100")
-    pr = None
+    # ② solution 配对（三级优先）：
+    #    ⓪ WORK_PR 预配对（反向发现器已确定 PR 号，零 search 调用——36 沙箱
+    #       并发时 search API 30/min 会被打爆，实测 39 题死于 403）
+    #    ① timeline 找 cross-referenced merged PR
+    #    ② 搜索式回退（closing keywords 对齐 GitHub 官方全集）
     closing_re = re.compile(
         rf"(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#{WORK_ISSUE}\b", re.I)
-    for ev in timeline:
-        if ev.get("event") == "cross-referenced":
-            src = ev.get("source", {}).get("issue", {})
-            if "pull_request" in src:
-                cand = gh(f"/repos/{WORK_REPO}/pulls/{src['number']}")
-                if cand.get("merged") and closing_re.search(cand.get("body") or ""):
-                    pr = cand
-                    break
+    pr = None
+    work_pr = os.environ.get("WORK_PR")
+    if work_pr:
+        cand = gh(f"/repos/{WORK_REPO}/pulls/{work_pr}")
+        if cand.get("merged") and closing_re.search(cand.get("body") or ""):
+            pr = cand
+    if pr is None:
+        timeline = gh(f"/repos/{WORK_REPO}/issues/{WORK_ISSUE}/timeline?per_page=100")
+        for ev in timeline:
+            if ev.get("event") == "cross-referenced":
+                src = ev.get("source", {}).get("issue", {})
+                if "pull_request" in src:
+                    cand = gh(f"/repos/{WORK_REPO}/pulls/{src['number']}")
+                    if cand.get("merged") and closing_re.search(cand.get("body") or ""):
+                        pr = cand
+                        break
     if pr is None:
         # 回退：搜索式配对（在已合并 PR body 中检索 issue 号 + closing keywords）。
         # fine-grained PAT 的 timeline 会过滤 cross-referenced 事件（仓库访问范围

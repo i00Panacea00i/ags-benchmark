@@ -1,0 +1,92 @@
+[make] 145 个单元 | maker=bench-maker-ds | 并发 36
+[make/pallets/click#2395] agent: {"result": "filtered", "stage": "patch_too_large", "reason": "540 > 500 行", "instance_id": "pallets__click-2395"}
+[make/pypa/packaging#476] agent: {"result": "filtered", "stage": "issue_not_closed", "reason": "state=open", "instance_id": "pypa__packaging-476"}
+[make/pypa/pip#10216] agent: {"result": "filtered", "stage": "issue_not_closed", "reason": "state=open", "instance_id": "pypa__pip-10216"}
+[make/pypa/pip#11024] agent: {"result": "filtered", "stage": "not_an_issue", "reason": "11024 是 PR 不是 issue", "instance_id": "pypa__pip-11024"}
+[make/pallets/click#3822] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/0 用例）", "instance_id": "pallets__click-3822"}
+[make/pallets/click#2899] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/0 用例）", "instance_id": "pallets__click-2899"}
+[make/pallets/click#2609] agent: {"result": "success", "instance_id": "pallets__click-2609", "f2p": 1, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-uploa
+[make/pallets/click#2609] ✅ 入库: F2P 1 / P2P 20
+[make/pallets/click#2682] agent: {"result": "success", "instance_id": "pallets__click-2682", "f2p": 1, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-uploa
+[make/pallets/click#2682] ✅ 入库: F2P 1 / P2P 20
+[make/pallets/click#2415] agent: {"result": "success", "instance_id": "pallets__click-2415", "f2p": 1, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-uploa
+[make/pallets/click#2415] ✅ 入库: F2P 1 / P2P 20
+[make/pallets/click#605] agent: {"result": "filtered", "stage": "patch_too_large", "reason": "510 > 500 行", "instance_id": "pallets__click-605"}
+[make/psf/black#4980] agent: {"result": "error", "instance_id": "psf__black-4980", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/psf/black#5164] agent: {"result": "error", "instance_id": "psf__black-5164", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/pypa/pip#14189] agent: {"result": "error", "instance_id": "pypa__pip-14189", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/psf/black#3826] agent: {"result": "error", "instance_id": "psf__black-3826", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/pypa/packaging#577] agent: {"result": "error", "instance_id": "pypa__packaging-577", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/pypa/packaging#909] agent: {"result": "error", "instance_id": "pypa__packaging-909", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/psf/black#4205] agent: {"result": "error", "instance_id": "psf__black-4205", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/pypa/pip#13084] agent: {"result": "error", "instance_id": "pypa__pip-13084", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/psf/black#3527] agent: {"result": "error", "instance_id": "psf__black-3527", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/psf/black#3593] agent: {"result": "error", "instance_id": "psf__black-3593", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/psf/black#2783] agent: {"result": "error", "instance_id": "psf__black-2783", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/psf/black#4140] agent: {"result": "error", "instance_id": "psf__black-4140", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/psf/black#3721] agent: {"result": "error", "instance_id": "psf__black-3721", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/pypa/packaging#1087] agent: {"result": "filtered", "stage": "patch_too_large", "reason": "633 > 500 行", "instance_id": "pypa__packaging-1087"}
+[make/psf/black#4465] agent: {"result": "error", "instance_id": "psf__black-4465", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/psf/black#4172] agent: {"result": "error", "instance_id": "psf__black-4172", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/psf/black#3861] agent: {"result": "error", "instance_id": "psf__black-3861", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/pypa/pip#13288] agent: {"result": "error", "instance_id": "pypa__pip-13288", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/pypa/pip#14136] agent: {"result": "error", "instance_id": "pypa__pip-14136", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/pypa/pip#14117] agent: {"result": "error", "instance_id": "pypa__pip-14117", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/pypa/pip#14079] agent: {"result": "error", "instance_id": "pypa__pip-14079", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/pypa/pip#14074] agent: {"result": "error", "instance_id": "pypa__pip-14074", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/pypa/pip#12215] agent: {"result": "error", "instance_id": "pypa__pip-12215", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/pypa/pip#14129] agent: {"result": "error", "instance_id": "pypa__pip-14129", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/pypa/pip#13548] agent: {"result": "error", "instance_id": "pypa__pip-13548", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/pypa/pip#13290] agent: {"result": "error", "instance_id": "pypa__pip-13290", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/pypa/pip#14107] agent: {"result": "error", "instance_id": "pypa__pip-14107", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/pypa/pip#13299] agent: {"result": "error", "instance_id": "pypa__pip-13299", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/pypa/pip#13157] agent: {"result": "error", "instance_id": "pypa__pip-13157", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/pypa/pip#6385] agent: {"result": "error", "instance_id": "pypa__pip-6385", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/pypa/pip#13696] agent: {"result": "error", "instance_id": "pypa__pip-13696", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/pypa/pip#12023] agent: {"result": "error", "instance_id": "pypa__pip-12023", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/pypa/pip#14044] agent: {"result": "error", "instance_id": "pypa__pip-14044", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/pypa/pip#13922] agent: {"result": "error", "instance_id": "pypa__pip-13922", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/pypa/pip#13226] agent: {"result": "error", "instance_id": "pypa__pip-13226", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/pypa/pip#13341] agent: {"result": "error", "instance_id": "pypa__pip-13341", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/pypa/pip#13979] agent: {"result": "error", "instance_id": "pypa__pip-13979", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/pypa/pip#12018] agent: {"result": "error", "instance_id": "pypa__pip-12018", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/pypa/pip#6823] agent: {"result": "error", "instance_id": "pypa__pip-6823", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/pypa/pip#12903] agent: {"result": "error", "instance_id": "pypa__pip-12903", "error": "HTTPError: HTTP Error 403: Forbidden"}
+[make/pallets/click#2697] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 1/39 用例）", "instance_id": "pallets__click-2697"}
+[make/Textualize/rich#2863] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/0 用例）", "instance_id": "Textualize__rich-2863"}
+[make/psf/black#4264] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/0 用例）", "instance_id": "psf__black-4264"}
+[make/pypa/packaging#945] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/0 用例）", "instance_id": "pypa__packaging-945"}
+[make/psf/black#4268] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/0 用例）", "instance_id": "psf__black-4268"}
+[make/pypa/packaging#859] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/180 用例）", "instance_id": "pypa__packaging-859"}
+[make/pypa/packaging#1162] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/0 用例）", "instance_id": "pypa__packaging-1162"}
+Traceback (most recent call last):
+  File "/home/ubuntu/ags-benchmark-architecture/src/drivers/../pool/sandbox_pool.py", line 123, in acquire
+    handle = self._warm.get_nowait()
+  File "/usr/lib/python3.10/asyncio/queues.py", line 182, in get_nowait
+    raise QueueEmpty
+asyncio.queues.QueueEmpty
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/ubuntu/ags-benchmark-architecture/src/drivers/maker_driver.py", line 175, in <module>
+    asyncio.run(main())
+  File "/usr/lib/python3.10/asyncio/runners.py", line 44, in run
+    return loop.run_until_complete(main)
+  File "/usr/lib/python3.10/asyncio/base_events.py", line 649, in run_until_complete
+    return future.result()
+  File "/home/ubuntu/ags-benchmark-architecture/src/drivers/maker_driver.py", line 162, in main
+    outs = await asyncio.gather(*[
+  File "/home/ubuntu/ags-benchmark-architecture/src/drivers/maker_driver.py", line 78, in make_unit
+    handle = await pool.acquire()
+  File "/home/ubuntu/ags-benchmark-architecture/src/drivers/../pool/sandbox_pool.py", line 129, in acquire
+    handle = SandboxHandle(await self._create_one(), time.monotonic())
+  File "/home/ubuntu/ags-benchmark-architecture/src/drivers/../pool/sandbox_pool.py", line 72, in _create_one
+    sb = await AsyncSandbox.create(
+  File "/home/ubuntu/ags-benchmark-architecture/venv/lib/python3.10/site-packages/e2b/sandbox_async/main.py", line 225, in create
+    sandbox = await cls._create(
+  File "/home/ubuntu/ags-benchmark-architecture/venv/lib/python3.10/site-packages/e2b/sandbox_async/main.py", line 1174, in _create
+    response = await SandboxApi._create_sandbox(
+  File "/home/ubuntu/ags-benchmark-architecture/venv/lib/python3.10/site-packages/e2b/sandbox_async/sandbox_api.py", line 258, in _create_sandbox
+    raise handle_api_exception(res)
+e2b.exceptions.SandboxException: 400: [LimitExceeded.SandboxInstance] Sandbox instance quota exceeded. Current: 100, Max: 100. Please stop unused sandbox instances or request a quota increase. (RequestId: ff054d49-fc27-4fd0-a64c-d2a0a6880422)

@@ -1,0 +1,95 @@
+[make] 145 个单元 | maker=bench-maker-ds | 并发 30 | 预配对 145
+[make/pallets/click#3822] L1 拦截：已是 done
+[make/pallets/click#2899] L1 拦截：已是 done
+[make/pallets/click#2682] L1 拦截：已是 done
+[make/pallets/click#2697] L1 拦截：已是 done
+[make/pallets/click#2609] L1 拦截：已是 done
+[make/pallets/click#605] L1 拦截：已是 done
+[make/Textualize/rich#2863] L1 拦截：已是 done
+[make/pallets/click#2395] L1 拦截：已是 done
+[make/pallets/click#2415] L1 拦截：已是 done
+[make/pypa/packaging#1087] L1 拦截：已是 done
+[make/pypa/packaging#945] L1 拦截：已是 done
+[make/pypa/packaging#476] L1 拦截：已是 done
+[make/pypa/packaging#1162] L1 拦截：已是 done
+[make/pypa/packaging#859] L1 拦截：已是 done
+[make/psf/black#4264] L1 拦截：已是 done
+[make/psf/black#4268] L1 拦截：已是 done
+[make/pypa/pip#10216] L1 拦截：已是 done
+[make/pypa/pip#11024] L1 拦截：已是 done
+[make/pypa/pip#12680] agent: {"result": "filtered", "stage": "security_sensitive", "reason": "安全敏感题材剔除", "instance_id": "pypa__pip-12680"}
+[make/psf/black#4465] agent: {"result": "filtered", "stage": "patch_conflict", "reason": "补丁在 base_commit 上不干净适用", "instance_id": "psf__black-4465"}
+[make/psf/black#4140] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/0 用例）", "instance_id": "psf__black-4140"}
+[make/psf/black#3861] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/0 用例）", "instance_id": "psf__black-3861"}
+[make/psf/black#3721] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/0 用例）", "instance_id": "psf__black-3721"}
+[make/psf/black#2783] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/0 用例）", "instance_id": "psf__black-2783"}
+[make/pypa/pip#14107] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/15 用例）", "instance_id": "pypa__pip-14107"}
+[make/pypa/pip#13979] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/31 用例）", "instance_id": "pypa__pip-13979"}
+[make/pypa/pip#12903] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/18 用例）", "instance_id": "pypa__pip-12903"}
+[make/pypa/pip#14189] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/9 用例）", "instance_id": "pypa__pip-14189"}
+[make/pypa/pip#12480] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/7 用例）", "instance_id": "pypa__pip-12480"}
+[make/pypa/pip#13696] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/13 用例）", "instance_id": "pypa__pip-13696"}
+[make/pypa/pip#14129] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/36 用例）", "instance_id": "pypa__pip-14129"}
+[make/pypa/pip#12372] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/152 用例）", "instance_id": "pypa__pip-12372"}
+[make/pypa/pip#13922] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/0 用例）", "instance_id": "pypa__pip-13922"}
+[make/pypa/pip#12018] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/50 用例）", "instance_id": "pypa__pip-12018"}
+[make/pypa/pip#13548] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/12 用例）", "instance_id": "pypa__pip-13548"}
+[make/pypa/pip#12165] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/24 用例）", "instance_id": "pypa__pip-12165"}
+[make/pypa/pip#12023] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/116 用例）", "instance_id": "pypa__pip-12023"}
+[make/pypa/pip#12891] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/5 用例）", "instance_id": "pypa__pip-12891"}
+[make/pypa/pip#13341] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/11 用例）", "instance_id": "pypa__pip-13341"}
+[make/pypa/pip#13290] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/46 用例）", "instance_id": "pypa__pip-13290"}
+[make/pypa/pip#5502] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/147 用例）", "instance_id": "pypa__pip-5502"}
+[make/pypa/pip#12688] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/17 用例）", "instance_id": "pypa__pip-12688"}
+[make/pypa/pip#12666] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/1 用例）", "instance_id": "pypa__pip-12666"}
+[make/pypa/pip#13157] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/0 用例）", "instance_id": "pypa__pip-13157"}
+[make/pypa/pip#11221] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/28 用例）", "instance_id": "pypa__pip-11221"}
+[make/pallets/click#2632] agent: {"result": "success", "instance_id": "pallets__click-2632", "f2p": 1, "p2p": 4, "rewrite": "template", "images": {"bench": "benchmark-upload
+[make/pallets/click#2447] agent: {"result": "success", "instance_id": "pallets__click-2447", "f2p": 2, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-uploa
+[make/pallets/click#2632] ✅ 入库: F2P 1 / P2P 4
+[make/pallets/click#2447] ✅ 入库: F2P 2 / P2P 20
+[make/pallets/click#2817] agent: {"result": "success", "instance_id": "pallets__click-2817", "f2p": 1, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-uploa
+[make/pallets/click#2817] ✅ 入库: F2P 1 / P2P 20
+[make/pallets/click#2012] agent: {"result": "success", "instance_id": "pallets__click-2012", "f2p": 11, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-uplo
+[make/pallets/click#2012] ✅ 入库: F2P 11 / P2P 20
+[make/pallets/click#2322] agent: {"result": "success", "instance_id": "pallets__click-2322", "f2p": 5, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-uploa
+[make/pallets/click#2322] ✅ 入库: F2P 5 / P2P 20
+[make/pypa/packaging#1333] agent: {"result": "success", "instance_id": "pypa__packaging-1333", "f2p": 5, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-uplo
+[make/pypa/packaging#1333] ✅ 入库: F2P 5 / P2P 20
+[make/pypa/packaging#710] agent: {"result": "success", "instance_id": "pypa__packaging-710", "f2p": 1, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-uploa
+[make/pypa/packaging#710] ✅ 入库: F2P 1 / P2P 20
+[make/psf/black#4077] agent: {"result": "success", "instance_id": "psf__black-4077", "f2p": 1, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-upload-si
+[make/psf/black#4077] ✅ 入库: F2P 1 / P2P 20
+[make/pypa/pip#12961] agent: {"result": "success", "instance_id": "pypa__pip-12961", "f2p": 1, "p2p": 18, "rewrite": "template", "images": {"bench": "benchmark-upload-si
+[make/pypa/pip#12961] ✅ 入库: F2P 1 / P2P 18
+Traceback (most recent call last):
+  File "/home/ubuntu/ags-benchmark-architecture/src/drivers/../pool/sandbox_pool.py", line 123, in acquire
+    handle = self._warm.get_nowait()
+  File "/usr/lib/python3.10/asyncio/queues.py", line 182, in get_nowait
+    raise QueueEmpty
+asyncio.queues.QueueEmpty
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/ubuntu/ags-benchmark-architecture/src/drivers/maker_driver.py", line 179, in <module>
+    asyncio.run(main())
+  File "/usr/lib/python3.10/asyncio/runners.py", line 44, in run
+    return loop.run_until_complete(main)
+  File "/usr/lib/python3.10/asyncio/base_events.py", line 649, in run_until_complete
+    return future.result()
+  File "/home/ubuntu/ags-benchmark-architecture/src/drivers/maker_driver.py", line 166, in main
+    outs = await asyncio.gather(*[
+  File "/home/ubuntu/ags-benchmark-architecture/src/drivers/maker_driver.py", line 80, in make_unit
+    handle = await pool.acquire()
+  File "/home/ubuntu/ags-benchmark-architecture/src/drivers/../pool/sandbox_pool.py", line 129, in acquire
+    handle = SandboxHandle(await self._create_one(), time.monotonic())
+  File "/home/ubuntu/ags-benchmark-architecture/src/drivers/../pool/sandbox_pool.py", line 72, in _create_one
+    sb = await AsyncSandbox.create(
+  File "/home/ubuntu/ags-benchmark-architecture/venv/lib/python3.10/site-packages/e2b/sandbox_async/main.py", line 225, in create
+    sandbox = await cls._create(
+  File "/home/ubuntu/ags-benchmark-architecture/venv/lib/python3.10/site-packages/e2b/sandbox_async/main.py", line 1174, in _create
+    response = await SandboxApi._create_sandbox(
+  File "/home/ubuntu/ags-benchmark-architecture/venv/lib/python3.10/site-packages/e2b/sandbox_async/sandbox_api.py", line 258, in _create_sandbox
+    raise handle_api_exception(res)
+e2b.exceptions.SandboxException: 400: [LimitExceeded.SandboxInstance] Sandbox instance quota exceeded. Current: 100, Max: 100. Please stop unused sandbox instances or request a quota increase. (RequestId: e7753951-4f77-4dee-ad69-86fdfad0617f)

@@ -1,0 +1,20 @@
+--- a/CHANGES.rst
++++ b/CHANGES.rst
+@@ -6,6 +6,7 @@ Version 8.2.1
+ -   Fix flag value handling for flag options with a provided type. :issue:`2894`
+     :issue:`2897` :pr:`2930`
+ -   Fix shell completion for nested groups. :issue:`2906` :pr:`2907`
++-   Flush ``sys.stderr`` at the end of ``CliRunner.invoke``. :issue:`2682`
+ 
+ Version 8.2.0
+ -------------
+--- a/src/click/testing.py
++++ b/src/click/testing.py
+@@ -510,6 +510,7 @@ def invoke(
+                 exc_info = sys.exc_info()
+             finally:
+                 sys.stdout.flush()
++                sys.stderr.flush()
+                 stdout = outstreams[0].getvalue()
+                 stderr = outstreams[1].getvalue()
+                 output = outstreams[2].getvalue()

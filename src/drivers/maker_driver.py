@@ -44,7 +44,7 @@ def refresh_tcr_token():
     return d["Username"], d["Token"]
 
 
-def unit_envs(repo, issue, tcr_user, tcr_pass):
+def unit_envs(repo, issue, tcr_user, tcr_pass, pr=None):
     ev = {"WORK_REPO": repo, "WORK_ISSUE": str(issue), "OUTPUT_DIR": "/output",
           "DOCKER_CONFIG": "/root/.docker",
           "TCR_REGISTRY": os.environ["TCR_REGISTRY"],
@@ -52,6 +52,8 @@ def unit_envs(repo, issue, tcr_user, tcr_pass):
           "TCR_PUSH_USER": tcr_user, "TCR_PUSH_PASS": tcr_pass,
           # 每题单元镜像的共享基座（digest 固定引用，防 tag 漂移）
           "BASE_IMAGE": os.environ["BASE_IMAGE"]}
+    if pr:
+        ev["WORK_PR"] = str(pr)   # 预配对（反向发现器）：跳过 timeline/search，防并发 403
     for k in ("GITHUB_TOKEN", "OPENAI_BASE_URL", "OPENAI_API_KEY", "LLM_MODEL"):
         if os.environ.get(k):
             ev[k] = os.environ[k]          # LLM 就绪时启用 DeepSeek 改写链，否则模板降级
@@ -137,9 +139,11 @@ async def main():
         if not os.environ.get(k):
             sys.exit(f"缺少环境变量: {k}")
 
-    units = [(u["repo"], u["issue"]) if isinstance(u, dict) else tuple(u)
+    units = [(u["repo"], u["issue"], u.get("pr"))
+             if isinstance(u, dict) else (*u, None)
              for u in json.load(open(args.units_file))]
-    print(f"[make] {len(units)} 个单元 | maker={args.maker_tool} | 并发 {args.concurrency}")
+    print(f"[make] {len(units)} 个单元 | maker={args.maker_tool} | 并发 {args.concurrency} | "
+          f"预配对 {sum(1 for _, _, p in units if p)}")
 
     claim = await asyncio.to_thread(
         make_claim_store, None,
@@ -161,8 +165,8 @@ async def main():
     try:
         outs = await asyncio.gather(*[
             make_unit(pool, claim, dataset, args.artifacts_dir, repo, issue,
-                      unit_envs(repo, issue, tcr_user, tcr_pass))
-            for repo, issue in units])
+                      unit_envs(repo, issue, tcr_user, tcr_pass, pr))
+            for repo, issue, pr in units])
     finally:
         await pool.close()
 
