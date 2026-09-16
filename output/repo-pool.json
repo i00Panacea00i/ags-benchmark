@@ -1,0 +1,52 @@
+{
+ "psf/black": {
+  "status": "verified",
+  "probe": "1/2 试制成功",
+  "verified_at": "2026-09-16 19:35:33"
+ },
+ "pydantic/pydantic": {
+  "status": "failed",
+  "probe": "0/2 试制成功",
+  "verified_at": null
+ },
+ "pypa/pip": {
+  "status": "verified",
+  "probe": "1/2 试制成功",
+  "verified_at": "2026-09-16 19:35:33"
+ },
+ "python-poetry/poetry": {
+  "status": "failed",
+  "probe": "0/2 试制成功",
+  "verified_at": null
+ },
+ "urllib3/urllib3": {
+  "status": "failed",
+  "probe": "0/2 试制成功",
+  "verified_at": null
+ },
+ "encode/httpx": {
+  "status": "failed",
+  "probe": "0/2 试制成功",
+  "verified_at": null
+ },
+ "pypa/build": {
+  "status": "failed",
+  "probe": "0/2 试制成功",
+  "verified_at": null
+ },
+ "pypa/virtualenv": {
+  "status": "verified",
+  "probe": "1/2 试制成功",
+  "verified_at": "2026-09-16 19:47:49"
+ },
+ "HypothesisWorks/hypothesis": {
+  "status": "failed",
+  "probe": "0/2 试制成功",
+  "verified_at": null
+ },
+ "pypa/setuptools": {
+  "status": "failed",
+  "probe": "0/2 试制成功",
+  "verified_at": null
+ }
+}

@@ -1,0 +1,20 @@
+--- a/docs/changelog/3181.feature.rst
++++ b/docs/changelog/3181.feature.rst
+@@ -0,0 +1,3 @@
++Stop installing the ``_virtualenv.{py,pth}`` distutils import hook for Python 3.10 and later, where pip, setuptools and
++CPython already ignore the install config keys it guards against; this removes the hook's startup import cost. The hook
++is still installed for Python 3.9 - :issue:`3181`.
+--- a/src/virtualenv/create/via_global_ref/api.py
++++ b/src/virtualenv/create/via_global_ref/api.py
+@@ -111,6 +111,11 @@ def create(self) -> None:
+         self.install_patch()
+ 
+     def install_patch(self) -> None:
++        # Python 3.10+ ignores the distutils install config keys this patch guards against (pip does so by default,
++        # setuptools and CPython's vendored distutils drop them too), so the runtime import hook only earns its
++        # startup cost on 3.9. See https://github.com/pypa/virtualenv/issues/3181.
++        if self.interpreter.version_info >= (3, 10):
++            return
+         text = self.env_patch_text()
+         if text:
+             pth = self.purelib / "_virtualenv.pth"

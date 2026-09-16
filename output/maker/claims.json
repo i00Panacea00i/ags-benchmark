@@ -248,5 +248,105 @@
   "state": "done",
   "note": "validated-dataset",
   "ts": "2026-09-16T09:22:52+00:00"
+ },
+ "make/urllib3/urllib3#5211": {
+  "state": "done",
+  "note": "filtered@harness_crash",
+  "ts": "2026-09-16T11:34:08+00:00"
+ },
+ "make/urllib3/urllib3#5077": {
+  "state": "done",
+  "note": "filtered@harness_crash",
+  "ts": "2026-09-16T11:34:06+00:00"
+ },
+ "make/pydantic/pydantic#13716": {
+  "state": "done",
+  "note": "filtered@untestable",
+  "ts": "2026-09-16T11:35:23+00:00"
+ },
+ "make/psf/black#3157": {
+  "state": "done",
+  "note": "filtered@untestable",
+  "ts": "2026-09-16T11:34:10+00:00"
+ },
+ "make/pydantic/pydantic#13713": {
+  "state": "done",
+  "note": "filtered@untestable",
+  "ts": "2026-09-16T11:35:23+00:00"
+ },
+ "make/psf/black#5210": {
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-16T11:35:29+00:00"
+ },
+ "make/pypa/pip#14227": {
+  "state": "done",
+  "note": "filtered@untestable",
+  "ts": "2026-09-16T11:34:29+00:00"
+ },
+ "make/pypa/pip#8573": {
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-16T11:35:30+00:00"
+ },
+ "make/python-poetry/poetry#11036": {
+  "state": "done",
+  "note": "filtered@harness_crash",
+  "ts": "2026-09-16T11:34:18+00:00"
+ },
+ "make/python-poetry/poetry#10425": {
+  "state": "done",
+  "note": "filtered@harness_crash",
+  "ts": "2026-09-16T11:34:18+00:00"
+ },
+ "make/encode/httpx#3411": {
+  "state": "done",
+  "note": "filtered@harness_crash",
+  "ts": "2026-09-16T11:44:34+00:00"
+ },
+ "make/encode/httpx#3135": {
+  "state": "failed",
+  "note": "HTTPError: HTTP Error 404: Not Found",
+  "ts": "2026-09-16T11:44:20+00:00"
+ },
+ "make/pypa/virtualenv#3181": {
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-16T11:47:47+00:00"
+ },
+ "make/pypa/virtualenv#3157": {
+  "state": "done",
+  "note": "filtered@untestable",
+  "ts": "2026-09-16T11:46:12+00:00"
+ },
+ "make/pypa/build#966": {
+  "state": "failed",
+  "note": "RuntimeError: 命令失败(1): /tmp/build/venv/bin/python -m pip install --quiet 'filelock >= 3' 'pytest >= 6.2.4' 'pytest-cov >= 2.12' 'pytest-mock >= 2' 'covdefaults >= 2.3' 'pytest-rerunfailures >= 9.1' 'p",
+  "ts": "2026-09-16T11:44:37+00:00"
+ },
+ "make/pypa/build#959": {
+  "state": "failed",
+  "note": "RuntimeError: 命令失败(1): /tmp/build/venv/bin/python -m pip install --quiet 'filelock >= 3' 'pytest >= 6.2.4' 'pytest-cov >= 2.12' 'pytest-mock >= 2' 'covdefaults >= 2.3' 'pytest-rerunfailures >= 9.1' 'p",
+  "ts": "2026-09-16T11:44:36+00:00"
+ },
+ "make/HypothesisWorks/hypothesis#3176": {
+  "state": "failed",
+  "note": "RuntimeError: 命令失败(1): /tmp/build/venv/bin/python -m pip install --quiet -e /tmp/build/HypothesisWorks__hypothesis 'pytest<9' pytest-json-report\n  error: subprocess-exited-with-error\n  \n  × Getting re",
+  "ts": "2026-09-16T12:01:04+00:00"
+ },
+ "make/HypothesisWorks/hypothesis#4857": {
+  "state": "failed",
+  "note": "RuntimeError: 命令失败(1): /tmp/build/venv/bin/python -m pip install --quiet -e /tmp/build/HypothesisWorks__hypothesis 'pytest<9' pytest-json-report\n  error: subprocess-exited-with-error\n  \n  × Getting re",
+  "ts": "2026-09-16T12:01:05+00:00"
+ },
+ "make/pypa/setuptools#4810": {
+  "state": "done",
+  "note": "filtered@harness_crash",
+  "ts": "2026-09-16T12:01:25+00:00"
+ },
+ "make/pypa/setuptools#4976": {
+  "state": "done",
+  "note": "filtered@untestable",
+  "ts": "2026-09-16T12:08:01+00:00"
  }
 }

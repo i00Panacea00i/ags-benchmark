@@ -1,0 +1,22 @@
+[
+ {
+  "repo": "HypothesisWorks/hypothesis",
+  "issue": 4857,
+  "pr": 4862
+ },
+ {
+  "repo": "HypothesisWorks/hypothesis",
+  "issue": 3176,
+  "pr": 4835
+ },
+ {
+  "repo": "pypa/setuptools",
+  "issue": 4810,
+  "pr": 5169
+ },
+ {
+  "repo": "pypa/setuptools",
+  "issue": 4976,
+  "pr": 4980
+ }
+]

@@ -1,0 +1,727 @@
+[
+ {
+  "repo": "pallets/click",
+  "issue": 3822,
+  "pr": 3858
+ },
+ {
+  "repo": "pallets/click",
+  "issue": 3571,
+  "pr": 3769
+ },
+ {
+  "repo": "pallets/click",
+  "issue": 3740,
+  "pr": 3739
+ },
+ {
+  "repo": "pallets/click",
+  "issue": 3572,
+  "pr": 3653
+ },
+ {
+  "repo": "pallets/click",
+  "issue": 2899,
+  "pr": 3499
+ },
+ {
+  "repo": "pallets/click",
+  "issue": 2012,
+  "pr": 3363
+ },
+ {
+  "repo": "pallets/click",
+  "issue": 2809,
+  "pr": 3256
+ },
+ {
+  "repo": "pallets/click",
+  "issue": 2790,
+  "pr": 3208
+ },
+ {
+  "repo": "pallets/click",
+  "issue": 3069,
+  "pr": 3090
+ },
+ {
+  "repo": "pallets/click",
+  "issue": 2447,
+  "pr": 3058
+ },
+ {
+  "repo": "pallets/click",
+  "issue": 2787,
+  "pr": 2934
+ },
+ {
+  "repo": "pallets/click",
+  "issue": 2682,
+  "pr": 2933
+ },
+ {
+  "repo": "pallets/click",
+  "issue": 2894,
+  "pr": 2930
+ },
+ {
+  "repo": "pallets/click",
+  "issue": 2703,
+  "pr": 2846
+ },
+ {
+  "repo": "pallets/click",
+  "issue": 2817,
+  "pr": 2818
+ },
+ {
+  "repo": "pallets/click",
+  "issue": 2813,
+  "pr": 2816
+ },
+ {
+  "repo": "pallets/click",
+  "issue": 2644,
+  "pr": 2800
+ },
+ {
+  "repo": "pallets/click",
+  "issue": 605,
+  "pr": 2796
+ },
+ {
+  "repo": "pallets/click",
+  "issue": 2746,
+  "pr": 2788
+ },
+ {
+  "repo": "pallets/click",
+  "issue": 2674,
+  "pr": 2775
+ },
+ {
+  "repo": "pallets/click",
+  "issue": 2632,
+  "pr": 2730
+ },
+ {
+  "repo": "pallets/click",
+  "issue": 2697,
+  "pr": 2728
+ },
+ {
+  "repo": "pallets/click",
+  "issue": 2609,
+  "pr": 2727
+ },
+ {
+  "repo": "pallets/click",
+  "issue": 2695,
+  "pr": 2696
+ },
+ {
+  "repo": "pallets/click",
+  "issue": 2621,
+  "pr": 2622
+ },
+ {
+  "repo": "pallets/click",
+  "issue": 2322,
+  "pr": 2604
+ },
+ {
+  "repo": "pallets/click",
+  "issue": 2415,
+  "pr": 2555
+ },
+ {
+  "repo": "pallets/click",
+  "issue": 2395,
+  "pr": 2553
+ },
+ {
+  "repo": "pallets/click",
+  "issue": 2246,
+  "pr": 2550
+ },
+ {
+  "repo": "pallets/click",
+  "issue": 2516,
+  "pr": 2517
+ },
+ {
+  "repo": "Textualize/rich",
+  "issue": 3115,
+  "pr": 3130
+ },
+ {
+  "repo": "Textualize/rich",
+  "issue": 2942,
+  "pr": 2943
+ },
+ {
+  "repo": "Textualize/rich",
+  "issue": 2863,
+  "pr": 2864
+ },
+ {
+  "repo": "Textualize/rich",
+  "issue": 2740,
+  "pr": 2804
+ },
+ {
+  "repo": "Textualize/rich",
+  "issue": 2688,
+  "pr": 2799
+ },
+ {
+  "repo": "psf/requests",
+  "issue": 6711,
+  "pr": 7315
+ },
+ {
+  "repo": "pypa/packaging",
+  "issue": 577,
+  "pr": 1351
+ },
+ {
+  "repo": "pypa/packaging",
+  "issue": 781,
+  "pr": 1346
+ },
+ {
+  "repo": "pypa/packaging",
+  "issue": 1333,
+  "pr": 1334
+ },
+ {
+  "repo": "pypa/packaging",
+  "issue": 1318,
+  "pr": 1319
+ },
+ {
+  "repo": "pypa/packaging",
+  "issue": 1315,
+  "pr": 1316
+ },
+ {
+  "repo": "pypa/packaging",
+  "issue": 831,
+  "pr": 1299
+ },
+ {
+  "repo": "pypa/packaging",
+  "issue": 1204,
+  "pr": 1206
+ },
+ {
+  "repo": "pypa/packaging",
+  "issue": 1178,
+  "pr": 1179
+ },
+ {
+  "repo": "pypa/packaging",
+  "issue": 1162,
+  "pr": 1163
+ },
+ {
+  "repo": "pypa/packaging",
+  "issue": 1154,
+  "pr": 1155
+ },
+ {
+  "repo": "pypa/packaging",
+  "issue": 909,
+  "pr": 1150
+ },
+ {
+  "repo": "pypa/packaging",
+  "issue": 1087,
+  "pr": 1092
+ },
+ {
+  "repo": "pypa/packaging",
+  "issue": 1067,
+  "pr": 1078
+ },
+ {
+  "repo": "pypa/packaging",
+  "issue": 1066,
+  "pr": 1068
+ },
+ {
+  "repo": "pypa/packaging",
+  "issue": 945,
+  "pr": 948
+ },
+ {
+  "repo": "pypa/packaging",
+  "issue": 885,
+  "pr": 888
+ },
+ {
+  "repo": "pypa/packaging",
+  "issue": 859,
+  "pr": 860
+ },
+ {
+  "repo": "pypa/packaging",
+  "issue": 710,
+  "pr": 711
+ },
+ {
+  "repo": "pypa/packaging",
+  "issue": 476,
+  "pr": 690
+ },
+ {
+  "repo": "pypa/packaging",
+  "issue": 657,
+  "pr": 662
+ },
+ {
+  "repo": "psf/black",
+  "issue": 5164,
+  "pr": 5167
+ },
+ {
+  "repo": "psf/black",
+  "issue": 4980,
+  "pr": 4983
+ },
+ {
+  "repo": "psf/black",
+  "issue": 4963,
+  "pr": 4964
+ },
+ {
+  "repo": "psf/black",
+  "issue": 4944,
+  "pr": 4958
+ },
+ {
+  "repo": "psf/black",
+  "issue": 4950,
+  "pr": 4952
+ },
+ {
+  "repo": "psf/black",
+  "issue": 3721,
+  "pr": 4774
+ },
+ {
+  "repo": "psf/black",
+  "issue": 4465,
+  "pr": 4466
+ },
+ {
+  "repo": "psf/black",
+  "issue": 4264,
+  "pr": 4273
+ },
+ {
+  "repo": "psf/black",
+  "issue": 4268,
+  "pr": 4270
+ },
+ {
+  "repo": "psf/black",
+  "issue": 4205,
+  "pr": 4222
+ },
+ {
+  "repo": "psf/black",
+  "issue": 4172,
+  "pr": 4176
+ },
+ {
+  "repo": "psf/black",
+  "issue": 4140,
+  "pr": 4165
+ },
+ {
+  "repo": "psf/black",
+  "issue": 4077,
+  "pr": 4161
+ },
+ {
+  "repo": "psf/black",
+  "issue": 3826,
+  "pr": 4015
+ },
+ {
+  "repo": "psf/black",
+  "issue": 3861,
+  "pr": 3862
+ },
+ {
+  "repo": "psf/black",
+  "issue": 3527,
+  "pr": 3846
+ },
+ {
+  "repo": "psf/black",
+  "issue": 3593,
+  "pr": 3594
+ },
+ {
+  "repo": "psf/black",
+  "issue": 2783,
+  "pr": 3564
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 13084,
+  "pr": 14217
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 14189,
+  "pr": 14190
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 13288,
+  "pr": 14179
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 11043,
+  "pr": 14163
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 14136,
+  "pr": 14143
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 6385,
+  "pr": 14135
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 14129,
+  "pr": 14130
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 14117,
+  "pr": 14118
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 14107,
+  "pr": 14108
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 12023,
+  "pr": 14085
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 14079,
+  "pr": 14084
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 14044,
+  "pr": 14080
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 14074,
+  "pr": 14075
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 13979,
+  "pr": 14012
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 13922,
+  "pr": 13960
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 10216,
+  "pr": 13888
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 12018,
+  "pr": 13886
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 13226,
+  "pr": 13797
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 13157,
+  "pr": 13732
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 13696,
+  "pr": 13703
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 13548,
+  "pr": 13549
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 11024,
+  "pr": 13467
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 13341,
+  "pr": 13345
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 13299,
+  "pr": 13303
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 13290,
+  "pr": 13291
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 12903,
+  "pr": 13280
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 6823,
+  "pr": 13205
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 11012,
+  "pr": 13070
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 11820,
+  "pr": 13064
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 5502,
+  "pr": 13063
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 12891,
+  "pr": 13052
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 5378,
+  "pr": 13051
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 13046,
+  "pr": 13047
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 12961,
+  "pr": 12962
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 12653,
+  "pr": 12877
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 12680,
+  "pr": 12729
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 12688,
+  "pr": 12711
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 12666,
+  "pr": 12669
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 11677,
+  "pr": 12646
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 11221,
+  "pr": 12569
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 12480,
+  "pr": 12494
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 12372,
+  "pr": 12392
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 12165,
+  "pr": 12291
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 12280,
+  "pr": 12281
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 12215,
+  "pr": 12217
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 12099,
+  "pr": 12201
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 12042,
+  "pr": 12078
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 12067,
+  "pr": 12068
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 11985,
+  "pr": 12060
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 4256,
+  "pr": 12032
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 11948,
+  "pr": 11949
+ },
+ {
+  "repo": "pypa/pip",
+  "issue": 11946,
+  "pr": 11947
+ },
+ {
+  "repo": "pypa/virtualenv",
+  "issue": 3105,
+  "pr": 3110
+ },
+ {
+  "repo": "pypa/virtualenv",
+  "issue": 3090,
+  "pr": 3091
+ },
+ {
+  "repo": "pypa/virtualenv",
+  "issue": 3072,
+  "pr": 3073
+ },
+ {
+  "repo": "pypa/virtualenv",
+  "issue": 3049,
+  "pr": 3067
+ },
+ {
+  "repo": "pypa/virtualenv",
+  "issue": 2896,
+  "pr": 3032
+ },
+ {
+  "repo": "pypa/virtualenv",
+  "issue": 2994,
+  "pr": 3008
+ },
+ {
+  "repo": "pypa/virtualenv",
+  "issue": 2969,
+  "pr": 2982
+ },
+ {
+  "repo": "pypa/virtualenv",
+  "issue": 2972,
+  "pr": 2974
+ },
+ {
+  "repo": "pypa/virtualenv",
+  "issue": 2774,
+  "pr": 2957
+ },
+ {
+  "repo": "pypa/virtualenv",
+  "issue": 2467,
+  "pr": 2925
+ },
+ {
+  "repo": "pypa/virtualenv",
+  "issue": 2834,
+  "pr": 2922
+ },
+ {
+  "repo": "pypa/virtualenv",
+  "issue": 2659,
+  "pr": 2921
+ },
+ {
+  "repo": "pypa/virtualenv",
+  "issue": 2780,
+  "pr": 2918
+ },
+ {
+  "repo": "pypa/virtualenv",
+  "issue": 2861,
+  "pr": 2917
+ },
+ {
+  "repo": "pypa/virtualenv",
+  "issue": 2786,
+  "pr": 2914
+ },
+ {
+  "repo": "pypa/virtualenv",
+  "issue": 2493,
+  "pr": 2913
+ },
+ {
+  "repo": "pypa/virtualenv",
+  "issue": 2870,
+  "pr": 2907
+ },
+ {
+  "repo": "pypa/virtualenv",
+  "issue": 2285,
+  "pr": 2821
+ },
+ {
+  "repo": "pypa/virtualenv",
+  "issue": 2419,
+  "pr": 2543
+ }
+]

@@ -90,7 +90,15 @@ def create_unit_tool(image_ref, tool_name):
     return tool_name
 
 
-def preheat_batch(recs, timeout_s=900):
+def preheat_batch(recs, timeout_s=180):
+    """批次级镜像预热（加速关键路径）。
+
+    在任何工具/实例创建前，把全部题目镜像经 CreatePreCacheImageTask 分发到
+    节点池并等待 Success——避免 Sandbox.create 阶段 N 个实例并发拉取新内容层
+    互相抢占带宽（实测瓶颈 61-219s/个即源于此；工具注册本身仅 ~0.4s）。
+    超时 180s：新镜像首次预热平台受理偶达 15 分钟（实测 20:15 提交 20:30 受理），
+    未确认不阻塞批次（仅该镜像实例拉起稍慢）。
+    """
     """批次级镜像预热（加速关键路径）。
 
     在任何工具/实例创建前，把全部题目镜像经 CreatePreCacheImageTask 分发到
@@ -252,6 +260,40 @@ def acquire_instance_token(instance_id):
     return json.loads(r.stdout)["Token"]
 
 
+def llm_probe(agent_sb):
+    """agent2 沙箱创建时向 LLM API 发一次连通性测试（2026-09-16 更新：
+    改用 OpenAI SDK 直调 hy4-preview，用户指定的调用方式）。
+
+    替代完整 agent 解题（省 token：批量压测期暂停解题循环），仅验证
+    agent 沙箱 → TokenHub → hy4-preview 链路可用（暴露 402/超时类问题），
+    随后直接进入 Phase A 标准答案核验。
+    """
+    t0 = time.time()
+    envs = {k: os.environ[k] for k in
+            ("OPENAI_BASE_URL", "OPENAI_API_KEY", "LLM_MODEL") if os.environ.get(k)}
+    if "OPENAI_API_KEY" not in envs:
+        return {"reachable": False, "error": "未配置 LLM 凭据"}
+    probe = (
+        "from openai import OpenAI\n"
+        "client = OpenAI(\n"
+        f"    api_key=\"{envs['OPENAI_API_KEY']}\",\n"
+        f"    base_url=\"{envs['OPENAI_BASE_URL']}\",\n"
+        ")\n"
+        "response = client.chat.completions.create(\n"
+        f"    model=\"{envs.get('LLM_MODEL', 'hy4-preview')}\",\n"
+        "    messages=[{\"role\": \"user\", \"content\": \"你好\"}],\n"
+        ")\n"
+        "print('LLM_PROBE_OK', response.choices[0].message.content[:40])\n")
+    r = sh_sbx(agent_sb, "pip3 install -q openai 2>/dev/null; "
+               f"python3 - <<'EOF'\n{probe}\nEOF",
+               timeout=180, envs={})
+    out = (r.stdout or "") + (r.stderr or "")
+    ok = "LLM_PROBE_OK" in out
+    return {"reachable": ok, "model": envs.get("LLM_MODEL"),
+            "latency_ms": round((time.time() - t0) * 1000),
+            **({} if ok else {"error": out[-200:]})}
+
+
 def phase_agent(agent_sb, bench_sb, rec):
     """独立 agent 沙箱解题（经 sit Token 直访 bench 沙箱），返回 pass@1 结果。
 
@@ -337,7 +379,7 @@ def analyze_failure(bench_sb, rec, agent_out):
 
 
 # ─────────────────── 单元验证编排 ───────────────────
-async def validate_unit(sem, rec, results, agent_on, rounds):
+async def validate_unit(sem, rec, results, agent_on, rounds, agent_mode="probe"):
     """一个单元的完整核验（v2 双沙箱）：
     建临时工具 → bench 实例 → agent 实例 → ①agent 解题(pass@1)
     → ②标准答案核验(Phase A) → ③agent 答错时对比分析 → 销毁。
@@ -375,14 +417,20 @@ async def validate_unit(sem, rec, results, agent_on, rounds):
             sb = Sandbox.create(template=tool_name, timeout=3600)
             print(f"[{time.strftime('%H:%M:%S')}] [{iid}] bench 实例就绪")
 
-            # ② agent 沙箱（独立实例）解题 → pass@1
+            # ② agent 沙箱（独立实例）：LLM 探测（默认）或完整解题（--agent-mode full）
             if agent_on:
                 agent_sb = Sandbox.create(template=AGENT_TOOL, timeout=3600)
-                verdict["agent"] = phase_agent(agent_sb, sb, rec)
-                print(f"[{time.strftime('%H:%M:%S')}] [{iid}] agent 解题: "
-                      f"pass@1={'✅' if verdict['agent'].get('pass_at_1') else '❌'} "
-                      f"({verdict['agent'].get('f2p_passed')}, "
-                      f"{verdict['agent'].get('turns')} 轮)")
+                if agent_mode == "full":
+                    verdict["agent"] = phase_agent(agent_sb, sb, rec)
+                    print(f"[{time.strftime('%H:%M:%S')}] [{iid}] agent 解题: "
+                          f"pass@1={'✅' if verdict['agent'].get('pass_at_1') else '❌'} "
+                          f"({verdict['agent'].get('f2p_passed')}, "
+                          f"{verdict['agent'].get('turns')} 轮)")
+                else:   # probe（默认）：一次请求测通 LLM 即回收
+                    verdict["llm"] = llm_probe(agent_sb)
+                    print(f"[{time.strftime('%H:%M:%S')}] [{iid}] LLM 探测: "
+                          f"{'✅ 通' if verdict['llm'].get('reachable') else '❌ ' + str(verdict['llm'].get('error', ''))[:60]}"
+                          f"（{verdict['llm'].get('latency_ms')}ms）")
                 agent_sb.kill()
                 agent_sb = None
 
@@ -391,8 +439,8 @@ async def validate_unit(sem, rec, results, agent_on, rounds):
             print(f"[{time.strftime('%H:%M:%S')}] [{iid}] Phase A: "
                   f"{verdict['phase_a'].get('result')}")
 
-            # ④ agent 答案错误 → 对比分析（agent 修改 vs 标准答案）
-            if agent_on and not verdict.get("agent", {}).get("pass_at_1"):
+            # ④ agent 答案错误 → 对比分析（仅 full 模式）
+            if agent_mode == "full" and not verdict.get("agent", {}).get("pass_at_1"):
                 verdict["failure_analysis"] = analyze_failure(sb, rec, verdict["agent"])
                 print(f"[{time.strftime('%H:%M:%S')}] [{iid}] 失败分析: "
                       f"{verdict['failure_analysis'].get('llm_analysis', '')[:80]}")
@@ -417,7 +465,10 @@ async def main():
     ap.add_argument("--units-file", default="output/maker/dataset.jsonl")
     ap.add_argument("--rounds", type=int, default=2)
     ap.add_argument("--no-agent", action="store_true",
-                    help="跳过 agent 解题阶段（仅标准答案核验）")
+                    help="跳过 agent 沙箱（连 LLM 探测也不做）")
+    ap.add_argument("--agent-mode", choices=["probe", "full"], default="probe",
+                    help="probe=创建 agent2 沙箱后仅一次 LLM 连通测试（默认，省 token）；"
+                         "full=完整 agent 解题 + pass@1 + 失败分析")
     ap.add_argument("--concurrency", type=int, default=8,
                     help="并发核验对数（agent+bench 沙箱对；上限 25=实例配额/2")
     ap.add_argument("--claims", default="output/validate-claims.json")
@@ -437,7 +488,7 @@ async def main():
         if os.path.exists(p):
             r["_problem_md"] = p
     print(f"[{time.strftime('%H:%M:%S')}] [validate] {len(recs)} 个单元 | 并发 {args.concurrency} | "
-          f"agent 解题 {'关' if args.no_agent else '开'} | 模式：双沙箱（agent + bench）")
+          f"agent {'关' if args.no_agent else args.agent_mode + ' 模式'} | 镜像预热 {'关' if args.no_preheat else '开'}")
 
     if not args.no_sweep:
         sweep_orphan_tools()
@@ -458,7 +509,8 @@ async def main():
         if not ok:
             print(f"[{r['instance_id']}] L1 拦截（已验证过）")
             return "blocked"
-        st = await validate_unit(sem, r, results, not args.no_agent, args.rounds)
+        st = await validate_unit(sem, r, results, not args.no_agent,
+                                 args.rounds, args.agent_mode)
         await asyncio.to_thread(claim.finish, key,
                                  "done" if st in ("validated", "rejected") else "failed", st)
         return st

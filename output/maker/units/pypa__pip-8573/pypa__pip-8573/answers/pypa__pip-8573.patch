@@ -1,0 +1,62 @@
+--- a/news/8573.bugfix.rst
++++ b/news/8573.bugfix.rst
+@@ -0,0 +1,2 @@
++Fix a crash when installing or uninstalling a distribution with an invalid
++entry point.
+--- a/src/pip/_internal/metadata/importlib/_dists.py
++++ b/src/pip/_internal/metadata/importlib/_dists.py
+@@ -15,7 +15,7 @@
+ from pip._vendor.packaging.version import Version
+ from pip._vendor.packaging.version import parse as parse_version
+ 
+-from pip._internal.exceptions import InvalidWheel, UnsupportedWheel
++from pip._internal.exceptions import InstallationError, InvalidWheel, UnsupportedWheel
+ from pip._internal.metadata.base import (
+     BaseDistribution,
+     BaseEntryPoint,
+@@ -199,7 +199,13 @@ def read_text(self, path: InfoPath) -> str:
+ 
+     def iter_entry_points(self) -> Iterable[BaseEntryPoint]:
+         # importlib.metadata's EntryPoint structure satisfies BaseEntryPoint.
+-        return self._dist.entry_points
++        try:
++            return self._dist.entry_points
++        except ValueError as e:
++            # Python 3.15+ validates entry points while parsing.
++            raise InstallationError(
++                f"Error parsing entry points for {self.raw_name}: {e}"
++            ) from e
+ 
+     def _metadata_impl(self) -> email.message.Message:
+         # From Python 3.10+, importlib.metadata declares PackageMetadata as the
+--- a/src/pip/_internal/metadata/pkg_resources.py
++++ b/src/pip/_internal/metadata/pkg_resources.py
+@@ -16,7 +16,12 @@
+ from pip._vendor.packaging.version import Version
+ from pip._vendor.packaging.version import parse as parse_version
+ 
+-from pip._internal.exceptions import InvalidWheel, NoneMetadataError, UnsupportedWheel
++from pip._internal.exceptions import (
++    InstallationError,
++    InvalidWheel,
++    NoneMetadataError,
++    UnsupportedWheel,
++)
+ from pip._internal.utils.egg_link import egg_link_path_from_location
+ from pip._internal.utils.misc import display_path, normalize_path
+ from pip._internal.utils.wheel import parse_wheel, read_wheel_metadata_file
+@@ -208,7 +213,13 @@ def read_text(self, path: InfoPath) -> str:
+         return content
+ 
+     def iter_entry_points(self) -> Iterable[BaseEntryPoint]:
+-        for group, entries in self._dist.get_entry_map().items():
++        try:
++            entry_map = self._dist.get_entry_map()
++        except ValueError as e:
++            raise InstallationError(
++                f"Error parsing entry points for {self.raw_name}: {e}"
++            ) from e
++        for group, entries in entry_map.items():
+             for name, entry_point in entries.items():
+                 name, _, value = str(entry_point).partition("=")
+                 yield EntryPoint(name=name.strip(), value=value.strip(), group=group)

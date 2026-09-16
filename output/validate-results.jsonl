@@ -18,3 +18,4 @@
 {"instance_id":"pallets__click-2832","phase_a":{"result":"validated","rounds":2}}
 {"instance_id":"Textualize__rich-3569","phase_a":{"result":"rejected","reason":"harness_crash","raw":" in 0.87s\n\nno tests ran in 0.12s\n{\n  \"instance_id\": \"Textualize__rich-3569\",\n  \"total\": 0,\n  \"fail_to_pass\": {\n    \"test_panel.py::test_title_text_with_panel_background\": \"missing\"\n  },\n  \"all_passed\""}}
 {"instance_id":"pallets__click-2819","phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"psf__black-5210","llm":{"reachable":true,"model":"hy4-preview","latency_ms":12343},"phase_a":{"result":"validated","rounds":2}}
