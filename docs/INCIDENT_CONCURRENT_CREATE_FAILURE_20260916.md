@@ -3,10 +3,11 @@
 | 项 | 值 |
 |---|---|
 | 事故编号 | INC-20260916-CCF |
+| 版本 | **v2（2026-09-16 21:20 更正版）**——v1 的「STOPPED 终态占配额」结论经复核被推翻，本版为修正后结论 |
 | 发生时间 | 2026-09-16 20:40（第一次）/ 20:52（第二次） |
 | 影响场景 | 100 题全流程压测·制作阶段（145 候选 / 36 并发） |
-| 直接影响 | 制作批两次中断：57 题后崩（A 批）、36 题后崩（B 批） |
-| 状态 | 根因已定位；部分已修复；**平台侧缺陷需工单跟进** |
+| 直接影响 | 制作批两次中断：57 题后崩（A 批）、36 题后崩（B 批，累计 57 题实例生命周期） |
+| 状态 | 根因已修正定位；403 已修复；**池补充节流待实施** |
 
 ---
 
@@ -21,95 +22,110 @@ Sandbox instance quota exceeded. Current: 100, Max: 100.
 ```
 
 配额已于当日由 50 提升至 100（工单落地确认），但并发批量创建仍在数分钟内
-自耗尽配额，且崩溃时**平台可见实例数与配额计数严重不符**。
+自耗尽配额。
 
 ## 二、时间线
 
 | 时刻 | 事件 |
 |---|---|
 | 20:36:29 | 制作批 A 启动（145 候选 / 36 并发 + 预热 4） |
-| ~20:40 | **批 A 崩溃**：57 题完成（3 成功 / 15 过滤 / 39 error），池创建实例时配额 100/100 |
-| 20:41-20:45 | 泄漏清查：E2B `Sandbox.list` 仅见 8 个 RUNNING（已清）；平台侧 `DescribeSandboxInstanceList` 见 **20 个 STOPPED** |
-| 20:45 | 配额验证：清理后**连续创建 6 个实例全部成功**（配额部分可用） |
-| 20:47:30 | 修复 GitHub 403 后批 B 启动（v1.1.4，36 并发） |
-| ~20:52 | **批 B 再次崩溃**于同一配额错误（首批 36 题完成：9 成功，403=0） |
-| 20:53-20:57 | 二次调查：实例面仍 20 STOPPED；Start/Stop 语义试验；API 能力测绘 |
+| ~20:40 | **批 A 崩溃**：57 题完成（3 成功 / 15 过滤 / 39 error-403） |
+| 20:41-20:45 | 初查（v1，含方法缺陷）：E2B 列表 8 RUNNING 清理；平台列表见「20 个 STOPPED」 |
+| 20:45 | 循环验证：连续创建 6 实例成功（配额有余量） |
+| 20:47:30 | 修复 403 后批 B 启动（v1.1.4：WORK_PR + patch700） |
+| ~20:52 | **批 B 再次崩溃**于同一错误（36 题完成：9 成功，403=0） |
+| 21:05-21:10 | 循环实验：创建10→kill→30s→创建10→60s→创建10，三轮全成功 |
+| 21:15 | **翻页复查：TotalCount=146（141 STOPPED + 5 RUNNING）**——v1 结论被推翻 |
 
-## 三、根因分析（三层）
+## 三、根因分析（v2 修正版）
 
-### 根因 ①（平台侧·核心）：`kill` 语义陷阱——停止 ≠ 销毁
+### 根因 ①（核心）：kill 异步过渡期占配额，高吞吐下堆积
 
-E2B SDK 的 `Sandbox.kill()` 在 AGS 数据面上映射为 **Stop（停止）而非销毁**：
+E2B `Sandbox.kill()` 在 AGS 上映射为 Stop，实例生命周期：
 
 ```
-kill() → StopSandboxInstance → Status=STOPPED（终态）
+RUNNING --kill(异步)--> STOPPING --(~4-5 分钟过渡)--> STOPPED
+  ↑ 占配额                ↑ 占配额                     ↑ 不占配额（v2 证实）
 ```
 
-证据（STOPPED 僵尸样本字段）：
-- `Persistent: false`（非持久实例）
-- `ExpiresAt: 2026-09-16T15:55`（**过期 5 小时仍未被 GC 回收**）
-- 对 STOPPED 调 `StopSandboxInstance` 被拒：*only RUNNING/PAUSING/PAUSED… can be stopped*
-- **平台无 `DeleteSandboxInstance` 接口**（tccli ags 全 API 清单核对）→ STOPPED 无法主动清除，只能等 GC
+高并发批次中「单元完成 → kill → 池立即补充新实例」的循环，使
+**STOPPING 过渡态堆积**：批 A 完成速率 ~14 题/min × 过渡 ~4.5min ≈ 63 个
+STOPPING + RUNNING 池 40 ≈ 100 → 撞顶。与两批崩溃点（57 题实例生命周期）
+数学吻合。
 
-### 根因 ②（平台侧）：配额计数滞留
+### 根因 ②（调查方法缺陷，v1 误判来源）
 
-崩溃时三方数据不一致：配额计数 Current=100，平台实例列表仅 20 STOPPED +
-0 RUNNING，E2B 列表仅 8 RUNNING。即**已 kill 实例的配额计数长时间不释放**
-（GC 周期 ≥ 数小时）。高并发批次内「完成→kill→池补充创建」的循环使计数
-**单调累积**，约 60-70 个实例生命周期后即自耗尽 100 配额——与两批崩溃点
-（57 题、36+21=57 题累计）吻合。
+`DescribeSandboxInstanceList` **默认分页 Limit=20**——v1 调查未翻页，把
+第一页的 20 个 STOPPED 当成全部实例，得出「可见 20 vs Current 100 矛盾」
+的错误前提，进而误判为「STOPPED 持续占配额」。翻页复核（`--Limit 20
+--Offset N` 循环）实得 **TotalCount=146（141 STOPPED + 5 RUNNING）**。
+
+### v1 结论被推翻的铁证
+
+在 146 个实例存在（141 STOPPED）的情况下，循环创建实验（10×3 轮）
+**全部成功**——若 STOPPED 占配额，141+5=146 > 100 必然失败。
+**故 STOPPED 终态不占配额**；kill 后配额恢复只需等过渡期（~5 分钟），
+而非 v1 认为的等待 GC（小时级）。
 
 ### 根因 ③（应用侧·伴随发现）：GitHub search 限速打爆（已修复）
 
-批 A 的 39 题 error 全为 `HTTP Error 403`：36 个 maker 沙箱并发执行
-**配对搜索**（search API 单 Token 30/min）瞬间超限。已修复：反向发现器的
-配对结果（PR 号）经 `WORK_PR` 环境变量直传 maker，**制作端零 search 调用**
+批 A 的 39 题 error 全为 `HTTP Error 403`：36 个 maker 沙箱并发执行配对
+搜索（search API 单 Token 30/min）瞬间超限。已修复：反向发现器的配对
+结果（PR 号）经 `WORK_PR` 环境变量直传 maker，制作端零 search 调用
 （批 B 实测 403=0）。
 
-## 四、API 语义测绘（本次调查修正的认知）
+## 四、API 语义测绘（v2 修正）
 
 | API | 实测语义 | 备注 |
 |---|---|---|
-| E2B `Sandbox.kill()` | 停止（→STOPPED），**非销毁** | 占配额直至 GC |
+| E2B `Sandbox.kill()` | 异步停止：RUNNING→STOPPING→STOPPED | **过渡期 ~4-5 分钟占配额；STOPPED 不占** |
+| `DescribeSandboxInstanceList` | **默认分页 Limit=20**，需 `--Offset` 翻页 + `TotalCount` 核实 | v1 误判的直接原因 |
 | `StartSandboxInstance` | **创建新实例**（参数为 ToolId/ToolName/Timeout） | 名不副实，勿用于恢复 |
 | `StopSandboxInstance` | RUNNING→STOPPED | STOPPED 上调用被拒（终态） |
-| `Pause/ResumeSandboxInstance` | 暂停/恢复（未试验） | 疑似不占 RUNNING 配额，待验证 |
-| `DeleteSandboxInstance` | **不存在** | 平台能力缺口 |
+| `DeleteSandboxInstance` | **不存在** | STOPPED 靠平台 GC（实测 2-6 小时） |
 
-## 五、影响评估
+## 五、影响评估（修正）
 
 - 压测中断两批，100 题目标当前完成 45/145 候选（12 成功 + 33 过滤）；
-- **不改代码的情况下**，任何 ≥60 实例生命周期的批量任务都会撞同一堵墙；
-- GC 周期实测 >5h——白天连续压测不可行，需分波等待或平台介入。
+- **恢复成本远低于 v1 判断**：kill 后 ~5 分钟过渡期结束配额即回，无需
+  等待小时级 GC——「池补充节流」一项改造即可支持单波连续跑完；
+- STOPPED 僵尸 GC 慢（2-6h）是独立的资源卫生问题，不阻塞压测。
 
-## 六、修复与缓解
+## 六、修复与缓解（v2 更新）
 
-**已实施（应用侧）**：
+**已实施**：
 1. `WORK_PR` 预配对——制作端零 search（403 根治，批 B 验证）；
-2. maker patch 上限 500→700（对齐发现端，消除误杀）；
-3. 崩溃残留 claim 全量重置（88 个 in-flight 恢复）。
+2. maker patch 上限 500→700；崩溃残留 claim 重置（88 个）。
 
-**建议实施（驱动侧，本周）**：
-4. **配额水位背压**：Pool 创建实例前轮询 `DescribeSandboxInstanceList`
-   计数 + 配额余量，动态降速/暂停补充（防单调累积撞墙）；
-5. **分波调度**：单波实例生命周期预算 ≤ 配额×60%（当前 ≤60），波间等待
-   GC 释放（以 InstanceSet 计数回升为信号）；
-6. Pause/Resume 语义验证：若 PAUSED 不占配额，长等待资源可 Pause 代 kill。
+**待实施（驱动侧，本周）**：
+3. **池补充节流**：单元完成 kill 后延迟 ~5 分钟再补充新实例，或轮询该
+   实例脱离 RUNNING 后再补充——消除 STOPPING 堆积，支持单波连续批量；
+4. **配额水位背压**：Pool 创建前以翻页 TotalCount 核算活跃实例（RUNNING+
+   STOPPING）水位，动态降速；
+5. 验证 STOPPING 过渡期的精确时长（当前 ~4-5min 为数学反推，未直测）。
 
-**需平台工单（请您决策提交）**：
-7. 诉求 A：提供 `DeleteSandboxInstance`（或 STOPPED 手动清除）接口；
-8. 诉求 B：确认 STOPPED 僵尸的 GC 承诺周期（实测 ExpiresAt 过期 5h+ 未回收）；
-9. 诉求 C：配额计数与实例列表的一致性（Current=100 vs 可见 20）。
+**平台工单建议（降级为非紧急）**：
+6. STOPPED 僵尸 GC 周期承诺（2-6h 偏慢，影响资源卫生不影响配额）；
+7. ~~DeleteSandboxInstance / 计数一致性诉求~~（v2 结论下不再必要）。
 
 ## 七、证据附录
 
-- 崩溃堆栈：`output/stress100/maker.log` / `maker-b.log` 尾部（含 RequestId）
+- 崩溃堆栈：`output/stress100/maker.log` / `maker-b.log`（RequestId ff054d49 / e7753951）
 - 39×403 明细：`grep '"result": "error"' output/stress100/maker.log`
-- STOPPED 僵尸字段：`tccli ags DescribeSandboxInstanceList`（Persistent/ExpiresAt/StopReason）
-- StopSandboxInstance 拒绝报文、StartSandboxInstance 参数表（本报告 §四）
-- 配额恢复验证：连续创建 6 实例成功记录（20:45）
+- **146 复核命令**：`tccli ags DescribeSandboxInstanceList --region ap-singapore
+  --cli-unfold-argument --Limit 20`（看 TotalCount）+ `--Offset` 翻页
+- 循环实验：创建10→kill→30s→10→60s→10 三轮全成功（21:05-21:10）
+- v1 误判现场：默认分页首页 20 个 STOPPED（20:41 / 20:57 两次查询均为 20）
+
+## 八、复盘教训
+
+1. **分页接口必须翻页 + TotalCount**——「列表数量」≠「资源总量」，本次
+   20 条默认页直接导致根因误判（v1→v2 修正花了一轮实验成本）；
+2. **小样本循环实验只能证明「有余量」，不能证明「全释放」**——配额类
+   问题要在接近上限处做实验；
+3. 异步生命周期（kill/停止/删除）要按**状态机**建模：占不占配额按状态
+   逐态验证，不能笼统归因「终态占配额」。
 
 ---
 
-*关联文档：`docs/BOTTLENECKS_20260916.md`（K 系列）、
-`docs/AGENT_RUNTIME_GUIDE.md`（坑位表将补充 kill 语义条目）。*
+*关联：`docs/BOTTLENECKS_20260916.md`、`docs/AGENT_RUNTIME_GUIDE.md` 坑位表。*

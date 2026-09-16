@@ -346,8 +346,9 @@ delete_unit_tool("my-tool")             # 内部：失败时先 kill_all_instanc
 | 20 | 跨沙箱用 files API 读写 | `/files` 独立端点不吃拦截器头 → 401 | 命令封装：`base64 -d` 写 / `base64 -w0` 读 |
 | 21 | **批量拉实例不预热**（把 CreateSandboxTool 当慢） | 工具注册其实仅 ~0.4-2s；真瓶颈是 Sandbox.create 阶段 N 实例并发拉新内容层抢节点带宽（实测 61-219s/个） | **批次级预热前置**：先 CreatePreCacheImageTask 全部镜像 + DescribePreCacheImageTask 轮询 Success，再建工具拉实例（实测 29min → 3.4min，8.6x） |
 | 22 | 探针周期用默认 3000ms | 就绪检测多等 ~2.5s/工具 | `ProbePeriodMs/ProbeTimeoutMs` 调 1000（下限 100，ReadyTimeoutMs 上限 30000） |
-| 23 | **把 E2B `kill()` 当销毁用**（★ 最重要） | AGS 上映射为 Stop → STOPPED 终态**持续占配额**，GC >5h；高并发批次「kill→池补充」循环使计数单调累积 → LimitExceeded 100/100 自耗尽（实测两批崩于 57 题累计点）；平台无 DeleteSandboxInstance | ① 单波实例生命周期预算 ≤ 配额×60%；② Pool 创建前查 `DescribeSandboxInstanceList` 水位动态背压；③ 工单诉求 Delete 接口（详见 docs/INCIDENT_CONCURRENT_CREATE_FAILURE_20260916.md） |
+| 23 | **把 E2B `kill()` 当同步销毁用**（★ 重要） | kill 是异步停止：RUNNING→STOPPING→STOPPED，**过渡期 ~4-5 分钟仍占配额**（STOPPED 不占，146 实例/141 STOPPED 下创建实验全过实锤）；高并发「kill→池立即补充」循环使 STOPPING 堆积 → LimitExceeded 自耗尽（实测两批崩于 57 题实例生命周期点） | **池补充节流**：kill 后延迟 ~5 分钟或确认实例脱离 RUNNING 再补充；配额水位按 RUNNING+STOPPING 翻页 TotalCount 核算（详见事故报告 v2） |
 | 24 | 用 `StartSandboxInstance` 恢复实例 | 名不副实：参数是 ToolId/ToolName，实为**创建新实例** | 恢复用 `ResumeSandboxInstance`；API 语义测绘见事故报告 §四 |
+| 25 | **列表接口不翻页就下结论** | `DescribeSandboxInstanceList` 默认分页 Limit=20——首页 20 个曾被误当全部实例，导致「STOPPED 占配额」的错误根因（事故 v1→v2 修正成本一轮实验） | 一律 `--Limit 20 --Offset N` 翻页 + 核对 `TotalCount` |
 
 ---
 
