@@ -57,11 +57,12 @@ def list_tools():
 
 
 def create_unit_tool(image_ref, tool_name):
-    """创建每题临时工具（SANDBOX 隔离网络；镜像=题目镜像；envd 启动）。
+    """（遗留：逐题临时工具模式，已被 Image Override 取代，保留兼容）
 
-    耗时实测（2026-09-16 对照实验）：工具注册仅 ~0.4-2s（元数据操作），
-    真正的镜像拉取发生在 Sandbox.create 实例阶段——并发批量拉取会共享
-    节点带宽（实测 61-219s/个）→ 预热必须前置到批次级（见 preheat_batch）。
+    新模式见 ensure_generic_tool / start_bench_instance：单通用工具 +
+    实例级镜像覆盖（StartSandboxInstance CustomConfiguration.Image），
+    并发不再受工具配额约束（仅受实例配额），依据 ags_image_override.md
+    （2026-09-18 实测：覆盖生效、4.2s 直接 RUNNING、e2b connect 可接入）。
     """
     r = tccli("CreateSandboxTool", "--cli-unfold-argument",
               "--ToolName", tool_name, "--ToolType", "custom",
@@ -88,6 +89,82 @@ def create_unit_tool(image_ref, tool_name):
     if r.returncode != 0:
         raise RuntimeError(f"工具创建失败: {r.stderr[-200:]}")
     return tool_name
+
+
+# ─────────────── Image Override 模式（单通用工具 + 实例级镜像覆盖） ───────────────
+GENERIC_TOOL = os.environ.get("BENCH_GENERIC_TOOL", "bench-generic")
+
+
+def ensure_generic_tool():
+    """确保通用题目工具存在且 ACTIVE（一次性；默认镜像仅占位，实例创建时覆盖）。
+
+    依据 ags_image_override.md：StartSandboxInstance 的 CustomConfiguration
+    仅传需覆盖字段（Image），其余继承工具默认——故此工具的默认镜像随意，
+    Command/Probe/Resources 在实例级自动生效。
+    """
+    for t in list_tools():
+        if t["ToolName"] == GENERIC_TOOL:
+            if t["Status"] == "ACTIVE":
+                return GENERIC_TOOL
+            if t["Status"] == "FAILED":
+                raise RuntimeError(f"通用工具 {GENERIC_TOOL} FAILED（删除重建）")
+            # CREATING 等待
+            wait_tool_active(GENERIC_TOOL)
+            return GENERIC_TOOL
+    # 不存在 → 创建（默认镜像用基座，仅作模板占位）
+    r = tccli("CreateSandboxTool", "--cli-unfold-argument",
+              "--ToolName", GENERIC_TOOL, "--ToolType", "custom",
+              "--NetworkConfiguration.NetworkMode", "SANDBOX",
+              "--CustomConfiguration.Image", os.environ["BASE_IMAGE"],
+              "--CustomConfiguration.ImageRegistryType", "enterprise",
+              "--CustomConfiguration.Command", "/usr/bin/envd",
+              "--CustomConfiguration.Ports.0.Name", "envd",
+              "--CustomConfiguration.Ports.0.Port", "49983",
+              "--CustomConfiguration.Ports.0.Protocol", "TCP",
+              "--CustomConfiguration.Probe.HttpGet.Path", "/health",
+              "--CustomConfiguration.Probe.HttpGet.Port", "49983",
+              "--CustomConfiguration.Probe.HttpGet.Scheme", "HTTP",
+              "--CustomConfiguration.Probe.ReadyTimeoutMs", "30000",
+              "--CustomConfiguration.Probe.ProbeTimeoutMs", "1000",
+              "--CustomConfiguration.Probe.ProbePeriodMs", "1000",
+              "--CustomConfiguration.Probe.SuccessThreshold", "1",
+              "--CustomConfiguration.Probe.FailureThreshold", "100",
+              "--CustomConfiguration.Resources.CPU", "1",
+              "--CustomConfiguration.Resources.Memory", "2Gi",
+              "--CustomConfiguration.Resources.Storage", "10Gi",
+              "--RoleArn", ROLE_ARN, "--DefaultTimeout", "2h",
+              "--Description", "generic bench tool (image override per-instance)")
+    if r.returncode != 0:
+        raise RuntimeError(f"通用工具创建失败: {r.stderr[-200:]}")
+    wait_tool_active(GENERIC_TOOL)
+    print(f"[{time.strftime('%H:%M:%S')}] [override] 通用工具 {GENERIC_TOOL} 就绪")
+    return GENERIC_TOOL
+
+
+def start_bench_instance(image_ref, timeout_s="1h"):
+    """Image Override 拉起题目实例：通用工具 + 实例级镜像覆盖 → InstanceId。
+
+    e2b 原生 create() 无法传镜像（坑 1）——必须 AGS API 创建 + connect 接入。
+    Timeout 必须显式传（坑 3：默认仅 5m）。
+    """
+    r = tccli("StartSandboxInstance", "--cli-unfold-argument",
+              "--ToolName", GENERIC_TOOL, "--Timeout", timeout_s,
+              "--CustomConfiguration.Image", image_ref,
+              "--CustomConfiguration.ImageRegistryType", "enterprise")
+    if r.returncode != 0:
+        raise RuntimeError(f"覆盖实例创建失败: {r.stderr[-200:]}")
+    d = json.loads(r.stdout[r.stdout.find("{"):])
+    inst = d.get("Instance", {})
+    iid, st = inst.get("InstanceId"), inst.get("Status")
+    if not iid or st != "RUNNING":
+        raise RuntimeError(f"覆盖实例未就绪: {d}")
+    return iid
+
+
+def connect_bench(iid):
+    """e2b 接入 AGS 创建的实例（Recipe C：不是 create，是 connect）。"""
+    from e2b_code_interpreter import Sandbox
+    return Sandbox.connect(iid, timeout=3600)
 
 
 def preheat_batch(recs, timeout_s=180):
@@ -246,6 +323,8 @@ AGENT_TOOL = os.environ.get("AGENT_TOOL", "bench-solver")
 #   实例：每题一对（agent + bench）→ 50 实例配额 → ≤25 对
 #   → 双重约束取小：25 对 = 50 实例顶格，建议留余量跑 ≤24
 MAX_CONCURRENT_UNITS = int(os.environ.get("VALIDATE_MAX_CONCURRENCY", "25"))
+# Image Override 后：不再受工具配额（30/账号）约束，仅受实例配额约束——
+# 每单元 2 实例（bench + agent），实例配额内可自由调高（VALIDATE_MAX_CONCURRENCY 环境变量覆盖）
 
 
 def acquire_instance_token(instance_id):
@@ -380,9 +459,10 @@ def analyze_failure(bench_sb, rec, agent_out):
 
 # ─────────────────── 单元验证编排 ───────────────────
 async def validate_unit(sem, rec, results, agent_on, rounds, agent_mode="probe"):
-    """一个单元的完整核验（v2 双沙箱）：
-    建临时工具 → bench 实例 → agent 实例 → ①agent 解题(pass@1)
-    → ②标准答案核验(Phase A) → ③agent 答错时对比分析 → 销毁。
+    """一个单元的完整核验（v4：Image Override 模式）：
+    通用工具 + 实例级镜像覆盖拉起 bench 实例 → agent 实例 → ①LLM 探测/解题
+    → ②标准答案核验(Phase A) → ③失败对比分析 → 销毁。
+    不再创建每题临时工具——并发不受工具配额（30）约束，仅受实例配额（100）。
     每题同时占用 2 个实例（agent + bench），受全局信号量背压。
     """
     iid = rec["instance_id"]
@@ -392,30 +472,18 @@ async def validate_unit(sem, rec, results, agent_on, rounds, agent_mode="probe")
         print(f"[{time.strftime('%H:%M:%S')}] [{iid}] ⏭ 无镜像记录（旧模式产物），跳过")
         return "skipped"
     image_ref = f"{image}@{digest}"
-    tool_name = TOOL_PREFIX + re.sub(r"[^a-z0-9-]", "-", iid.lower())[:40]
 
     async with sem:
         from e2b_code_interpreter import Sandbox
         sb = agent_sb = None
         verdict = {"instance_id": iid}
         try:
-            # ① CVM: tccli 建工具 + 预热 + 等 ACTIVE；拉起 bench 实例（题目烧入）
-            #    偶发 FAILED（实测：同镜像本地冒烟正常仍 FAILED，平台侧调度异常）
-            #    → 换名重试一次（v2 命名与原工具名不冲突，配额占用相同）
-            import random
-            for attempt, tn in enumerate([tool_name,
-                                          f"{tool_name}-r{random.randint(10, 99)}"]):
-                try:
-                    create_unit_tool(image_ref, tn)
-                    wait_tool_active(tn)
-                    tool_name = tn
-                    break
-                except RuntimeError:
-                    delete_unit_tool(tn)
-                    if attempt == 1:
-                        raise
-            sb = Sandbox.create(template=tool_name, timeout=3600)
-            print(f"[{time.strftime('%H:%M:%S')}] [{iid}] bench 实例就绪")
+            # ① Image Override：通用工具 + 镜像覆盖拉起 bench 实例（题目烧入）
+            #    e2b create() 无法传镜像 → AGS API 创建 + connect 接入（两步）
+            bench_iid = await asyncio.to_thread(start_bench_instance, image_ref)
+            sb = await asyncio.to_thread(connect_bench, bench_iid)
+            print(f"[{time.strftime('%H:%M:%S')}] [{iid}] bench 实例就绪"
+                  f"（override {GENERIC_TOOL}）")
 
             # ② agent 沙箱（独立实例）：LLM 探测（默认）或完整解题（--agent-mode full）
             if agent_on:
@@ -454,8 +522,6 @@ async def validate_unit(sem, rec, results, agent_on, rounds, agent_mode="probe")
                         x.kill()
                     except Exception:
                         pass
-            ok = delete_unit_tool(tool_name)      # CVM: tccli 删工具（配额归还）
-            print(f"[{time.strftime('%H:%M:%S')}] [{iid}] 工具{'已删' if ok else '删除失败(留待清扫)'}")
         results.append(verdict)
         return verdict.get("phase_a", {}).get("result", "error")
 
@@ -478,9 +544,9 @@ async def main():
                     help="跳过批次级镜像预热（调试用）")
     args = ap.parse_args()
 
-    for k in ("E2B_DOMAIN", "E2B_API_KEY", "ROLE_ARN"):
+    for k in ("E2B_DOMAIN", "E2B_API_KEY", "ROLE_ARN", "BASE_IMAGE"):
         if not os.environ.get(k):
-            sys.exit(f"缺少环境变量: {k}（ROLEArn 为工具创建所需 CAM 角色）")
+            sys.exit(f"缺少环境变量: {k}（ROLEArn/BASE_IMAGE 为通用工具创建所需）")
 
     recs = [json.loads(l) for l in open(args.units_file) if l.strip()]
     for r in recs:                                   # 附带 problem.md 路径（题面）
@@ -488,10 +554,14 @@ async def main():
         if os.path.exists(p):
             r["_problem_md"] = p
     print(f"[{time.strftime('%H:%M:%S')}] [validate] {len(recs)} 个单元 | 并发 {args.concurrency} | "
-          f"agent {'关' if args.no_agent else args.agent_mode + ' 模式'} | 镜像预热 {'关' if args.no_preheat else '开'}")
+          f"agent {'关' if args.no_agent else args.agent_mode + ' 模式'} | 镜像预热 {'关' if args.no_preheat else '开'}"
+          f" | 模式 Image-Override({GENERIC_TOOL})")
 
     if not args.no_sweep:
         sweep_orphan_tools()
+
+    # ★ Image Override：单通用工具 + 实例级镜像覆盖（配额 1 个工具，并发仅受实例配额约束）
+    await asyncio.to_thread(ensure_generic_tool)
 
     # ★ 批次级预热：镜像分发与实例拉起分离，避免 N 实例并发拉取抢带宽
     #   （实测：未预热批次 Sandbox.create 61-219s/个；预热后预期 <10s）
