@@ -33,6 +33,13 @@ from e2b.sandbox.commands.command_handle import CommandExitException
 
 MAKER_ENTRY = "/opt/builder/builder_agent.py"    # maker 镜像内入口（已验证协议）
 
+# GitHub token 轮换池（GITHUB_TOKENS 限额感知；同账号 PAT 共享池，为异账号扩容预留）
+try:
+    from github_token_pool import GhTokenPool                     # noqa: E402
+    _GH_POOL = GhTokenPool.from_env()
+except Exception:
+    _GH_POOL = None
+
 
 def refresh_tcr_token():
     """TCR 实例令牌每批刷新（实测 ~1.5h 过期）。"""
@@ -54,7 +61,13 @@ def unit_envs(repo, issue, tcr_user, tcr_pass, pr=None):
           "BASE_IMAGE": os.environ["BASE_IMAGE"]}
     if pr:
         ev["WORK_PR"] = str(pr)   # 预配对（反向发现器）：跳过 timeline/search，防并发 403
-    for k in ("GITHUB_TOKEN", "OPENAI_BASE_URL", "OPENAI_API_KEY", "LLM_MODEL"):
+    # GitHub token：优先轮换池（GITHUB_TOKENS，限额感知）；同账号 PAT 实测共享
+    # 限额池（2026-09-21），轮换无增益但为异账号扩容预留；缺省回落 GITHUB_TOKEN。
+    if _GH_POOL is not None:
+        ev["GITHUB_TOKEN"] = _GH_POOL.acquire()
+    elif os.environ.get("GITHUB_TOKEN"):
+        ev["GITHUB_TOKEN"] = os.environ["GITHUB_TOKEN"]
+    for k in ("OPENAI_BASE_URL", "OPENAI_API_KEY", "LLM_MODEL"):
         if os.environ.get(k):
             ev[k] = os.environ[k]          # LLM 就绪时启用 DeepSeek 改写链，否则模板降级
     ip = subprocess.run(["dig", "+short", os.environ["TCR_REGISTRY"], "@8.8.8.8"],
