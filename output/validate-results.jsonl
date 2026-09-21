@@ -19,3 +19,91 @@
 {"instance_id":"Textualize__rich-3569","phase_a":{"result":"rejected","reason":"harness_crash","raw":" in 0.87s\n\nno tests ran in 0.12s\n{\n  \"instance_id\": \"Textualize__rich-3569\",\n  \"total\": 0,\n  \"fail_to_pass\": {\n    \"test_panel.py::test_title_text_with_panel_background\": \"missing\"\n  },\n  \"all_passed\""}}
 {"instance_id":"pallets__click-2819","phase_a":{"result":"validated","rounds":2}}
 {"instance_id":"psf__black-5210","llm":{"reachable":true,"model":"hy4-preview","latency_ms":12343},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pallets__click-3059","llm":{"reachable":true,"model":"hy4-preview","latency_ms":10385},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pallets__click-3084","llm":{"reachable":true,"model":"hy4-preview","latency_ms":9269},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pallets__click-3145","llm":{"reachable":true,"model":"hy4-preview","latency_ms":9300},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pallets__click-3071","llm":{"reachable":true,"model":"hy4-preview","latency_ms":8925},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pallets__click-2836","llm":{"reachable":true,"model":"hy4-preview","latency_ms":10339},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pallets__click-2897","llm":{"reachable":true,"model":"hy4-preview","latency_ms":7931},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pallets__click-2968","llm":{"reachable":true,"model":"hy4-preview","latency_ms":10157},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"Textualize__rich-3881","llm":{"reachable":true,"model":"hy4-preview","latency_ms":14619},"phase_a":{"result":"rejected","reason":"harness_crash","raw":"\nno tests ran in 0.91s\n\nno tests ran in 0.12s\n{\n  \"instance_id\": \"Textualize__rich-3881\",\n  \"total\": 0,\n  \"fail_to_pass\": {\n    \"test_prompt.py::test_prompt_confirm_markup\": \"missing\"\n  },\n  \"all_pass"}}
+{"instance_id":"pallets__click-3105","llm":{"reachable":true,"model":"hy4-preview","latency_ms":7369},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"Textualize__rich-3295","llm":{"reachable":true,"model":"hy4-preview","latency_ms":15033},"phase_a":{"result":"rejected","reason":"harness_crash","raw":"n in 0.12s\n{\n  \"instance_id\": \"Textualize__rich-3295\",\n  \"total\": 0,\n  \"fail_to_pass\": {\n    \"test_syntax.py::test_background_color_override_includes_padding\": \"missing\"\n  },\n  \"all_passed\": false\n}\nE"}}
+{"instance_id":"pallets__click-2832","llm":{"reachable":true,"model":"hy4-preview","latency_ms":8585},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pallets__click-2983","llm":{"reachable":true,"model":"hy4-preview","latency_ms":9633},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"Textualize__rich-3569","llm":{"reachable":true,"model":"hy4-preview","latency_ms":10205},"phase_a":{"result":"rejected","reason":"harness_crash","raw":" in 0.96s\n\nno tests ran in 0.12s\n{\n  \"instance_id\": \"Textualize__rich-3569\",\n  \"total\": 0,\n  \"fail_to_pass\": {\n    \"test_panel.py::test_title_text_with_panel_background\": \"missing\"\n  },\n  \"all_passed\""}}
+{"instance_id":"pallets__click-2819","llm":{"reachable":true,"model":"hy4-preview","latency_ms":9030},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pallets__click-2609","llm":{"reachable":true,"model":"hy4-preview","latency_ms":12093},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pallets__click-3107","llm":{"reachable":true,"model":"hy4-preview","latency_ms":8742},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"psf__requests-6643","llm":{"reachable":true,"model":"hy4-preview","latency_ms":10385},"phase_a":{"result":"rejected","reason":"harness_crash","raw":"odule>\n    from requests.compat import urljoin\nsrc/requests/__init__.py:147: in <module>\n    from . import packages, utils\nsrc/requests/packages.py:16: in <module>\n    locals()[package] = __import__(p"}}
+{"instance_id":"Textualize__rich-3517","llm":{"reachable":true,"model":"hy4-preview","latency_ms":15981},"phase_a":{"result":"rejected","reason":"harness_crash","raw":"0.82s\n\nno tests ran in 0.12s\n{\n  \"instance_id\": \"Textualize__rich-3517\",\n  \"total\": 0,\n  \"fail_to_pass\": {\n    \"test_table.py::test_columns_highlight_added_by_add_row\": \"missing\"\n  },\n  \"all_passed\": "}}
+{"instance_id":"pypa__packaging-727","llm":{"reachable":true,"model":"hy4-preview","latency_ms":18292},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pallets__click-2632","llm":{"reachable":true,"model":"hy4-preview","latency_ms":20744},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pallets__click-2817","llm":{"reachable":true,"model":"hy4-preview","latency_ms":7150},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pallets__click-2682","llm":{"reachable":true,"model":"hy4-preview","latency_ms":9196},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pallets__click-2447","llm":{"reachable":true,"model":"hy4-preview","latency_ms":8853},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pallets__click-2415","llm":{"reachable":true,"model":"hy4-preview","latency_ms":8381},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pallets__click-2012","llm":{"reachable":true,"model":"hy4-preview","latency_ms":10161},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pallets__click-2322","llm":{"reachable":true,"model":"hy4-preview","latency_ms":7226},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__packaging-1333","llm":{"reachable":true,"model":"hy4-preview","latency_ms":8294},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__packaging-1178","llm":{"reachable":true,"model":"hy4-preview","latency_ms":8701},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__pip-12961","llm":{"reachable":true,"model":"hy4-preview","latency_ms":15632},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"psf__black-4077","llm":{"reachable":true,"model":"hy4-preview","latency_ms":9210},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__packaging-710","llm":{"reachable":true,"model":"hy4-preview","latency_ms":8623},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__packaging-657","llm":{"reachable":true,"model":"hy4-preview","latency_ms":7521},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"psf__black-5164","llm":{"reachable":true,"model":"hy4-preview","latency_ms":9675},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__pip-11677","llm":{"reachable":true,"model":"hy4-preview","latency_ms":7871},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__pip-14117","llm":{"reachable":true,"model":"hy4-preview","latency_ms":12122},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__pip-14074","llm":{"reachable":true,"model":"hy4-preview","latency_ms":8032},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__pip-14079","llm":{"reachable":true,"model":"hy4-preview","latency_ms":9955},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__pip-13299","llm":{"reachable":true,"model":"hy4-preview","latency_ms":8122},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__pip-11012","llm":{"reachable":true,"model":"hy4-preview","latency_ms":9472},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__pip-6385","llm":{"reachable":true,"model":"hy4-preview","latency_ms":10094},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__virtualenv-2285","llm":{"reachable":true,"model":"hy4-preview","latency_ms":16453},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"Textualize__rich-3176","llm":{"reachable":true,"model":"hy4-preview","latency_ms":6642},"phase_a":{"result":"rejected","reason":"harness_crash","raw":"_cells\": \"missing\",\n    \"test_cells.py::test_chop_cells_double_width_boundary\": \"missing\",\n    \"test_cells.py::test_chop_cells_mixed_width\": \"missing\",\n    \"test_text.py::test_wrap_cjk_mixed\": \"missin"}}
+{"instance_id":"pypa__pip-11948","llm":{"reachable":true,"model":"hy4-preview","latency_ms":8605},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__pip-11985","llm":{"reachable":true,"model":"hy4-preview","latency_ms":9175},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__virtualenv-3072","llm":{"reachable":true,"model":"hy4-preview","latency_ms":9494},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__packaging-733","llm":{"reachable":true,"model":"hy4-preview","latency_ms":9351},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"psf__black-5210","llm":{"reachable":true,"model":"hy4-preview","latency_ms":8747},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__virtualenv-3181","llm":{"reachable":true,"model":"hy4-preview","latency_ms":15483},"phase_a":{"result":"rejected","reason":"answer_not_all_passed"}}
+{"instance_id":"pypa__pip-8573","llm":{"reachable":true,"model":"hy4-preview","latency_ms":9967},"phase_a":{"result":"rejected","reason":"answer_not_all_passed"}}
+{"instance_id":"pypa__pip-12653","llm":{"reachable":true,"model":"hy4-preview","latency_ms":17226},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__pip-5378","llm":{"reachable":true,"model":"hy4-preview","latency_ms":9301},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__virtualenv-2969","llm":{"reachable":true,"model":"hy4-preview","latency_ms":8676},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"psf__black-4963","llm":{"reachable":true,"model":"hy4-preview","latency_ms":8708},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__pip-13084","llm":{"reachable":true,"model":"hy4-preview","latency_ms":8129},"phase_a":{"result":"rejected","reason":"harness_crash","raw":"ollectors for /benchmark/repos/pypa__pip/tests/unit/test_self_check_outdated.py::test_pip_self_version_check_emit_no_prompt_is_silent\n\nERROR: found no collectors for /benchmark/repos/pypa__pip/tests/u"}}
+{"instance_id":"pypa__packaging-1204","llm":{"reachable":true,"model":"hy4-preview","latency_ms":9306},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__pip-14044","llm":{"reachable":true,"model":"hy4-preview","latency_ms":7352},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__virtualenv-2972","llm":{"reachable":true,"model":"hy4-preview","latency_ms":9463},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__pip-13046","llm":{"reachable":true,"model":"hy4-preview","latency_ms":11466},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"psf__black-4950","llm":{"reachable":true,"model":"hy4-preview","latency_ms":10038},"phase_a":{"result":"rejected","reason":"harness_crash","raw":"io\r\n/benchmark/tests/psf__black-4950/tests.patch:7: trailing whitespace.\nfrom concurrent.futures import ThreadPoolExecutor\r\n/benchmark/tests/psf__black-4950/tests.patch:8: trailing whitespace.\nfrom pa"}}
+{"instance_id":"pypa__virtualenv-2493","llm":{"reachable":true,"model":"hy4-preview","latency_ms":14224},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__packaging-909","llm":{"reachable":true,"model":"hy4-preview","latency_ms":7096},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__virtualenv-2659","llm":{"reachable":true,"model":"hy4-preview","latency_ms":8776},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"psf__black-3826","llm":{"reachable":true,"model":"hy4-preview","latency_ms":15373},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__virtualenv-3049","llm":{"reachable":true,"model":"hy4-preview","latency_ms":10254},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__virtualenv-2870","llm":{"reachable":true,"model":"hy4-preview","latency_ms":9664},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"psf__black-4944","llm":{"reachable":true,"model":"hy4-preview","latency_ms":8897},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"psf__black-4205","llm":{"reachable":true,"model":"hy4-preview","latency_ms":9265},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"psf__black-3527","llm":{"reachable":true,"model":"hy4-preview","latency_ms":17262},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__pip-6823","llm":{"reachable":true,"model":"hy4-preview","latency_ms":9006},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__packaging-885","llm":{"reachable":true,"model":"hy4-preview","latency_ms":7605},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__packaging-1154","llm":{"reachable":true,"model":"hy4-preview","latency_ms":7490},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"psf__black-3593","llm":{"reachable":true,"model":"hy4-preview","latency_ms":15698},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__pip-13226","llm":{"reachable":true,"model":"hy4-preview","latency_ms":8746},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__pip-11043","llm":{"reachable":true,"model":"hy4-preview","latency_ms":8321},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__packaging-1067","llm":{"reachable":true,"model":"hy4-preview","latency_ms":13823},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__virtualenv-2774","llm":{"reachable":true,"model":"hy4-preview","latency_ms":13420},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__virtualenv-2467","llm":{"reachable":true,"model":"hy4-preview","latency_ms":7994},"phase_a":{"result":"rejected","reason":"answer_not_all_passed"}}
+{"instance_id":"pypa__packaging-1066","llm":{"reachable":true,"model":"hy4-preview","latency_ms":9339},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__virtualenv-3090","llm":{"reachable":true,"model":"hy4-preview","latency_ms":8024},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__pip-11820","llm":{"reachable":true,"model":"hy4-preview","latency_ms":8554},"phase_a":{"result":"rejected","reason":"harness_crash","raw":"_outdated.py::test_get_statefile_name_known_values[C:\\\\Users\\\\User\\\\Desktop\\\\venv-902cecc0745b8ecf2509ba473f3556f0ba222fedc6df433acda24aa5]\n\nERROR: found no collectors for /benchmark/repos/pypa__pip/t"}}
+{"instance_id":"pypa__pip-13288","llm":{"reachable":true,"model":"hy4-preview","latency_ms":8631},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__virtualenv-2896","llm":{"reachable":true,"model":"hy4-preview","latency_ms":6773},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__pip-12280","llm":{"reachable":true,"model":"hy4-preview","latency_ms":8107},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__virtualenv-3105","llm":{"reachable":true,"model":"hy4-preview","latency_ms":7835},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__pip-14136","llm":{"reachable":true,"model":"hy4-preview","latency_ms":10054},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"psf__black-4172","llm":{"reachable":true,"model":"hy4-preview","latency_ms":7819},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"psf__black-4980","llm":{"reachable":true,"model":"hy4-preview","latency_ms":8494},"phase_a":{"result":"validated","rounds":2}}
+{"instance_id":"pypa__virtualenv-2786","llm":{"reachable":true,"model":"hy4-preview","latency_ms":14606},"phase_a":{"result":"validated","rounds":2}}

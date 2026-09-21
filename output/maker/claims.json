@@ -355,19 +355,19 @@
   "ts": "2026-09-16T12:37:05+00:00"
  },
  "make/pallets/click#3571": {
-  "state": "failed",
-  "note": "崩溃启动残留，留待补跑",
-  "ts": "2026-09-21T07:21:50+00:00"
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-21T08:40:36+00:00"
  },
  "make/pallets/click#3740": {
-  "state": "failed",
-  "note": "崩溃启动残留，留待补跑",
-  "ts": "2026-09-21T07:21:50+00:00"
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-21T08:42:28+00:00"
  },
  "make/pallets/click#3069": {
-  "state": "failed",
-  "note": "崩溃启动残留，留待补跑",
-  "ts": "2026-09-21T07:21:50+00:00"
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-21T08:40:38+00:00"
  },
  "make/pallets/click#2447": {
   "state": "done",
@@ -376,8 +376,8 @@
  },
  "make/pallets/click#2787": {
   "state": "failed",
-  "note": "崩溃启动残留，留待补跑",
-  "ts": "2026-09-21T07:21:50+00:00"
+  "note": "TimeoutExpired: Command '/tmp/build/venv/bin/python -m pytest tests/test_chain.py tests/test_termui.py tests/test_utils.py -q --tb=no --json-report --json-report-file=/tmp/report_b0.json' timed out af",
+  "ts": "2026-09-21T08:52:25+00:00"
  },
  "make/pallets/click#2682": {
   "state": "done",
@@ -385,9 +385,9 @@
   "ts": "2026-09-16T12:37:58+00:00"
  },
  "make/pallets/click#3572": {
-  "state": "failed",
-  "note": "崩溃启动残留，留待补跑",
-  "ts": "2026-09-21T07:21:50+00:00"
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-21T08:40:08+00:00"
  },
  "make/pallets/click#2899": {
   "state": "done",
@@ -405,29 +405,29 @@
   "ts": "2026-09-16T12:48:45+00:00"
  },
  "make/pallets/click#2644": {
-  "state": "failed",
-  "note": "崩溃启动残留，留待补跑",
-  "ts": "2026-09-21T07:21:50+00:00"
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-21T08:42:38+00:00"
  },
  "make/pallets/click#2809": {
-  "state": "failed",
-  "note": "崩溃启动残留，留待补跑",
-  "ts": "2026-09-21T07:21:50+00:00"
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-21T08:44:52+00:00"
  },
  "make/pallets/click#2790": {
-  "state": "failed",
-  "note": "崩溃启动残留，留待补跑",
-  "ts": "2026-09-21T07:21:50+00:00"
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-21T08:44:48+00:00"
  },
  "make/pallets/click#2746": {
-  "state": "failed",
-  "note": "崩溃启动残留，留待补跑",
-  "ts": "2026-09-21T07:21:50+00:00"
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-21T08:42:38+00:00"
  },
  "make/pallets/click#2674": {
   "state": "failed",
-  "note": "崩溃启动残留，留待补跑",
-  "ts": "2026-09-21T07:21:50+00:00"
+  "note": "TimeoutExpired: Command '/tmp/build/venv/bin/python -m pytest tests/test_utils.py -q --tb=no --json-report --json-report-file=/tmp/report_b0.json' timed out after 900 seconds",
+  "ts": "2026-09-21T08:52:25+00:00"
  },
  "make/pallets/click#2632": {
   "state": "done",
@@ -440,14 +440,14 @@
   "ts": "2026-09-16T12:37:58+00:00"
  },
  "make/pallets/click#2695": {
-  "state": "failed",
-  "note": "崩溃启动残留，留待补跑",
-  "ts": "2026-09-21T07:21:50+00:00"
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-21T08:44:45+00:00"
  },
  "make/pallets/click#2621": {
-  "state": "failed",
-  "note": "崩溃启动残留，留待补跑",
-  "ts": "2026-09-21T07:21:50+00:00"
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-21T08:44:56+00:00"
  },
  "make/pallets/click#2322": {
   "state": "done",
@@ -465,24 +465,24 @@
   "ts": "2026-09-16T12:36:56+00:00"
  },
  "make/pallets/click#2246": {
-  "state": "failed",
-  "note": "崩溃启动残留，留待补跑",
-  "ts": "2026-09-21T07:21:50+00:00"
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-21T08:43:32+00:00"
  },
  "make/pallets/click#2516": {
-  "state": "failed",
-  "note": "崩溃启动残留，留待补跑",
-  "ts": "2026-09-21T07:21:50+00:00"
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-21T08:40:09+00:00"
  },
  "make/Textualize/rich#3115": {
-  "state": "failed",
-  "note": "崩溃启动残留，留待补跑",
-  "ts": "2026-09-21T07:21:50+00:00"
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-21T08:45:11+00:00"
  },
  "make/Textualize/rich#2942": {
-  "state": "failed",
-  "note": "崩溃启动残留，留待补跑",
-  "ts": "2026-09-21T07:21:50+00:00"
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-21T08:42:48+00:00"
  },
  "make/Textualize/rich#2863": {
   "state": "done",
@@ -490,29 +490,29 @@
   "ts": "2026-09-16T12:38:12+00:00"
  },
  "make/Textualize/rich#2740": {
-  "state": "failed",
-  "note": "崩溃启动残留，留待补跑",
-  "ts": "2026-09-21T07:21:50+00:00"
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-21T08:45:15+00:00"
  },
  "make/Textualize/rich#2688": {
-  "state": "failed",
-  "note": "崩溃启动残留，留待补跑",
-  "ts": "2026-09-21T07:21:50+00:00"
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-21T08:40:53+00:00"
  },
  "make/pallets/click#2813": {
-  "state": "failed",
-  "note": "崩溃启动残留，留待补跑",
-  "ts": "2026-09-21T07:21:50+00:00"
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-21T08:42:42+00:00"
  },
  "make/pallets/click#2894": {
-  "state": "failed",
-  "note": "崩溃启动残留，留待补跑",
-  "ts": "2026-09-21T07:21:50+00:00"
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-21T08:42:42+00:00"
  },
  "make/pallets/click#2703": {
-  "state": "failed",
-  "note": "崩溃启动残留，留待补跑",
-  "ts": "2026-09-21T07:21:50+00:00"
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-21T08:40:27+00:00"
  },
  "make/pallets/click#605": {
   "state": "done",
@@ -520,19 +520,19 @@
   "ts": "2026-09-16T12:37:58+00:00"
  },
  "make/pypa/packaging#1318": {
-  "state": "failed",
-  "note": "崩溃启动残留，留待补跑",
-  "ts": "2026-09-21T07:21:50+00:00"
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-21T08:48:08+00:00"
  },
  "make/pypa/packaging#1315": {
-  "state": "failed",
-  "note": "崩溃启动残留，留待补跑",
-  "ts": "2026-09-21T07:21:50+00:00"
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-21T08:40:32+00:00"
  },
  "make/pypa/packaging#831": {
-  "state": "failed",
-  "note": "崩溃启动残留，留待补跑",
-  "ts": "2026-09-21T07:21:50+00:00"
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-21T08:45:14+00:00"
  },
  "make/pypa/packaging#1204": {
   "state": "done",
@@ -591,8 +591,8 @@
  },
  "make/psf/requests#6711": {
   "state": "failed",
-  "note": "崩溃启动残留，留待补跑",
-  "ts": "2026-09-21T07:21:50+00:00"
+  "note": "RuntimeError: kaniko 构建失败(benchmark-upload-sicheng.tencentcloudcr.com/benchmark-repo/benchmark-requests:20260921-084214-6711): epos/psf__requests  && chmod +x /benchmark/harness/*.sh] \nerror: uninstal",
+  "ts": "2026-09-21T08:42:29+00:00"
  },
  "make/pypa/packaging#710": {
   "state": "done",
@@ -630,9 +630,9 @@
   "ts": "2026-09-21T07:27:31+00:00"
  },
  "make/pypa/packaging#577": {
-  "state": "failed",
-  "note": "崩溃启动残留，留待补跑",
-  "ts": "2026-09-21T07:21:50+00:00"
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-21T08:44:52+00:00"
  },
  "make/psf/black#3721": {
   "state": "done",
@@ -645,9 +645,9 @@
   "ts": "2026-09-16T12:38:13+00:00"
  },
  "make/pypa/packaging#781": {
-  "state": "failed",
-  "note": "崩溃启动残留，留待补跑",
-  "ts": "2026-09-21T07:21:50+00:00"
+  "state": "done",
+  "note": "validated-dataset",
+  "ts": "2026-09-21T08:42:52+00:00"
  },
  "make/pypa/packaging#476": {
   "state": "done",

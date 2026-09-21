@@ -1,0 +1,12 @@
+{
+ "purpose": "题面改写（防模型背答案）",
+ "model": "hy4-preview",
+ "base_url": "https://tokenhub.tencentmaas.com/v1",
+ "identifier_keep_ratio": 0.6667,
+ "orig_sha256": "1be806bb3bcd1df8",
+ "rewritten_sha256": "01f13d71a7d23ef9",
+ "evidence_files": [
+  "problems/pallets__click-3572.orig.md",
+  "problems/pallets__click-3572.md"
+ ]
+}

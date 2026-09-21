@@ -1,0 +1,55 @@
+[make] 27 个单元 | maker=bench-maker-ds | 并发 12 | 预配对 27
+[make/pallets/click#3572] agent: {"result": "success", "instance_id": "pallets__click-3572", "f2p": 2, "p2p": 20, "rewrite": "deepseek-harness(hy4-preview,标识符保留67%)", "image
+[make/pallets/click#3572] ✅ 入库: F2P 2 / P2P 20
+[make/pallets/click#2516] agent: {"result": "success", "instance_id": "pallets__click-2516", "f2p": 25, "p2p": 20, "rewrite": "deepseek-harness(hy4-preview,标识符保留100%)", "ima
+[make/pallets/click#2516] ✅ 入库: F2P 25 / P2P 20
+[make/pallets/click#2703] agent: {"result": "success", "instance_id": "pallets__click-2703", "f2p": 3, "p2p": 20, "rewrite": "deepseek-harness(hy4-preview,标识符保留100%)", "imag
+[make/pallets/click#2703] ✅ 入库: F2P 3 / P2P 20
+[make/pypa/packaging#1315] agent: {"result": "success", "instance_id": "pypa__packaging-1315", "f2p": 1, "p2p": 20, "rewrite": "deepseek-harness(hy4-preview,标识符保留71%)", "imag
+[make/pypa/packaging#1315] ✅ 入库: F2P 1 / P2P 20
+[make/pallets/click#3571] agent: {"result": "success", "instance_id": "pallets__click-3571", "f2p": 6, "p2p": 20, "rewrite": "deepseek-harness(hy4-preview,标识符保留62%)", "image
+[make/pallets/click#3571] ✅ 入库: F2P 6 / P2P 20
+[make/pallets/click#3069] agent: {"result": "success", "instance_id": "pallets__click-3069", "f2p": 4, "p2p": 20, "rewrite": "deepseek-harness(hy4-preview,标识符保留50%)", "image
+[make/pallets/click#3069] ✅ 入库: F2P 4 / P2P 20
+[make/Textualize/rich#2688] agent: {"result": "success", "instance_id": "Textualize__rich-2688", "f2p": 4, "p2p": 3, "rewrite": "deepseek-harness(hy4-preview,标识符保留50%)", "imag
+[make/Textualize/rich#2688] ✅ 入库: F2P 4 / P2P 3
+[make/pallets/click#3740] agent: {"result": "success", "instance_id": "pallets__click-3740", "f2p": 6, "p2p": 20, "rewrite": "deepseek-harness(hy4-preview,标识符保留89%)", "image
+[make/pallets/click#3740] ✅ 入库: F2P 6 / P2P 20
+[make/psf/requests#6711] agent: {"result": "error", "instance_id": "psf__requests-6711", "error": "RuntimeError: kaniko 构建失败(benchmark-upload-sicheng.tencentcloudcr.com/ben
+[make/pallets/click#2746] agent: {"result": "success", "instance_id": "pallets__click-2746", "f2p": 1, "p2p": 20, "rewrite": "deepseek-harness(hy4-preview,标识符保留82%)", "image
+[make/pallets/click#2746] ✅ 入库: F2P 1 / P2P 20
+[make/pallets/click#2644] agent: {"result": "success", "instance_id": "pallets__click-2644", "f2p": 1, "p2p": 20, "rewrite": "deepseek-harness(hy4-preview,标识符保留96%)", "image
+[make/pallets/click#2644] ✅ 入库: F2P 1 / P2P 20
+[make/pallets/click#2894] agent: {"result": "success", "instance_id": "pallets__click-2894", "f2p": 5, "p2p": 20, "rewrite": "deepseek-harness(hy4-preview,标识符保留93%)", "image
+[make/pallets/click#2894] ✅ 入库: F2P 5 / P2P 20
+[make/pallets/click#2813] agent: {"result": "success", "instance_id": "pallets__click-2813", "f2p": 1, "p2p": 20, "rewrite": "deepseek-harness(hy4-preview,标识符保留82%)", "image
+[make/pallets/click#2813] ✅ 入库: F2P 1 / P2P 20
+[make/Textualize/rich#2942] agent: {"result": "success", "instance_id": "Textualize__rich-2942", "f2p": 1, "p2p": 20, "rewrite": "deepseek-harness(hy4-preview,标识符保留100%)", "im
+[make/Textualize/rich#2942] ✅ 入库: F2P 1 / P2P 20
+[make/pypa/packaging#781] agent: {"result": "success", "instance_id": "pypa__packaging-781", "f2p": 5, "p2p": 20, "rewrite": "deepseek-harness(hy4-preview,标识符保留100%)", "imag
+[make/pypa/packaging#781] ✅ 入库: F2P 5 / P2P 20
+[make/pallets/click#2246] agent: {"result": "success", "instance_id": "pallets__click-2246", "f2p": 1, "p2p": 20, "rewrite": "deepseek-harness(hy4-preview,标识符保留100%)", "imag
+[make/pallets/click#2246] ✅ 入库: F2P 1 / P2P 20
+[make/pallets/click#2695] agent: {"result": "success", "instance_id": "pallets__click-2695", "f2p": 1, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-uploa
+[make/pallets/click#2695] ✅ 入库: F2P 1 / P2P 20
+[make/pallets/click#2790] agent: {"result": "success", "instance_id": "pallets__click-2790", "f2p": 3, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-uploa
+[make/pallets/click#2790] ✅ 入库: F2P 3 / P2P 20
+[make/pypa/packaging#577] agent: {"result": "success", "instance_id": "pypa__packaging-577", "f2p": 5, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-uploa
+[make/pypa/packaging#577] ✅ 入库: F2P 5 / P2P 20
+[make/pallets/click#2809] agent: {"result": "success", "instance_id": "pallets__click-2809", "f2p": 14, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-uplo
+[make/pallets/click#2809] ✅ 入库: F2P 14 / P2P 20
+[make/pallets/click#2621] agent: {"result": "success", "instance_id": "pallets__click-2621", "f2p": 1, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-uploa
+[make/pallets/click#2621] ✅ 入库: F2P 1 / P2P 20
+[make/Textualize/rich#3115] agent: {"result": "success", "instance_id": "Textualize__rich-3115", "f2p": 3, "p2p": 1, "rewrite": "deepseek-harness(hy4-preview,标识符保留50%)", "imag
+[make/Textualize/rich#3115] ✅ 入库: F2P 3 / P2P 1
+[make/pypa/packaging#831] agent: {"result": "success", "instance_id": "pypa__packaging-831", "f2p": 3, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-uploa
+[make/pypa/packaging#831] ✅ 入库: F2P 3 / P2P 20
+[make/Textualize/rich#2740] agent: {"result": "success", "instance_id": "Textualize__rich-2740", "f2p": 1, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-upl
+[make/Textualize/rich#2740] ✅ 入库: F2P 1 / P2P 20
+[make/pypa/packaging#1318] agent: {"result": "success", "instance_id": "pypa__packaging-1318", "f2p": 6, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-uplo
+[make/pypa/packaging#1318] ✅ 入库: F2P 6 / P2P 20
+[make/pallets/click#2787] agent: {"result": "error", "instance_id": "pallets__click-2787", "error": "TimeoutExpired: Command '/tmp/build/venv/bin/python -m pytest tests/test
+[make/pallets/click#2674] agent: {"result": "error", "instance_id": "pallets__click-2674", "error": "TimeoutExpired: Command '/tmp/build/venv/bin/python -m pytest tests/test
+
+[make] 完成: {'success': 24, 'error': 3}
+[make] 池指标: {'created': 28, 'killed': 28, 'failures': 0, 'retries': 0, 'create_p50_s': 2.23, 'create_p90_s': 2.3, 'create_max_s': 2.36, 'acquire_wait_p50_ms': 0.0}

@@ -1,3 +1,268 @@
 [15:38:43] [validate] 88 个单元 | 并发 12 | agent probe 模式 | 镜像预热 开 | 模式 Image-Override(bench-generic)
 [15:42:06] [preheat] 镜像预热 35/88 完成，耗时 202s（超时余 53 个未确认）
 [15:42:13] [pallets__click-3059] bench 实例就绪（override bench-generic）
+[15:42:28] [pallets__click-3059] LLM 探测: ✅ 通（10385ms）
+[15:42:34] [pallets__click-3059] Phase A: validated
+[15:42:34] [pallets__click-3084] bench 实例就绪（override bench-generic）
+[15:42:47] [pallets__click-3084] LLM 探测: ✅ 通（9269ms）
+[15:42:52] [pallets__click-3084] Phase A: validated
+[15:42:53] [pallets__click-3145] bench 实例就绪（override bench-generic）
+[15:43:06] [pallets__click-3145] LLM 探测: ✅ 通（9300ms）
+[15:43:11] [pallets__click-3145] Phase A: validated
+[15:43:11] [pallets__click-3071] bench 实例就绪（override bench-generic）
+[15:43:24] [pallets__click-3071] LLM 探测: ✅ 通（8925ms）
+[15:43:30] [pallets__click-3071] Phase A: validated
+[15:43:30] [pallets__click-2836] bench 实例就绪（override bench-generic）
+[15:43:44] [pallets__click-2836] LLM 探测: ✅ 通（10339ms）
+[15:43:50] [pallets__click-2836] Phase A: validated
+[15:43:50] [pallets__click-2897] bench 实例就绪（override bench-generic）
+[15:44:02] [pallets__click-2897] LLM 探测: ✅ 通（7931ms）
+[15:44:07] [pallets__click-2897] Phase A: validated
+[15:44:07] [pallets__click-2968] bench 实例就绪（override bench-generic）
+[15:44:21] [pallets__click-2968] LLM 探测: ✅ 通（10157ms）
+[15:44:26] [pallets__click-2968] Phase A: validated
+[15:44:27] [Textualize__rich-3881] bench 实例就绪（override bench-generic）
+[15:44:45] [Textualize__rich-3881] LLM 探测: ✅ 通（14619ms）
+[15:44:50] [Textualize__rich-3881] Phase A: rejected
+[15:44:51] [pallets__click-3105] bench 实例就绪（override bench-generic）
+[15:45:02] [pallets__click-3105] LLM 探测: ✅ 通（7369ms）
+[15:45:07] [pallets__click-3105] Phase A: validated
+[15:45:07] [Textualize__rich-3295] bench 实例就绪（override bench-generic）
+[15:45:26] [Textualize__rich-3295] LLM 探测: ✅ 通（15033ms）
+[15:45:32] [Textualize__rich-3295] Phase A: rejected
+[15:45:32] [pallets__click-2832] bench 实例就绪（override bench-generic）
+[15:45:45] [pallets__click-2832] LLM 探测: ✅ 通（8585ms）
+[15:45:49] [pallets__click-2832] Phase A: validated
+[15:45:49] [pallets__click-2983] bench 实例就绪（override bench-generic）
+[15:46:03] [pallets__click-2983] LLM 探测: ✅ 通（9633ms）
+[15:46:09] [pallets__click-2983] Phase A: validated
+[15:46:09] [Textualize__rich-3569] bench 实例就绪（override bench-generic）
+[15:46:24] [Textualize__rich-3569] LLM 探测: ✅ 通（10205ms）
+[15:46:29] [Textualize__rich-3569] Phase A: rejected
+[15:46:29] [pallets__click-2819] bench 实例就绪（override bench-generic）
+[15:46:43] [pallets__click-2819] LLM 探测: ✅ 通（9030ms）
+[15:46:48] [pallets__click-2819] Phase A: validated
+[15:46:48] [pallets__click-2609] bench 实例就绪（override bench-generic）
+[15:47:05] [pallets__click-2609] LLM 探测: ✅ 通（12093ms）
+[15:47:10] [pallets__click-2609] Phase A: validated
+[15:47:10] [pallets__click-3107] bench 实例就绪（override bench-generic）
+[15:47:23] [pallets__click-3107] LLM 探测: ✅ 通（8742ms）
+[15:47:29] [pallets__click-3107] Phase A: validated
+[15:47:29] [psf__requests-6643] bench 实例就绪（override bench-generic）
+[15:47:44] [psf__requests-6643] LLM 探测: ✅ 通（10385ms）
+[15:47:48] [psf__requests-6643] Phase A: rejected
+[15:47:48] [Textualize__rich-3517] bench 实例就绪（override bench-generic）
+[15:48:08] [Textualize__rich-3517] LLM 探测: ✅ 通（15981ms）
+[15:48:13] [Textualize__rich-3517] Phase A: rejected
+[15:48:13] [pypa__packaging-727] bench 实例就绪（override bench-generic）
+[15:48:35] [pypa__packaging-727] LLM 探测: ✅ 通（18292ms）
+[15:48:40] [pypa__packaging-727] Phase A: validated
+[15:48:41] [pallets__click-2632] bench 实例就绪（override bench-generic）
+[15:49:06] [pallets__click-2632] LLM 探测: ✅ 通（20744ms）
+[15:49:10] [pallets__click-2632] Phase A: validated
+[15:49:10] [pallets__click-2817] bench 实例就绪（override bench-generic）
+[15:49:22] [pallets__click-2817] LLM 探测: ✅ 通（7150ms）
+[15:49:26] [pallets__click-2817] Phase A: validated
+[15:49:27] [pallets__click-2682] bench 实例就绪（override bench-generic）
+[15:49:40] [pallets__click-2682] LLM 探测: ✅ 通（9196ms）
+[15:49:44] [pallets__click-2682] Phase A: validated
+[15:49:44] [pallets__click-2447] bench 实例就绪（override bench-generic）
+[15:49:57] [pallets__click-2447] LLM 探测: ✅ 通（8853ms）
+[15:50:02] [pallets__click-2447] Phase A: validated
+[15:50:02] [pallets__click-2415] bench 实例就绪（override bench-generic）
+[15:50:15] [pallets__click-2415] LLM 探测: ✅ 通（8381ms）
+[15:50:19] [pallets__click-2415] Phase A: validated
+[15:50:20] [pallets__click-2012] bench 实例就绪（override bench-generic）
+[15:50:34] [pallets__click-2012] LLM 探测: ✅ 通（10161ms）
+[15:50:39] [pallets__click-2012] Phase A: validated
+[15:50:39] [pallets__click-2322] bench 实例就绪（override bench-generic）
+[15:50:50] [pallets__click-2322] LLM 探测: ✅ 通（7226ms）
+[15:50:54] [pallets__click-2322] Phase A: validated
+[15:50:55] [pypa__packaging-1333] bench 实例就绪（override bench-generic）
+[15:51:07] [pypa__packaging-1333] LLM 探测: ✅ 通（8294ms）
+[15:51:11] [pypa__packaging-1333] Phase A: validated
+[15:51:11] [pypa__packaging-1178] bench 实例就绪（override bench-generic）
+[15:51:24] [pypa__packaging-1178] LLM 探测: ✅ 通（8701ms）
+[15:51:28] [pypa__packaging-1178] Phase A: validated
+[15:51:29] [pypa__pip-12961] bench 实例就绪（override bench-generic）
+[15:51:48] [pypa__pip-12961] LLM 探测: ✅ 通（15632ms）
+[15:51:56] [pypa__pip-12961] Phase A: validated
+[15:51:57] [psf__black-4077] bench 实例就绪（override bench-generic）
+[15:52:10] [psf__black-4077] LLM 探测: ✅ 通（9210ms）
+[15:52:15] [psf__black-4077] Phase A: validated
+[15:52:16] [pypa__packaging-710] bench 实例就绪（override bench-generic）
+[15:52:28] [pypa__packaging-710] LLM 探测: ✅ 通（8623ms）
+[15:52:32] [pypa__packaging-710] Phase A: validated
+[15:52:33] [pypa__packaging-657] bench 实例就绪（override bench-generic）
+[15:52:44] [pypa__packaging-657] LLM 探测: ✅ 通（7521ms）
+[15:52:49] [pypa__packaging-657] Phase A: validated
+[15:52:50] [psf__black-5164] bench 实例就绪（override bench-generic）
+[15:53:04] [psf__black-5164] LLM 探测: ✅ 通（9675ms）
+[15:53:11] [psf__black-5164] Phase A: validated
+[15:53:12] [pypa__pip-11677] bench 实例就绪（override bench-generic）
+[15:53:24] [pypa__pip-11677] LLM 探测: ✅ 通（7871ms）
+[15:53:33] [pypa__pip-11677] Phase A: validated
+[15:53:33] [pypa__pip-14117] bench 实例就绪（override bench-generic）
+[15:53:50] [pypa__pip-14117] LLM 探测: ✅ 通（12122ms）
+[15:53:57] [pypa__pip-14117] Phase A: validated
+[15:53:57] [pypa__pip-14074] bench 实例就绪（override bench-generic）
+[15:54:10] [pypa__pip-14074] LLM 探测: ✅ 通（8032ms）
+[15:54:17] [pypa__pip-14074] Phase A: validated
+[15:54:18] [pypa__pip-14079] bench 实例就绪（override bench-generic）
+[15:54:32] [pypa__pip-14079] LLM 探测: ✅ 通（9955ms）
+[15:54:43] [pypa__pip-14079] Phase A: validated
+[15:54:43] [pypa__pip-13299] bench 实例就绪（override bench-generic）
+[15:54:56] [pypa__pip-13299] LLM 探测: ✅ 通（8122ms）
+[15:55:02] [pypa__pip-13299] Phase A: validated
+[15:55:02] [pypa__pip-11012] bench 实例就绪（override bench-generic）
+[15:55:16] [pypa__pip-11012] LLM 探测: ✅ 通（9472ms）
+[15:55:22] [pypa__pip-11012] Phase A: validated
+[15:55:23] [pypa__pip-6385] bench 实例就绪（override bench-generic）
+[15:55:37] [pypa__pip-6385] LLM 探测: ✅ 通（10094ms）
+[15:55:44] [pypa__pip-6385] Phase A: validated
+[15:55:44] [pypa__virtualenv-2285] bench 实例就绪（override bench-generic）
+[15:56:05] [pypa__virtualenv-2285] LLM 探测: ✅ 通（16453ms）
+[15:56:19] [pypa__virtualenv-2285] Phase A: validated
+[15:56:19] [Textualize__rich-3176] bench 实例就绪（override bench-generic）
+[15:56:30] [Textualize__rich-3176] LLM 探测: ✅ 通（6642ms）
+[15:56:35] [Textualize__rich-3176] Phase A: rejected
+[15:56:35] [pypa__pip-11948] bench 实例就绪（override bench-generic）
+[15:56:48] [pypa__pip-11948] LLM 探测: ✅ 通（8605ms）
+[15:56:56] [pypa__pip-11948] Phase A: validated
+[15:56:56] [pypa__pip-11985] bench 实例就绪（override bench-generic）
+[15:57:10] [pypa__pip-11985] LLM 探测: ✅ 通（9175ms）
+[15:57:18] [pypa__pip-11985] Phase A: validated
+[15:57:18] [pypa__virtualenv-3072] bench 实例就绪（override bench-generic）
+[15:57:32] [pypa__virtualenv-3072] LLM 探测: ✅ 通（9494ms）
+[15:57:38] [pypa__virtualenv-3072] Phase A: validated
+[15:57:38] [pypa__packaging-733] bench 实例就绪（override bench-generic）
+[15:57:52] [pypa__packaging-733] LLM 探测: ✅ 通（9351ms）
+[15:57:57] [pypa__packaging-733] Phase A: validated
+[15:57:57] [psf__black-5210] bench 实例就绪（override bench-generic）
+[15:58:10] [psf__black-5210] LLM 探测: ✅ 通（8747ms）
+[15:58:18] [psf__black-5210] Phase A: validated
+[15:58:18] [pypa__virtualenv-3181] bench 实例就绪（override bench-generic）
+[15:58:38] [pypa__virtualenv-3181] LLM 探测: ✅ 通（15483ms）
+[16:15:03] [pypa__virtualenv-3181] Phase A: rejected
+[16:15:04] [pypa__pip-8573] bench 实例就绪（override bench-generic）
+[16:15:18] [pypa__pip-8573] LLM 探测: ✅ 通（9967ms）
+[16:15:28] [pypa__pip-8573] Phase A: rejected
+[16:15:28] [pypa__pip-12653] bench 实例就绪（override bench-generic）
+[16:15:50] [pypa__pip-12653] LLM 探测: ✅ 通（17226ms）
+[16:15:59] [pypa__pip-12653] Phase A: validated
+[16:15:59] [pypa__pip-5378] bench 实例就绪（override bench-generic）
+[16:16:13] [pypa__pip-5378] LLM 探测: ✅ 通（9301ms）
+[16:16:23] [pypa__pip-5378] Phase A: validated
+[16:16:23] [pypa__virtualenv-2969] bench 实例就绪（override bench-generic）
+[16:16:36] [pypa__virtualenv-2969] LLM 探测: ✅ 通（8676ms）
+[16:16:41] [pypa__virtualenv-2969] Phase A: validated
+[16:16:41] [psf__black-4963] bench 实例就绪（override bench-generic）
+[16:16:54] [psf__black-4963] LLM 探测: ✅ 通（8708ms）
+[16:17:01] [psf__black-4963] Phase A: validated
+[16:17:01] [pypa__pip-13084] bench 实例就绪（override bench-generic）
+[16:17:14] [pypa__pip-13084] LLM 探测: ✅ 通（8129ms）
+[16:17:20] [pypa__pip-13084] Phase A: rejected
+[16:17:20] [pypa__packaging-1204] bench 实例就绪（override bench-generic）
+[16:17:34] [pypa__packaging-1204] LLM 探测: ✅ 通（9306ms）
+[16:17:38] [pypa__packaging-1204] Phase A: validated
+[16:17:38] [pypa__pip-14044] bench 实例就绪（override bench-generic）
+[16:17:50] [pypa__pip-14044] LLM 探测: ✅ 通（7352ms）
+[16:17:57] [pypa__pip-14044] Phase A: validated
+[16:17:57] [pypa__virtualenv-2972] bench 实例就绪（override bench-generic）
+[16:18:11] [pypa__virtualenv-2972] LLM 探测: ✅ 通（9463ms）
+[16:18:34] [pypa__virtualenv-2972] Phase A: validated
+[16:18:35] [pypa__pip-13046] bench 实例就绪（override bench-generic）
+[16:18:51] [pypa__pip-13046] LLM 探测: ✅ 通（11466ms）
+[16:18:58] [pypa__pip-13046] Phase A: validated
+[16:18:58] [psf__black-4950] bench 实例就绪（override bench-generic）
+[16:19:13] [psf__black-4950] LLM 探测: ✅ 通（10038ms）
+[16:19:17] [psf__black-4950] Phase A: rejected
+[16:19:17] [pypa__virtualenv-2493] bench 实例就绪（override bench-generic）
+[16:19:36] [pypa__virtualenv-2493] LLM 探测: ✅ 通（14224ms）
+[16:19:46] [pypa__virtualenv-2493] Phase A: validated
+[16:19:47] [pypa__packaging-909] bench 实例就绪（override bench-generic）
+[16:19:58] [pypa__packaging-909] LLM 探测: ✅ 通（7096ms）
+[16:20:03] [pypa__packaging-909] Phase A: validated
+[16:20:04] [pypa__virtualenv-2659] bench 实例就绪（override bench-generic）
+[16:20:17] [pypa__virtualenv-2659] LLM 探测: ✅ 通（8776ms）
+[16:20:38] [pypa__virtualenv-2659] Phase A: validated
+[16:20:39] [psf__black-3826] bench 实例就绪（override bench-generic）
+[16:20:59] [psf__black-3826] LLM 探测: ✅ 通（15373ms）
+[16:21:04] [psf__black-3826] Phase A: validated
+[16:21:04] [pypa__virtualenv-3049] bench 实例就绪（override bench-generic）
+[16:21:18] [pypa__virtualenv-3049] LLM 探测: ✅ 通（10254ms）
+[16:21:39] [pypa__virtualenv-3049] Phase A: validated
+[16:21:40] [pypa__virtualenv-2870] bench 实例就绪（override bench-generic）
+[16:21:54] [pypa__virtualenv-2870] LLM 探测: ✅ 通（9664ms）
+[16:22:10] [pypa__virtualenv-2870] Phase A: validated
+[16:22:11] [psf__black-4944] bench 实例就绪（override bench-generic）
+[16:22:24] [psf__black-4944] LLM 探测: ✅ 通（8897ms）
+[16:22:33] [psf__black-4944] Phase A: validated
+[16:22:33] [psf__black-4205] bench 实例就绪（override bench-generic）
+[16:22:47] [psf__black-4205] LLM 探测: ✅ 通（9265ms）
+[16:22:53] [psf__black-4205] Phase A: validated
+[16:22:53] [psf__black-3527] bench 实例就绪（override bench-generic）
+[16:23:14] [psf__black-3527] LLM 探测: ✅ 通（17262ms）
+[16:23:20] [psf__black-3527] Phase A: validated
+[16:23:20] [pypa__pip-6823] bench 实例就绪（override bench-generic）
+[16:23:34] [pypa__pip-6823] LLM 探测: ✅ 通（9006ms）
+[16:23:41] [pypa__pip-6823] Phase A: validated
+[16:23:41] [pypa__packaging-885] bench 实例就绪（override bench-generic）
+[16:23:53] [pypa__packaging-885] LLM 探测: ✅ 通（7605ms）
+[16:23:58] [pypa__packaging-885] Phase A: validated
+[16:23:58] [pypa__packaging-1154] bench 实例就绪（override bench-generic）
+[16:24:10] [pypa__packaging-1154] LLM 探测: ✅ 通（7490ms）
+[16:24:22] [pypa__packaging-1154] Phase A: validated
+[16:24:23] [psf__black-3593] bench 实例就绪（override bench-generic）
+[16:24:42] [psf__black-3593] LLM 探测: ✅ 通（15698ms）
+[16:24:53] [psf__black-3593] Phase A: validated
+[16:24:53] [pypa__pip-13226] bench 实例就绪（override bench-generic）
+[16:25:06] [pypa__pip-13226] LLM 探测: ✅ 通（8746ms）
+[16:25:14] [pypa__pip-13226] Phase A: validated
+[16:25:14] [pypa__pip-11043] bench 实例就绪（override bench-generic）
+[16:25:27] [pypa__pip-11043] LLM 探测: ✅ 通（8321ms）
+[16:25:35] [pypa__pip-11043] Phase A: validated
+[16:25:35] [pypa__packaging-1067] bench 实例就绪（override bench-generic）
+[16:25:53] [pypa__packaging-1067] LLM 探测: ✅ 通（13823ms）
+[16:26:00] [pypa__packaging-1067] Phase A: validated
+[16:26:00] [pypa__virtualenv-2774] bench 实例就绪（override bench-generic）
+[16:26:18] [pypa__virtualenv-2774] LLM 探测: ✅ 通（13420ms）
+[16:26:24] [pypa__virtualenv-2774] Phase A: validated
+[16:26:24] [pypa__virtualenv-2467] bench 实例就绪（override bench-generic）
+[16:26:37] [pypa__virtualenv-2467] LLM 探测: ✅ 通（7994ms）
+[16:26:45] [pypa__virtualenv-2467] Phase A: rejected
+[16:26:45] [pypa__packaging-1066] bench 实例就绪（override bench-generic）
+[16:26:59] [pypa__packaging-1066] LLM 探测: ✅ 通（9339ms）
+[16:27:05] [pypa__packaging-1066] Phase A: validated
+[16:27:05] [pypa__virtualenv-3090] bench 实例就绪（override bench-generic）
+[16:27:17] [pypa__virtualenv-3090] LLM 探测: ✅ 通（8024ms）
+[16:27:37] [pypa__virtualenv-3090] Phase A: validated
+[16:27:37] [pypa__pip-11820] bench 实例就绪（override bench-generic）
+[16:27:50] [pypa__pip-11820] LLM 探测: ✅ 通（8554ms）
+[16:27:56] [pypa__pip-11820] Phase A: rejected
+[16:27:56] [pypa__pip-13288] bench 实例就绪（override bench-generic）
+[16:28:09] [pypa__pip-13288] LLM 探测: ✅ 通（8631ms）
+[16:28:24] [pypa__pip-13288] Phase A: validated
+[16:28:25] [pypa__virtualenv-2896] bench 实例就绪（override bench-generic）
+[16:28:36] [pypa__virtualenv-2896] LLM 探测: ✅ 通（6773ms）
+[16:28:56] [pypa__virtualenv-2896] Phase A: validated
+[16:28:57] [pypa__pip-12280] bench 实例就绪（override bench-generic）
+[16:29:09] [pypa__pip-12280] LLM 探测: ✅ 通（8107ms）
+[16:29:18] [pypa__pip-12280] Phase A: validated
+[16:29:18] [pypa__virtualenv-3105] bench 实例就绪（override bench-generic）
+[16:29:30] [pypa__virtualenv-3105] LLM 探测: ✅ 通（7835ms）
+[16:29:39] [pypa__virtualenv-3105] Phase A: validated
+[16:29:39] [pypa__pip-14136] bench 实例就绪（override bench-generic）
+[16:29:54] [pypa__pip-14136] LLM 探测: ✅ 通（10054ms）
+[16:30:10] [pypa__pip-14136] Phase A: validated
+[16:30:10] [psf__black-4172] bench 实例就绪（override bench-generic）
+[16:30:22] [psf__black-4172] LLM 探测: ✅ 通（7819ms）
+[16:30:27] [psf__black-4172] Phase A: validated
+[16:30:27] [psf__black-4980] bench 实例就绪（override bench-generic）
+[16:30:40] [psf__black-4980] LLM 探测: ✅ 通（8494ms）
+[16:30:48] [psf__black-4980] Phase A: validated
+[16:30:49] [pypa__virtualenv-2786] bench 实例就绪（override bench-generic）
+[16:31:07] [pypa__virtualenv-2786] LLM 探测: ✅ 通（14606ms）
+[16:31:47] [pypa__virtualenv-2786] Phase A: validated
+
+[16:31:48] [validate] 完成: {'validated': 76, 'rejected': 12}

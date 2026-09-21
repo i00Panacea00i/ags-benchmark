@@ -1,0 +1,63 @@
+{
+ "date": "2026-09-21",
+ "timeline": [
+  [
+   "15:21",
+   "maker 批启动 91 单元 @ 并发12（首启 bench-builder 404 → 修 MAKER_TOOL 环境变量）"
+  ],
+  [
+   "15:34",
+   "maker 主批完成: 64 done（27 单元被首启崩溃 claim 抢注，留补跑）"
+  ],
+  [
+   "15:35",
+   "validator 批启动 88 单元 @ 并发12 Image Override（JSONL 格式修复后 15:38 正式跑）"
+  ],
+  [
+   "16:35",
+   "验证批完成: validated 76 / rejected 12 / error 0，56 分钟"
+  ],
+  [
+   "16:36",
+   "补跑批 27 单元（token 池已扩容 2 账号）"
+  ],
+  [
+   "16:52",
+   "补跑完成: 24 成功 / 3 error → 镜像总入库 112"
+  ]
+ ],
+ "maker": {
+  "units_total": 118,
+  "images": 112,
+  "unit_cycle_s": 90,
+  "pool_metrics": {
+   "create_p50_s": 2.23,
+   "acquire_wait_p50_ms": 0.0
+  }
+ },
+ "validator": {
+  "mode": "Image-Override(bench-generic)",
+  "units": 88,
+  "concurrency": 12,
+  "duration_min": 56,
+  "throughput_per_hour": 94,
+  "validated": 76,
+  "rejected": 12,
+  "error": 0,
+  "llm_probe_p50_s": 9.3,
+  "llm_probe_p95_s": 16.5
+ },
+ "github_token_pool": {
+  "tokens": 5,
+  "accounts": 2,
+  "core_limit_per_hour": 10000,
+  "finding": "同账号 PAT 共享限额（按用户计）；异账号独立 +5000/h"
+ },
+ "issues_found": [
+  "tccli CAM 临时凭证过期（用户手动续期；长期建议绑 CVM 角色或永久密钥）",
+  "同账号 PAT 共享 core 限额池——多 token 轮换无增益（需异账号）",
+  "驱动脚本漏 MAKER_TOOL 环境变量 → 首启 404；崩溃时 in-flight claim 抢注需人工恢复",
+  "验证输入 JSONL/数组格式混用（临时脚本产物）",
+  "validate-results.jsonl 跨批累计（无批次隔离字段）"
+ ]
+}

@@ -1,0 +1,64 @@
+--- a/CHANGES.rst
++++ b/CHANGES.rst
+@@ -53,6 +53,10 @@ Unreleased
+     fail. :issue:`3105` :pr:`3211`
+ -   Add ``click.get_pager_file`` for file-like access to an output
+     pager. :pr:`1572`
++-   Show custom error messages from types when :func:`prompt` with
++    ``hide_input=True`` fails validation, instead of always showing a
++    generic message. Built-in type messages mask the input value.
++    :issue:`2809` :pr:`3256`
+ 
+ Version 8.3.3
+ -------------
+--- a/src/click/termui.py
++++ b/src/click/termui.py
+@@ -4,6 +4,7 @@
+ import inspect
+ import io
+ import itertools
++import re
+ import sys
+ import typing as t
+ from contextlib import AbstractContextManager
+@@ -53,6 +54,27 @@
+ _ansi_reset_all = "\033[0m"
+ 
+ 
++_HIDDEN_INPUT_MASK = "'***'"
++
++
++def _mask_hidden_input(message: str, value: str) -> str:
++    """Replace occurrences of ``value`` in ``message`` with a fixed mask.
++
++    Both ``repr(value)`` (the form built-in :class:`ParamType` errors use
++    via ``{value!r}``) and the raw value are masked. The raw-value pass
++    uses word-boundary lookarounds so a substring like ``"1"`` does not
++    match inside ``"10"``, and ``"ent"`` does not match inside
++    ``"Authentication"``. The empty string is skipped to avoid matching
++    at every boundary.
++    """
++    message = message.replace(repr(value), _HIDDEN_INPUT_MASK)
++    if value:
++        message = re.sub(
++            rf"(?<!\w){re.escape(value)}(?!\w)", _HIDDEN_INPUT_MASK, message
++        )
++    return message
++
++
+ def hidden_prompt_func(prompt: str) -> str:
+     import getpass
+ 
+@@ -202,10 +224,8 @@ def prompt_func(text: str) -> str:
+         try:
+             result = value_proc(value)
+         except UsageError as e:
+-            if hide_input:
+-                echo(_("Error: The value you entered was invalid."), err=err)
+-            else:
+-                echo(_("Error: {e.message}").format(e=e), err=err)
++            message = _mask_hidden_input(e.message, value) if hide_input else e.message
++            echo(_("Error: {message}").format(message=message), err=err)
+             continue
+         if not confirmation_prompt:
+             return result

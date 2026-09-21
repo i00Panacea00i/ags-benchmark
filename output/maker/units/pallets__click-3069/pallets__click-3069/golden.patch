@@ -1,0 +1,70 @@
+--- a/CHANGES.rst
++++ b/CHANGES.rst
+@@ -13,6 +13,8 @@ Unreleased
+     behavior for multiple parameters using the same name. :issue:`3071` :pr:`3079`
+ -   Fix rendering when ``prompt`` and ``confirm`` parameter ``prompt_suffix`` is
+     empty. :issue:`3019` :pr:`3021`
++-   When ``Sentinel.UNSET`` is found during parsing, it will skip calls to
++    ``type_cast_value``. :issue:`3069` :pr:`3090`
+ 
+ Version 8.3.0
+ --------------
+--- a/src/click/core.py
++++ b/src/click/core.py
+@@ -2338,7 +2338,7 @@ def type_cast_value(self, ctx: Context, value: t.Any) -> t.Any:
+         """Convert and validate a value against the parameter's
+         :attr:`type`, :attr:`multiple`, and :attr:`nargs`.
+         """
+-        if value in (None, UNSET):
++        if value is None:
+             if self.multiple or self.nargs == -1:
+                 return ()
+             else:
+@@ -2421,7 +2421,16 @@ def process_value(self, ctx: Context, value: t.Any) -> t.Any:
+ 
+         :meta private:
+         """
+-        value = self.type_cast_value(ctx, value)
++        # shelter `type_cast_value` from ever seeing an `UNSET` value by handling the
++        # cases in which `UNSET` gets special treatment explicitly at this layer
++        #
++        # Refs:
++        # https://github.com/pallets/click/issues/3069
++        if value is UNSET:
++            if self.multiple or self.nargs == -1:
++                value = ()
++        else:
++            value = self.type_cast_value(ctx, value)
+ 
+         if self.required and self.value_is_missing(value):
+             raise MissingParameter(ctx=ctx, param=self)
+@@ -3256,13 +3265,22 @@ def consume_value(
+ 
+         return value, source
+ 
+-    def type_cast_value(self, ctx: Context, value: t.Any) -> t.Any:
+-        if self.is_flag and not self.required:
+-            if value is UNSET:
+-                if self.is_bool_flag:
+-                    # If the flag is a boolean flag, we return False if it is not set.
+-                    value = False
+-        return super().type_cast_value(ctx, value)
++    def process_value(self, ctx: Context, value: t.Any) -> t.Any:
++        # process_value has to be overridden on Options in order to capture
++        # `value == UNSET` cases before `type_cast_value()` gets called.
++        #
++        # Refs:
++        # https://github.com/pallets/click/issues/3069
++        if self.is_flag and not self.required and self.is_bool_flag and value is UNSET:
++            value = False
++
++            if self.callback is not None:
++                value = self.callback(ctx, self, value)
++
++            return value
++
++        # in the normal case, rely on Parameter.process_value
++        return super().process_value(ctx, value)
+ 
+ 
+ class Argument(Parameter):
