@@ -1,0 +1,148 @@
+[make] 91 个单元 | maker=bench-maker-ds | 并发 12 | 预配对 91
+[make/pallets/click#3572] L1 拦截：已是 in-flight
+[make/pallets/click#3571] L1 拦截：已是 in-flight
+[make/pallets/click#3740] L1 拦截：已是 in-flight
+[make/pallets/click#2790] L1 拦截：已是 in-flight
+[make/pallets/click#3069] L1 拦截：已是 in-flight
+[make/pallets/click#2809] L1 拦截：已是 in-flight
+[make/pallets/click#2894] L1 拦截：已是 in-flight
+[make/pallets/click#2787] L1 拦截：已是 in-flight
+[make/pallets/click#2746] L1 拦截：已是 in-flight
+[make/pallets/click#2644] L1 拦截：已是 in-flight
+[make/pallets/click#2703] L1 拦截：已是 in-flight
+[make/pallets/click#2813] L1 拦截：已是 in-flight
+[make/pallets/click#2695] L1 拦截：已是 in-flight
+[make/pallets/click#2674] L1 拦截：已是 in-flight
+[make/pallets/click#2621] L1 拦截：已是 in-flight
+[make/Textualize/rich#3115] L1 拦截：已是 in-flight
+[make/Textualize/rich#2942] L1 拦截：已是 in-flight
+[make/pallets/click#2246] L1 拦截：已是 in-flight
+[make/Textualize/rich#2688] L1 拦截：已是 in-flight
+[make/pypa/packaging#1318] L1 拦截：已是 in-flight
+[make/Textualize/rich#2740] L1 拦截：已是 in-flight
+[make/pypa/packaging#1315] L1 拦截：已是 in-flight
+[make/psf/requests#6711] L1 拦截：已是 in-flight
+[make/pallets/click#2516] L1 拦截：已是 in-flight
+[make/pypa/packaging#831] L1 拦截：已是 in-flight
+[make/pypa/packaging#577] L1 拦截：已是 in-flight
+[make/pypa/packaging#781] L1 拦截：已是 in-flight
+[make/pypa/pip#4256] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/31 用例）", "instance_id": "pypa__pip-4256"}
+[make/pypa/pip#12215] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/141 用例）", "instance_id": "pypa__pip-12215"}
+[make/pypa/pip#12042] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/0 用例）", "instance_id": "pypa__pip-12042"}
+[make/pypa/pip#12067] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/141 用例）", "instance_id": "pypa__pip-12067"}
+[make/pypa/pip#12099] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/11 用例）", "instance_id": "pypa__pip-12099"}
+[make/pypa/virtualenv#2780] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/9 用例）", "instance_id": "pypa__virtualenv-2780"}
+[make/pypa/virtualenv#2834] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/1 用例）", "instance_id": "pypa__virtualenv-2834"}
+[make/pypa/virtualenv#2419] agent: {"result": "filtered", "stage": "harness_crash", "reason": "pytest 异常: {'__harness__': 'crash', '__stderr__': 'INTERNALERROR>           ^^^^
+[make/pypa/pip#11946] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/8 用例）", "instance_id": "pypa__pip-11946"}
+[make/pypa/virtualenv#2994] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/0 用例）", "instance_id": "pypa__virtualenv-2994"}
+[make/pypa/virtualenv#2861] agent: {"result": "filtered", "stage": "untestable", "reason": "无跨轮稳定 F2P（不稳定 0/23 用例）", "instance_id": "pypa__virtualenv-2861"}
+[make/pypa/packaging#1178] agent: {"result": "success", "instance_id": "pypa__packaging-1178", "f2p": 1, "p2p": 19, "rewrite": "template", "images": {"bench": "benchmark-uplo
+[make/pypa/packaging#1178] ✅ 入库: F2P 1 / P2P 19
+[make/pypa/packaging#657] agent: {"result": "success", "instance_id": "pypa__packaging-657", "f2p": 5, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-uploa
+[make/pypa/packaging#657] ✅ 入库: F2P 5 / P2P 20
+[make/psf/black#5164] agent: {"result": "success", "instance_id": "psf__black-5164", "f2p": 1, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-upload-si
+[make/psf/black#5164] ✅ 入库: F2P 1 / P2P 20
+[make/pypa/pip#14074] agent: {"result": "success", "instance_id": "pypa__pip-14074", "f2p": 1, "p2p": 0, "rewrite": "template", "images": {"bench": "benchmark-upload-sic
+[make/pypa/pip#14074] ✅ 入库: F2P 1 / P2P 0
+[make/pypa/pip#14079] agent: {"result": "success", "instance_id": "pypa__pip-14079", "f2p": 3, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-upload-si
+[make/pypa/pip#14079] ✅ 入库: F2P 3 / P2P 20
+[make/pypa/pip#11677] agent: {"result": "success", "instance_id": "pypa__pip-11677", "f2p": 2, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-upload-si
+[make/pypa/pip#14117] agent: {"result": "success", "instance_id": "pypa__pip-14117", "f2p": 4, "p2p": 0, "rewrite": "template", "images": {"bench": "benchmark-upload-sic
+[make/pypa/pip#11677] ✅ 入库: F2P 2 / P2P 20
+[make/pypa/pip#14117] ✅ 入库: F2P 4 / P2P 0
+[make/pypa/pip#13299] agent: {"result": "success", "instance_id": "pypa__pip-13299", "f2p": 1, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-upload-si
+[make/pypa/pip#13299] ✅ 入库: F2P 1 / P2P 20
+[make/pypa/pip#11012] agent: {"result": "success", "instance_id": "pypa__pip-11012", "f2p": 1, "p2p": 9, "rewrite": "template", "images": {"bench": "benchmark-upload-sic
+[make/pypa/pip#11012] ✅ 入库: F2P 1 / P2P 9
+[make/pypa/pip#11948] agent: {"result": "success", "instance_id": "pypa__pip-11948", "f2p": 2, "p2p": 7, "rewrite": "template", "images": {"bench": "benchmark-upload-sic
+[make/pypa/pip#11948] ✅ 入库: F2P 2 / P2P 7
+[make/pypa/pip#11985] agent: {"result": "success", "instance_id": "pypa__pip-11985", "f2p": 1, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-upload-si
+[make/pypa/pip#11985] ✅ 入库: F2P 1 / P2P 20
+[make/pypa/pip#6385] agent: {"result": "success", "instance_id": "pypa__pip-6385", "f2p": 1, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-upload-sic
+[make/pypa/pip#6385] ✅ 入库: F2P 1 / P2P 20
+[make/pypa/virtualenv#2285] agent: {"result": "success", "instance_id": "pypa__virtualenv-2285", "f2p": 1, "p2p": 16, "rewrite": "template", "images": {"bench": "benchmark-upl
+[make/pypa/virtualenv#2285] ✅ 入库: F2P 1 / P2P 16
+[make/pypa/virtualenv#3072] agent: {"result": "success", "instance_id": "pypa__virtualenv-3072", "f2p": 2, "p2p": 9, "rewrite": "template", "images": {"bench": "benchmark-uplo
+[make/pypa/virtualenv#3072] ✅ 入库: F2P 2 / P2P 9
+[make/pypa/virtualenv#2969] agent: {"result": "success", "instance_id": "pypa__virtualenv-2969", "f2p": 1, "p2p": 1, "rewrite": "template", "images": {"bench": "benchmark-uplo
+[make/pypa/virtualenv#2969] ✅ 入库: F2P 1 / P2P 1
+[make/psf/black#4963] agent: {"result": "success", "instance_id": "psf__black-4963", "f2p": 1, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-upload-si
+[make/psf/black#4963] ✅ 入库: F2P 1 / P2P 20
+[make/pypa/pip#13046] agent: {"result": "success", "instance_id": "pypa__pip-13046", "f2p": 1, "p2p": 20, "rewrite": "deepseek-harness(hy4-preview,标识符保留83%)", "images": 
+[make/pypa/pip#13046] ✅ 入库: F2P 1 / P2P 20
+[make/pypa/pip#12653] agent: {"result": "success", "instance_id": "pypa__pip-12653", "f2p": 2, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-upload-si
+[make/pypa/pip#12653] ✅ 入库: F2P 2 / P2P 20
+[make/pypa/pip#14044] agent: {"result": "success", "instance_id": "pypa__pip-14044", "f2p": 3, "p2p": 18, "rewrite": "template", "images": {"bench": "benchmark-upload-si
+[make/pypa/pip#14044] ✅ 入库: F2P 3 / P2P 18
+[make/pypa/pip#5378] agent: {"result": "success", "instance_id": "pypa__pip-5378", "f2p": 9, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-upload-sic
+[make/pypa/pip#5378] ✅ 入库: F2P 9 / P2P 20
+[make/pypa/pip#6823] agent: {"result": "success", "instance_id": "pypa__pip-6823", "f2p": 1, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-upload-sic
+[make/pypa/pip#6823] ✅ 入库: F2P 1 / P2P 20
+[make/psf/black#3593] agent: {"result": "success", "instance_id": "psf__black-3593", "f2p": 1, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-upload-si
+[make/psf/black#3593] ✅ 入库: F2P 1 / P2P 20
+[make/pypa/pip#14136] agent: {"result": "success", "instance_id": "pypa__pip-14136", "f2p": 1, "p2p": 13, "rewrite": "template", "images": {"bench": "benchmark-upload-si
+[make/pypa/pip#14136] ✅ 入库: F2P 1 / P2P 13
+[make/pypa/virtualenv#3105] agent: {"result": "success", "instance_id": "pypa__virtualenv-3105", "f2p": 4, "p2p": 5, "rewrite": "template", "images": {"bench": "benchmark-uplo
+[make/pypa/virtualenv#3105] ✅ 入库: F2P 4 / P2P 5
+[make/pypa/pip#12280] agent: {"result": "success", "instance_id": "pypa__pip-12280", "f2p": 3, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-upload-si
+[make/pypa/pip#12280] ✅ 入库: F2P 3 / P2P 20
+[make/pypa/virtualenv#2972] agent: {"result": "success", "instance_id": "pypa__virtualenv-2972", "f2p": 1, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-upl
+[make/pypa/virtualenv#2972] ✅ 入库: F2P 1 / P2P 20
+[make/pypa/packaging#1204] agent: {"result": "success", "instance_id": "pypa__packaging-1204", "f2p": 3, "p2p": 20, "rewrite": "deepseek-harness(hy4-preview,标识符保留100%)", "ima
+[make/pypa/packaging#1204] ✅ 入库: F2P 3 / P2P 20
+[make/pypa/virtualenv#2493] agent: {"result": "success", "instance_id": "pypa__virtualenv-2493", "f2p": 1, "p2p": 6, "rewrite": "template", "images": {"bench": "benchmark-uplo
+[make/pypa/virtualenv#2493] ✅ 入库: F2P 1 / P2P 6
+[make/pypa/pip#13084] agent: {"result": "success", "instance_id": "pypa__pip-13084", "f2p": 2, "p2p": 16, "rewrite": "deepseek-harness(hy4-preview,标识符保留100%)", "images":
+[make/pypa/pip#13084] ✅ 入库: F2P 2 / P2P 16
+[make/psf/black#4950] agent: {"result": "success", "instance_id": "psf__black-4950", "f2p": 1, "p2p": 0, "rewrite": "deepseek-harness(hy4-preview,标识符保留100%)", "images": 
+[make/psf/black#4950] ✅ 入库: F2P 1 / P2P 0
+[make/pypa/virtualenv#2659] agent: {"result": "success", "instance_id": "pypa__virtualenv-2659", "f2p": 1, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-upl
+[make/pypa/virtualenv#2659] ✅ 入库: F2P 1 / P2P 20
+[make/pypa/virtualenv#3049] agent: {"result": "success", "instance_id": "pypa__virtualenv-3049", "f2p": 7, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-upl
+[make/pypa/virtualenv#3049] ✅ 入库: F2P 7 / P2P 20
+[make/pypa/packaging#909] agent: {"result": "success", "instance_id": "pypa__packaging-909", "f2p": 5, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-uploa
+[make/pypa/packaging#909] ✅ 入库: F2P 5 / P2P 20
+[make/psf/black#3826] agent: {"result": "success", "instance_id": "psf__black-3826", "f2p": 1, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-upload-si
+[make/psf/black#3826] ✅ 入库: F2P 1 / P2P 20
+[make/pypa/virtualenv#2870] agent: {"result": "success", "instance_id": "pypa__virtualenv-2870", "f2p": 1, "p2p": 18, "rewrite": "template", "images": {"bench": "benchmark-upl
+[make/pypa/virtualenv#2870] ✅ 入库: F2P 1 / P2P 18
+[make/psf/black#4944] agent: {"result": "success", "instance_id": "psf__black-4944", "f2p": 20, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-upload-s
+[make/psf/black#4944] ✅ 入库: F2P 20 / P2P 20
+[make/psf/black#4205] agent: {"result": "success", "instance_id": "psf__black-4205", "f2p": 2, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-upload-si
+[make/psf/black#4205] ✅ 入库: F2P 2 / P2P 20
+[make/psf/black#3527] agent: {"result": "success", "instance_id": "psf__black-3527", "f2p": 1, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-upload-si
+[make/psf/black#3527] ✅ 入库: F2P 1 / P2P 20
+[make/pypa/packaging#885] agent: {"result": "success", "instance_id": "pypa__packaging-885", "f2p": 20, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-uplo
+[make/pypa/packaging#885] ✅ 入库: F2P 20 / P2P 20
+[make/psf/black#4980] agent: {"result": "success", "instance_id": "psf__black-4980", "f2p": 1, "p2p": 20, "rewrite": "deepseek-harness(hy4-preview,标识符保留88%)", "images": 
+[make/psf/black#4980] ✅ 入库: F2P 1 / P2P 20
+[make/psf/black#4172] agent: {"result": "success", "instance_id": "psf__black-4172", "f2p": 1, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-upload-si
+[make/psf/black#4172] ✅ 入库: F2P 1 / P2P 20
+[make/pypa/packaging#1154] agent: {"result": "success", "instance_id": "pypa__packaging-1154", "f2p": 2, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-uplo
+[make/pypa/packaging#1154] ✅ 入库: F2P 2 / P2P 20
+[make/pypa/pip#13226] agent: {"result": "success", "instance_id": "pypa__pip-13226", "f2p": 1, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-upload-si
+[make/pypa/pip#13226] ✅ 入库: F2P 1 / P2P 20
+[make/pypa/pip#11043] agent: {"result": "success", "instance_id": "pypa__pip-11043", "f2p": 1, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-upload-si
+[make/pypa/pip#11043] ✅ 入库: F2P 1 / P2P 20
+[make/pypa/packaging#1067] agent: {"result": "success", "instance_id": "pypa__packaging-1067", "f2p": 12, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-upl
+[make/pypa/packaging#1067] ✅ 入库: F2P 12 / P2P 20
+[make/pypa/virtualenv#2774] agent: {"result": "success", "instance_id": "pypa__virtualenv-2774", "f2p": 1, "p2p": 7, "rewrite": "template", "images": {"bench": "benchmark-uplo
+[make/pypa/virtualenv#2774] ✅ 入库: F2P 1 / P2P 7
+[make/pypa/virtualenv#2467] agent: {"result": "success", "instance_id": "pypa__virtualenv-2467", "f2p": 1, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-upl
+[make/pypa/virtualenv#2467] ✅ 入库: F2P 1 / P2P 20
+[make/pypa/pip#11820] agent: {"result": "success", "instance_id": "pypa__pip-11820", "f2p": 1, "p2p": 12, "rewrite": "template", "images": {"bench": "benchmark-upload-si
+[make/pypa/pip#11820] ✅ 入库: F2P 1 / P2P 12
+[make/pypa/packaging#1066] agent: {"result": "success", "instance_id": "pypa__packaging-1066", "f2p": 6, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-uplo
+[make/pypa/packaging#1066] ✅ 入库: F2P 6 / P2P 20
+[make/pypa/pip#13288] agent: {"result": "success", "instance_id": "pypa__pip-13288", "f2p": 1, "p2p": 20, "rewrite": "deepseek-harness(hy4-preview,标识符保留88%)", "images": 
+[make/pypa/pip#13288] ✅ 入库: F2P 1 / P2P 20
+[make/pypa/virtualenv#2896] agent: {"result": "success", "instance_id": "pypa__virtualenv-2896", "f2p": 3, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-upl
+[make/pypa/virtualenv#2896] ✅ 入库: F2P 3 / P2P 20
+[make/pypa/virtualenv#3090] agent: {"result": "success", "instance_id": "pypa__virtualenv-3090", "f2p": 1, "p2p": 6, "rewrite": "template", "images": {"bench": "benchmark-uplo
+[make/pypa/virtualenv#3090] ✅ 入库: F2P 1 / P2P 6
+[make/pypa/virtualenv#2786] agent: {"result": "success", "instance_id": "pypa__virtualenv-2786", "f2p": 2, "p2p": 20, "rewrite": "template", "images": {"bench": "benchmark-upl
+[make/pypa/virtualenv#2786] ✅ 入库: F2P 2 / P2P 20
+
+[make] 完成: {'blocked': 27, 'success': 53, 'filtered': 11}
+[make] 池指标: {'created': 64, 'killed': 64, 'failures': 0, 'retries': 0, 'create_p50_s': 2.25, 'create_p90_s': 2.31, 'create_max_s': 2.45, 'acquire_wait_p50_ms': 4356.4}

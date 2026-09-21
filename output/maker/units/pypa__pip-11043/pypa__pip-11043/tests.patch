@@ -1,0 +1,40 @@
+--- a/tests/conftest.py
++++ b/tests/conftest.py
+@@ -360,6 +360,7 @@ def isolate(tmpdir: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+     monkeypatch.setenv("GIT_CONFIG_NOSYSTEM", "1")
+     monkeypatch.setenv("GIT_AUTHOR_NAME", "pip")
+     monkeypatch.setenv("GIT_AUTHOR_EMAIL", "distutils-sig@python.org")
++    monkeypatch.delenv("PIP_NO_PARTIAL_CLONE_FOR_BROKEN_GIT_SERVER", False)
+ 
+     # We want to disable the version check from running in the tests
+     monkeypatch.setenv("PIP_DISABLE_PIP_VERSION_CHECK", "true")
+--- a/tests/unit/test_vcs.py
++++ b/tests/unit/test_vcs.py
+@@ -884,6 +884,27 @@ def test_fetch_new(self) -> None:
+ 
+         update_submodules_mock.assert_called_with(self.dest, verbosity=1)
+ 
++    def test_fetch_new_partial_clone_disabled(
++        self, monkeypatch: pytest.MonkeyPatch
++    ) -> None:
++        monkeypatch.setenv("PIP_NO_PARTIAL_CLONE_FOR_BROKEN_GIT_SERVER", "1")
++        with mock.patch.object(self.svn, "get_git_version", return_value=(2, 17)):
++            with mock.patch.object(
++                self.svn, "update_submodules"
++            ) as update_submodules_mock:
++                self.svn.fetch_new(
++                    self.dest, hide_url(self.url), self.rev_options, verbosity=1
++                )
++
++        assert self.call_subprocess_mock.call_args_list[0][0][0] == [
++            "git",
++            "clone",
++            hide_url("git+http://username:password@git.example.com/"),
++            self.dest,
++        ]
++
++        update_submodules_mock.assert_called_with(self.dest, verbosity=1)
++
+     def test_fetch_new_legacy(self) -> None:
+         with mock.patch.object(self.svn, "get_git_version", return_value=(1, 0)):
+             with mock.patch.object(

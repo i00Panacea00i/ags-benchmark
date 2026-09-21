@@ -1,0 +1,33 @@
+--- a/news/14044.bugfix.rst
++++ b/news/14044.bugfix.rst
+@@ -0,0 +1,2 @@
++Never use persistent wheel cache for local directory requirements even if there
++is a matching entry, somehow.
+--- a/news/14080.bugfix.rst
++++ b/news/14080.bugfix.rst
+@@ -0,0 +1,2 @@
++Fix caching bug where local directory requirements would be cached if the
++directory name contains a dash.
+--- a/src/pip/_internal/cache.py
++++ b/src/pip/_internal/cache.py
+@@ -134,6 +134,8 @@ def get(
+     ) -> Link:
+         candidates = []
+ 
++        if link.is_existing_dir():
++            return link
+         if not package_name:
+             return link
+ 
+--- a/src/pip/_internal/wheel_builder.py
++++ b/src/pip/_internal/wheel_builder.py
+@@ -49,6 +49,9 @@ def _should_cache(
+     if req.editable or not req.source_dir:
+         # never cache editable requirements
+         return False
++    if req.link and req.link.is_existing_dir():
++        # never cache local directory requirements
++        return False
+ 
+     if req.link and req.link.is_vcs:
+         # VCS checkout. Do not cache

@@ -1,0 +1,15 @@
+--- a/news/12280.bugfix.rst
++++ b/news/12280.bugfix.rst
+@@ -0,0 +1 @@
++Fix crash when the git version number contains something else than digits and dots.
+--- a/src/pip/_internal/vcs/git.py
++++ b/src/pip/_internal/vcs/git.py
+@@ -101,7 +101,7 @@ def get_git_version(self) -> Tuple[int, ...]:
+         if not match:
+             logger.warning("Can't parse git version: %s", version)
+             return ()
+-        return tuple(int(c) for c in match.groups())
++        return (int(match.group(1)), int(match.group(2)))
+ 
+     @classmethod
+     def get_current_branch(cls, location: str) -> Optional[str]:

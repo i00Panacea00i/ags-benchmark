@@ -1,0 +1,179 @@
+--- a/docs/changelog/3049.feature.rst
++++ b/docs/changelog/3049.feature.rst
+@@ -0,0 +1,2 @@
++Automatically resolve version manager shims (pyenv, mise, asdf) to the real Python binary during discovery, preventing
++incorrect interpreter selection when shims are on ``PATH`` - by :user:`gaborbernat`.
+--- a/docs/explanation.rst
++++ b/docs/explanation.rst
+@@ -205,6 +205,26 @@ When you provide a specifier, virtualenv searches for matching interpreters usin
+    directories for managed Python installations.
+ 3. **PATH search**: Search for executables on the ``PATH`` environment variable with names matching the specification.
+ 
++Version manager shim resolution
++===============================
++
++Version managers like `pyenv <https://github.com/pyenv/pyenv>`_, `mise <https://mise.jdx.dev/>`_, and `asdf
++<https://asdf-vm.com/>`_ place lightweight shim scripts on ``PATH`` that delegate to the real Python binary. When
++virtualenv discovers a Python interpreter by running it as a subprocess, shims may resolve to the wrong Python version
++(typically the system Python) because the shim's resolution logic depends on shell environment state that doesn't fully
++propagate to child processes.
++
++virtualenv detects shims by checking whether the candidate executable lives in a known shim directory
++(``$PYENV_ROOT/shims``, ``$MISE_DATA_DIR/shims``, or ``$ASDF_DATA_DIR/shims``). When a shim is detected, virtualenv
++bypasses it and locates the real binary directly under the version manager's ``versions`` directory, using the active
++version from:
++
++1. The ``PYENV_VERSION`` environment variable (colon-separated for multiple versions).
++2. A ``.python-version`` file in the current directory or any parent directory.
++3. The global version file at ``$PYENV_ROOT/version``.
++
++This convention is shared across pyenv, mise, and asdf, so the same resolution logic works for all three.
++
+ .. warning::
+ 
+     Virtual environments typically reference the system Python's standard library. If you upgrade the system Python, the
+--- a/docs/how-to/usage.rst
++++ b/docs/how-to/usage.rst
+@@ -64,6 +64,29 @@ than a rule. The interpreter at this path is checked first, but only used if it
+ 
+ In this example, /usr/bin/python3.9 is checked first but rejected because it does not satisfy the >=3.10 constraint.
+ 
++Using version managers (pyenv, mise, asdf)
++==========================================
++
++virtualenv automatically resolves shims from `pyenv <https://github.com/pyenv/pyenv>`_, `mise <https://mise.jdx.dev/>`_,
++and `asdf <https://asdf-vm.com/>`_ to the real Python binary. Set the active Python version using any of the standard
++mechanisms and virtualenv will discover it:
++
++.. code-block:: console
++
++    $ pyenv local 3.12.0
++    $ virtualenv venv  # uses pyenv's 3.12.0, not the system Python
++
++    $ PYENV_VERSION=3.11.0 virtualenv venv  # uses 3.11.0
++
++This also works with mise and asdf:
++
++.. code-block:: console
++
++    $ mise use python@3.12
++    $ virtualenv venv
++
++No additional configuration is required. See :doc:`../explanation` for details on how shim resolution works.
++
+ ********************************
+  Activate a virtual environment
+ ********************************
+--- a/docs/reference/compatibility.rst
++++ b/docs/reference/compatibility.rst
+@@ -60,6 +60,8 @@ These Python distributions work on Linux, macOS, and Windows:
+ - Installations from `python.org <https://www.python.org/downloads/>`_
+ - `python-build-standalone <https://github.com/astral-sh/python-build-standalone>`_ builds (used by `uv
+   <https://docs.astral.sh/uv/>`_ and `mise <https://mise.jdx.dev/>`_)
++- Python versions managed by `pyenv <https://github.com/pyenv/pyenv>`_, `mise <https://mise.jdx.dev/>`_, or `asdf
++  <https://asdf-vm.com/>`_ (shims are automatically resolved to the real binary)
+ 
+ Linux
+ =====
+--- a/docs/tutorial/getting-started.rst
++++ b/docs/tutorial/getting-started.rst
+@@ -11,7 +11,9 @@ environment, install packages, and learn how to manage project dependencies.
+ 
+ Before starting this tutorial, you need:
+ 
+-- Python 3.8 or later installed on your system.
++- Python 3.8 or later installed on your system. If you use a version manager like `pyenv
++  <https://github.com/pyenv/pyenv>`_, `mise <https://mise.jdx.dev/>`_, or `asdf <https://asdf-vm.com/>`_, virtualenv
++  will automatically discover the Python version they manage.
+ - virtualenv installed (see :doc:`../how-to/install`).
+ 
+ ***************************************
+--- a/src/virtualenv/discovery/builtin.py
++++ b/src/virtualenv/discovery/builtin.py
+@@ -169,6 +169,9 @@ def propose_interpreters(  # noqa: C901, PLR0912, PLR0915
+         LOGGER.debug(LazyPathDump(pos, path, env))
+         for exe, impl_must_match in find_candidates(path):
+             exe_raw = str(exe)
++            if resolved := _resolve_shim(exe_raw, env):
++                LOGGER.debug("resolved shim %s to %s", exe_raw, resolved)
++                exe_raw = resolved
+             exe_id = fs_path_id(exe_raw)
+             if exe_id in tested_exes:
+                 continue
+@@ -255,6 +258,76 @@ def path_exes(path: Path) -> Generator[tuple[Path, bool], None, None]:
+     return path_exes
+ 
+ 
++def _resolve_shim(exe_path: str, env: Mapping[str, str]) -> str | None:
++    """Resolve a version-manager shim to the actual Python binary.
++
++    Version managers like pyenv, mise, and asdf place shim scripts in a directory on PATH that delegate to the real
++    Python binary. When run as subprocesses, these shims may resolve to the system Python instead of the
++    version-manager-managed version. This function bypasses the shim by reading the ``.python-version`` file (a
++    convention shared across version managers) and directly locating the binary under the versions directory.
++
++    """
++    for shims_dir_env, versions_path in _VERSION_MANAGER_LAYOUTS:
++        if root := env.get(shims_dir_env):
++            shims_dir = os.path.join(root, "shims")
++            if os.path.dirname(exe_path) == shims_dir:
++                exe_name = os.path.basename(exe_path)
++                versions_dir = os.path.join(root, *versions_path)
++                return _resolve_shim_to_binary(exe_name, versions_dir, env)
++    return None
++
++
++_VERSION_MANAGER_LAYOUTS: list[tuple[str, tuple[str, ...]]] = [
++    ("PYENV_ROOT", ("versions",)),
++    ("MISE_DATA_DIR", ("installs", "python")),
++    ("ASDF_DATA_DIR", ("installs", "python")),
++]
++
++
++def _resolve_shim_to_binary(exe_name: str, versions_dir: str, env: Mapping[str, str]) -> str | None:
++    for version in _active_versions(env):
++        resolved = os.path.join(versions_dir, version, "bin", exe_name)
++        if os.path.isfile(resolved) and os.access(resolved, os.X_OK):
++            return resolved
++    return None
++
++
++def _active_versions(env: Mapping[str, str]) -> Generator[str, None, None]:
++    """Yield active Python version strings by reading version-manager configuration.
++
++    Checks in priority order: ``PYENV_VERSION`` env var, ``.python-version`` file (searching parent directories from
++    cwd), then the global version file at ``$PYENV_ROOT/version``.
++
++    """
++    if pyenv_version := env.get("PYENV_VERSION"):
++        yield from pyenv_version.split(":")
++        return
++    if versions := _read_python_version_file(os.getcwd()):
++        yield from versions
++        return
++    if (pyenv_root := env.get("PYENV_ROOT")) and (
++        versions := _read_python_version_file(os.path.join(pyenv_root, "version"), search_parents=False)
++    ):
++        yield from versions
++
++
++def _read_python_version_file(start: str, *, search_parents: bool = True) -> list[str] | None:
++    """Read a ``.python-version`` file, optionally searching parent directories."""
++    current = start
++    while True:
++        candidate = os.path.join(current, ".python-version") if os.path.isdir(current) else current
++        if os.path.isfile(candidate):
++            with open(candidate, encoding="utf-8") as f:
++                if versions := [v for line in f if (v := line.strip()) and not v.startswith("#")]:
++                    return versions
++        if not search_parents:
++            return None
++        parent = os.path.dirname(current)
++        if parent == current:
++            return None
++        current = parent
++
++
+ class PathPythonInfo(PythonInfo):
+     """python info from path."""
+ 

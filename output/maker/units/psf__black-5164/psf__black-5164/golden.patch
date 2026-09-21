@@ -1,0 +1,32 @@
+--- a/CHANGES.md
++++ b/CHANGES.md
+@@ -6,6 +6,8 @@
+      Please include the PR number in the changelog entry, not the issue number -->
+ 
+ - Add support for NO_COLOR environment variable to disable ANSI output (#5129)
++- No spurious target version warning when runtime version is included in a
++  --target-version flag (#5167)
+ 
+ ### Highlights
+ 
+--- a/src/black/__init__.py
++++ b/src/black/__init__.py
+@@ -206,10 +206,16 @@ def target_version_option_callback(
+ def _target_versions_exceed_runtime(
+     target_versions: set[TargetVersion],
+ ) -> bool:
++    """Check if ALL target versions exceed the runtime Python version.
++
++    If any target version is at or below the runtime version, the AST
++    safety check can succeed for that version's features, so the warning
++    would be spurious.
++    """
+     if not target_versions:
+         return False
+-    max_target_minor = max(tv.value for tv in target_versions)
+-    return max_target_minor > sys.version_info[1]
++    min_target_minor = min(tv.value for tv in target_versions)
++    return min_target_minor > sys.version_info[1]
+ 
+ 
+ def _version_mismatch_message(target_versions: set[TargetVersion]) -> str:

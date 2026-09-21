@@ -1,0 +1,44 @@
+--- a/news/14117.bugfix.rst
++++ b/news/14117.bugfix.rst
+@@ -0,0 +1 @@
++Avoid reading installed file lists in ``pip show`` unless ``--files`` is used.
+--- a/src/pip/_internal/commands/show.py
++++ b/src/pip/_internal/commands/show.py
+@@ -53,7 +53,7 @@ def run(self, options: Values, args: list[str]) -> int:
+             return ERROR
+         query = args
+ 
+-        results = search_packages_info(query)
++        results = search_packages_info(query, include_files=options.files)
+         if not print_results(
+             results, list_files=options.files, verbose=options.verbose
+         ):
+@@ -82,7 +82,10 @@ class _PackageInfo(NamedTuple):
+     files: list[str] | None
+ 
+ 
+-def search_packages_info(query: list[str]) -> Generator[_PackageInfo, None, None]:
++def search_packages_info(
++    query: list[str],
++    include_files: bool,
++) -> Generator[_PackageInfo, None, None]:
+     """
+     Gather details from installed distributions. Print distribution name,
+     version, location, and installed files. Installed files requires a
+@@ -133,11 +136,11 @@ def _get_requiring_packages(current_dist: BaseDistribution) -> Iterator[str]:
+         except FileNotFoundError:
+             entry_points = []
+ 
+-        files_iter = dist.iter_declared_entries()
+-        if files_iter is None:
+-            files: list[str] | None = None
+-        else:
+-            files = sorted(files_iter)
++        files: list[str] | None = None
++        if include_files:
++            files_iter = dist.iter_declared_entries()
++            if files_iter is not None:
++                files = sorted(files_iter)
+ 
+         metadata = dist.metadata
+ 

@@ -1,0 +1,119 @@
+--- a/src/packaging/tags.py
++++ b/src/packaging/tags.py
+@@ -36,6 +36,7 @@
+     "AppleVersion",
+     "PythonVersion",
+     "Tag",
++    "UnsortedTagsError",
+     "android_platforms",
+     "compatible_tags",
+     "cpython_tags",
+@@ -79,6 +80,12 @@ def _compute_32_bit_interpreter() -> bool:
+ _32_BIT_INTERPRETER = _compute_32_bit_interpreter()
+ 
+ 
++class UnsortedTagsError(ValueError):
++    """
++    Raised when a tag component is not in sorted order per PEP 425.
++    """
++
++
+ class Tag:
+     """
+     A representation of the tag triple for a wheel.
+@@ -159,7 +166,7 @@ def __setstate__(self, state: tuple[None, dict[str, Any]]) -> None:
+         self._hash = hash((self._interpreter, self._abi, self._platform))
+ 
+ 
+-def parse_tag(tag: str) -> frozenset[Tag]:
++def parse_tag(tag: str, *, validate_order: bool = False) -> frozenset[Tag]:
+     """
+     Parses the provided tag (e.g. `py3-none-any`) into a frozenset of
+     :class:`Tag` instances.
+@@ -168,10 +175,27 @@ def parse_tag(tag: str) -> frozenset[Tag]:
+     `compressed tag set`_, e.g. ``"py2.py3-none-any"`` which supports both
+     Python 2 and Python 3.
+ 
++    If **validate_order** is true, compressed tag set components are checked
++    to be in sorted order as required by PEP 425.
++
+     :param str tag: The tag to parse, e.g. ``"py3-none-any"``.
++    :param bool validate_order: Check whether compressed tag set components
++        are in sorted order.
++    :raises UnsortedTagsError: If **validate_order** is true and any compressed tag
++        set component is not in sorted order.
++
++    .. versionadded:: 26.1
++       The *validate_order* parameter.
+     """
+     tags = set()
+     interpreters, abis, platforms = tag.split("-")
++    if validate_order:
++        for component in (interpreters, abis, platforms):
++            parts = component.split(".")
++            if parts != sorted(parts):
++                raise UnsortedTagsError(
++                    f"Tag component {component!r} is not in sorted order per PEP 425"
++                )
+     for interpreter in interpreters.split("."):
+         for abi in abis.split("."):
+             for platform_ in platforms.split("."):
+--- a/src/packaging/utils.py
++++ b/src/packaging/utils.py
+@@ -7,7 +7,7 @@
+ import re
+ from typing import NewType, Tuple, Union, cast
+ 
+-from .tags import Tag, parse_tag
++from .tags import Tag, UnsortedTagsError, parse_tag
+ from .version import InvalidVersion, Version, _TrimmedRelease
+ 
+ __all__ = [
+@@ -156,6 +156,8 @@ def canonicalize_version(
+ 
+ def parse_wheel_filename(
+     filename: str,
++    *,
++    validate_order: bool = False,
+ ) -> tuple[NormalizedName, Version, BuildTag, frozenset[Tag]]:
+     """
+     This function takes the filename of a wheel file, and parses it,
+@@ -171,7 +173,12 @@ def parse_wheel_filename(
+     string format allows multiple tags to be combined into a single
+     string).
+ 
++    If **validate_order** is true, compressed tag set components are
++    checked to be in sorted order as required by PEP 425.
++
+     :param str filename: The name of the wheel file.
++    :param bool validate_order: Check whether compressed tag set components
++        are in sorted order.
+     :raises InvalidWheelFilename: If the filename in question
+         does not follow the :ref:`wheel specification
+         <pypug:binary-distribution-format>`.
+@@ -188,6 +195,9 @@ def parse_wheel_filename(
+     True
+     >>> not build
+     True
++
++    .. versionadded:: 26.1
++       The *validate_order* parameter.
+     """
+     if not filename.endswith(".whl"):
+         raise InvalidWheelFilename(
+@@ -225,7 +235,14 @@ def parse_wheel_filename(
+         build = cast("BuildTag", (int(build_match.group(1)), build_match.group(2)))
+     else:
+         build = ()
+-    tags = parse_tag(parts[-1])
++    tag_str = parts[-1]
++    try:
++        tags = parse_tag(tag_str, validate_order=validate_order)
++    except UnsortedTagsError:
++        raise InvalidWheelFilename(
++            f"Invalid wheel filename (compressed tag set components must be in "
++            f"sorted order per PEP 425): {filename!r}"
++        ) from None
+     return (name, version, build, tags)
+ 
+ 

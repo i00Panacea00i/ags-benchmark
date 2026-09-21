@@ -1,0 +1,3 @@
+[15:38:43] [validate] 88 个单元 | 并发 12 | agent probe 模式 | 镜像预热 开 | 模式 Image-Override(bench-generic)
+[15:42:06] [preheat] 镜像预热 35/88 完成，耗时 202s（超时余 53 个未确认）
+[15:42:13] [pallets__click-3059] bench 实例就绪（override bench-generic）

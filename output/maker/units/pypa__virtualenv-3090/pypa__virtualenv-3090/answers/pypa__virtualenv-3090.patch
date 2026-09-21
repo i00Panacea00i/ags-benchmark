@@ -1,0 +1,45 @@
+--- a/.github/workflows/check.yaml
++++ b/.github/workflows/check.yaml
+@@ -192,3 +192,5 @@ jobs:
+         run: tox run -vv --notest --skip-missing-interpreters false -e ${{ matrix.tox_env }}
+       - name: 🏃 Run check for ${{ matrix.tox_env }}
+         run: tox run --skip-pkg-install -e ${{ matrix.tox_env }}
++        env:
++          UPGRADE_ADVISORY: ${{ matrix.tox_env == 'upgrade' && '1' || '' }}
+--- a/docs/changelog/3090.bugfix.rst
++++ b/docs/changelog/3090.bugfix.rst
+@@ -0,0 +1,2 @@
++Use ``BASH_SOURCE[0]`` instead of ``$0`` in the bash activate script relocation fallback, fixing incorrect ``PATH`` when
++sourcing the activate script from a different directory - by :user:`gaborbernat`.
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -193,6 +193,7 @@ lint.per-file-ignores."tests/**/*.py" = [
+   "PLR2004", # Magic value used in comparison, consider replacing with a constant variable
+   "S101",    # asserts allowed in tests
+   "S603",    # `subprocess` call: check for execution of untrusted input
++  "S607",    # partial executable path is fine in tests
+ ]
+ lint.isort = { known-first-party = [
+   "virtualenv",
+--- a/src/virtualenv/activation/bash/activate.sh
++++ b/src/virtualenv/activation/bash/activate.sh
+@@ -62,7 +62,7 @@ deactivate nondestructive
+ 
+ if [ ! -d __VIRTUAL_ENV__ ]; then
+     echo "Virtual environment directory __VIRTUAL_ENV__ does not exist!" >&2
+-    CURRENT_PATH=$(realpath "${0}")
++    CURRENT_PATH=$(realpath "${BASH_SOURCE[0]}")
+     CURRENT_DIR=$(dirname "${CURRENT_PATH}")
+     VIRTUAL_ENV="$(realpath "${CURRENT_DIR}/../")"
+ else
+--- a/src/virtualenv/run/__init__.py
++++ b/src/virtualenv/run/__init__.py
+@@ -106,7 +106,7 @@ def build_parser(
+     if interpreter is None:
+         msg = f"failed to find interpreter for {discover}"
+         raise RuntimeError(msg)
+-    elements = [
++    elements: list[ComponentBuilder] = [
+         CreatorSelector(interpreter, parser),
+         SeederSelector(interpreter, parser),
+         ActivationSelector(interpreter, parser),

@@ -1,0 +1,70 @@
+--- a/docs/changelog/2786.bugfix.rst
++++ b/docs/changelog/2786.bugfix.rst
+@@ -0,0 +1,3 @@
++Creating a virtual environment on a filesystem without symlink-support would fail even with `--copies`
++Make `fs_supports_symlink` perform a real symlink creation check on all platforms.
++Contributed by :user:`esafak`.
+--- a/src/virtualenv/create/via_global_ref/api.py
++++ b/src/virtualenv/create/via_global_ref/api.py
+@@ -62,7 +62,12 @@ def add_parser_arguments(cls, parser, interpreter, meta, app_data):
+             help="give the virtual environment access to the system site-packages dir",
+         )
+         if not meta.can_symlink and not meta.can_copy:
+-            msg = "neither symlink or copy method supported"
++            errors = []
++            if meta.symlink_error:
++                errors.append(f"symlink: {meta.symlink_error}")
++            if meta.copy_error:
++                errors.append(f"copy: {meta.copy_error}")
++            msg = f"neither symlink or copy method supported: {', '.join(errors)}"
+             raise RuntimeError(msg)
+         group = parser.add_mutually_exclusive_group()
+         if meta.can_symlink:
+--- a/src/virtualenv/discovery/py_info.py
++++ b/src/virtualenv/discovery/py_info.py
+@@ -219,7 +219,9 @@ def is_venv(self):
+         return self.base_prefix is not None
+ 
+     def sysconfig_path(self, key, config_var=None, sep=os.sep):
+-        pattern = self.sysconfig_paths[key]
++        pattern = self.sysconfig_paths.get(key)
++        if pattern is None:
++            return ""
+         if config_var is None:
+             config_var = self.sysconfig_vars
+         else:
+--- a/src/virtualenv/info.py
++++ b/src/virtualenv/info.py
+@@ -34,18 +34,20 @@ def fs_supports_symlink():
+     if _CAN_SYMLINK is None:
+         can = False
+         if hasattr(os, "symlink"):
+-            if IS_WIN:
+-                with tempfile.NamedTemporaryFile(prefix="TmP") as tmp_file:
+-                    temp_dir = os.path.dirname(tmp_file.name)
+-                    dest = os.path.join(temp_dir, f"{tmp_file.name}-{'b'}")
+-                    try:
+-                        os.symlink(tmp_file.name, dest)
+-                        can = True
+-                    except (OSError, NotImplementedError):
+-                        pass
+-                LOGGER.debug("symlink on filesystem does%s work", "" if can else " not")
+-            else:
+-                can = True
++            # Creating a symlink can fail for a variety of reasons, indicating that the filesystem does not support it.
++            # E.g. on Linux with a VFAT partition mounted.
++            with tempfile.NamedTemporaryFile(prefix="TmP") as tmp_file:
++                temp_dir = os.path.dirname(tmp_file.name)
++                dest = os.path.join(temp_dir, f"{tmp_file.name}-{'b'}")
++                try:
++                    os.symlink(tmp_file.name, dest)
++                    can = True
++                except (OSError, NotImplementedError):
++                    pass  # symlink is not supported
++                finally:
++                    if os.path.lexists(dest):
++                        os.remove(dest)
++            LOGGER.debug("symlink on filesystem does%s work", "" if can else " not")
+         _CAN_SYMLINK = can
+     return _CAN_SYMLINK
+ 

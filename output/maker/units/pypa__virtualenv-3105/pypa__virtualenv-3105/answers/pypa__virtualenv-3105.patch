@@ -1,0 +1,23 @@
+--- a/docs/changelog/3110.bugfix.rst
++++ b/docs/changelog/3110.bugfix.rst
+@@ -0,0 +1 @@
++Use terminal width for help formatting instead of hardcoded 240.
+--- a/src/virtualenv/config/cli/parser.py
++++ b/src/virtualenv/config/cli/parser.py
+@@ -1,6 +1,7 @@
+ from __future__ import annotations
+ 
+ import os
++import shutil
+ from argparse import SUPPRESS, ArgumentDefaultsHelpFormatter, ArgumentParser, Namespace
+ from collections import OrderedDict
+ from typing import TYPE_CHECKING, Any
+@@ -140,7 +141,7 @@ def parse_known_args(
+ 
+ class HelpFormatter(ArgumentDefaultsHelpFormatter):
+     def __init__(self, prog: str, **kwargs: Any) -> None:  # noqa: ANN401
+-        super().__init__(prog, max_help_position=32, width=240, **kwargs)
++        super().__init__(prog, max_help_position=32, width=shutil.get_terminal_size().columns, **kwargs)
+ 
+     def _get_help_string(self, action: Action) -> str | None:
+         text = super()._get_help_string(action)

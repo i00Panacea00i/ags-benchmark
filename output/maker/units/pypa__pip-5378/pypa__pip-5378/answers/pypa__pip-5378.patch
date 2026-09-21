@@ -1,0 +1,116 @@
+--- a/docs/html/user_guide.rst
++++ b/docs/html/user_guide.rst
+@@ -96,6 +96,8 @@ pip can be configured to connect through a proxy server in various ways:
+ * using ``proxy`` in a :ref:`config-file`
+ * by setting the standard environment-variables ``http_proxy``, ``https_proxy``
+   and ``no_proxy``.
++* using the ``--no-proxy-env`` command-line option to ignore proxies set through
++  those environment variables (an explicit ``--proxy`` is still used).
+ * using the environment variable ``PIP_USER_AGENT_USER_DATA`` to include
+   a JSON-encoded string in the user-agent variable used in pip's requests.
+ 
+--- a/news/5378.feature.rst
++++ b/news/5378.feature.rst
+@@ -0,0 +1,3 @@
++Add a ``--no-proxy-env`` (or ``--proxy ""``) option to ignore proxies
++configured via non-pip environment variables or configuration files.
++A proxy set with ``--proxy`` is still used.
+--- a/src/pip/_internal/build_env/installer.py
++++ b/src/pip/_internal/build_env/installer.py
+@@ -104,8 +104,11 @@ def install(
+         for link in finder.find_links:
+             args.extend(["--find-links", link])
+ 
+-        if finder.proxy:
++        # is not None: forward an empty --proxy "" (disable proxying) too.
++        if finder.proxy is not None:
+             args.extend(["--proxy", finder.proxy])
++        if finder.no_proxy_env:
++            args.append("--no-proxy-env")
+         for host in finder.trusted_hosts:
+             args.extend(["--trusted-host", host])
+         if finder.custom_cert:
+--- a/src/pip/_internal/cli/cmdoptions.py
++++ b/src/pip/_internal/cli/cmdoptions.py
+@@ -314,10 +314,19 @@ class PipOption(Option):
+     "--proxy",
+     dest="proxy",
+     type="str",
+-    default="",
++    default=None,
+     help="Specify a proxy in the form scheme://[user:passwd@]proxy.server:port.",
+ )
+ 
++no_proxy_env: Callable[..., Option] = partial(
++    Option,
++    "--no-proxy-env",
++    dest="no_proxy_env",
++    action="store_true",
++    default=False,
++    help="Do not read proxy configuration from environment variables.",
++)
++
+ retries: Callable[..., Option] = partial(
+     Option,
+     "--retries",
+@@ -1260,6 +1269,7 @@ def check_list_path_option(options: Values) -> None:
+         no_input,
+         keyring_provider,
+         proxy,
++        no_proxy_env,
+         retries,
+         timeout,
+         exists_action,
+--- a/src/pip/_internal/cli/index_command.py
++++ b/src/pip/_internal/cli/index_command.py
+@@ -121,14 +121,18 @@ def _build_session(
+         if options.timeout or timeout:
+             session.timeout = timeout if timeout is not None else options.timeout
+ 
+-        # Handle configured proxies
+-        if options.proxy:
+-            session.proxies = {
+-                "http": options.proxy,
+-                "https": options.proxy,
+-            }
++        # An explicit --proxy (including "" to disable proxying) or --no-proxy-env
++        # makes the session ignore environment proxies; unset --proxy is None.
++        if options.proxy is not None or options.no_proxy_env:
++            if options.proxy:
++                session.proxies = {
++                    "http": options.proxy,
++                    "https": options.proxy,
++                }
+             session.trust_env = False
++            # Keep "" so an empty --proxy reaches build subprocesses.
+             session.pip_proxy = options.proxy
++            session.pip_no_proxy_env = options.no_proxy_env
+ 
+         # Determine if we can prompt the user for authentication or not
+         session.auth.prompting = not options.no_input
+--- a/src/pip/_internal/index/package_finder.py
++++ b/src/pip/_internal/index/package_finder.py
+@@ -726,6 +726,10 @@ def index_urls(self) -> list[str]:
+     def proxy(self) -> str | None:
+         return self._link_collector.session.pip_proxy
+ 
++    @property
++    def no_proxy_env(self) -> bool:
++        return self._link_collector.session.pip_no_proxy_env
++
+     @property
+     def trusted_hosts(self) -> Iterable[str]:
+         for host_port in self._link_collector.session.pip_trusted_origins:
+--- a/src/pip/_internal/network/session.py
++++ b/src/pip/_internal/network/session.py
+@@ -343,7 +343,9 @@ def __init__(
+         # Namespace the attribute with "pip_" just in case to prevent
+         # possible conflicts with the base class.
+         self.pip_trusted_origins: list[tuple[str, int | None]] = []
+-        self.pip_proxy = None
++        # "" disables proxying; None means no --proxy was given.
++        self.pip_proxy: str | None = None
++        self.pip_no_proxy_env = False
+ 
+         # Attach our User Agent to the request
+         self.headers["User-Agent"] = user_agent()

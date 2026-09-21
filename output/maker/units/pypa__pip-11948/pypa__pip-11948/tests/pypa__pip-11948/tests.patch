@@ -1,0 +1,78 @@
+--- a/tests/functional/test_install_report.py
++++ b/tests/functional/test_install_report.py
+@@ -92,6 +92,39 @@ def test_install_report_index(script: PipTestEnvironment, tmp_path: Path) -> Non
+     assert "requires_dist" in paste_report["metadata"]
+ 
+ 
++@pytest.mark.network
++def test_install_report_direct_archive(
++    script: PipTestEnvironment, tmp_path: Path, shared_data: TestData
++) -> None:
++    """Test report for direct URL archive."""
++    report_path = tmp_path / "report.json"
++    script.pip(
++        "install",
++        str(shared_data.root / "packages" / "simplewheel-1.0-py2.py3-none-any.whl"),
++        "--dry-run",
++        "--no-index",
++        "--report",
++        str(report_path),
++    )
++    report = json.loads(report_path.read_text())
++    assert "install" in report
++    assert len(report["install"]) == 1
++    simplewheel_report = _install_dict(report)["simplewheel"]
++    assert simplewheel_report["metadata"]["name"] == "simplewheel"
++    assert simplewheel_report["requested"] is True
++    assert simplewheel_report["is_direct"] is True
++    url = simplewheel_report["download_info"]["url"]
++    assert url.startswith("file://")
++    assert url.endswith("/packages/simplewheel-1.0-py2.py3-none-any.whl")
++    assert (
++        simplewheel_report["download_info"]["archive_info"]["hash"]
++        == "sha256=e63aa139caee941ec7f33f057a5b987708c2128238357cf905429846a2008718"
++    )
++    assert simplewheel_report["download_info"]["archive_info"]["hashes"] == {
++        "sha256": "e63aa139caee941ec7f33f057a5b987708c2128238357cf905429846a2008718"
++    }
++
++
+ @pytest.mark.network
+ def test_install_report_vcs_and_wheel_cache(
+     script: PipTestEnvironment, tmp_path: Path
+--- a/tests/unit/test_direct_url.py
++++ b/tests/unit/test_direct_url.py
+@@ -140,3 +140,33 @@ def _redact_archive(url: str) -> str:
+         == "https://${PIP_TOKEN}@g.c/u/p.git"
+     )
+     assert _redact_git("ssh://git@g.c/u/p.git") == "ssh://git@g.c/u/p.git"
++
++
++def test_hash_to_hashes() -> None:
++    direct_url = DirectUrl(url="https://e.c/archive.tar.gz", info=ArchiveInfo())
++    assert isinstance(direct_url.info, ArchiveInfo)
++    direct_url.info.hash = "sha256=abcdef"
++    assert direct_url.info.hashes == {"sha256": "abcdef"}
++
++
++def test_hash_to_hashes_constructor() -> None:
++    direct_url = DirectUrl(
++        url="https://e.c/archive.tar.gz", info=ArchiveInfo(hash="sha256=abcdef")
++    )
++    assert isinstance(direct_url.info, ArchiveInfo)
++    assert direct_url.info.hashes == {"sha256": "abcdef"}
++    direct_url = DirectUrl(
++        url="https://e.c/archive.tar.gz",
++        info=ArchiveInfo(hash="sha256=abcdef", hashes={"sha512": "123456"}),
++    )
++    assert isinstance(direct_url.info, ArchiveInfo)
++    assert direct_url.info.hashes == {"sha256": "abcdef", "sha512": "123456"}
++    # In case of conflict between hash and hashes, hashes wins.
++    direct_url = DirectUrl(
++        url="https://e.c/archive.tar.gz",
++        info=ArchiveInfo(
++            hash="sha256=abcdef", hashes={"sha256": "012345", "sha512": "123456"}
++        ),
++    )
++    assert isinstance(direct_url.info, ArchiveInfo)
++    assert direct_url.info.hashes == {"sha256": "012345", "sha512": "123456"}

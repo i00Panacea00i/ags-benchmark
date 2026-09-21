@@ -1,0 +1,52 @@
+--- a/src/packaging/markers.py
++++ b/src/packaging/markers.py
+@@ -484,6 +484,16 @@ def evaluate(
+         )
+ 
+ 
++def _pep440_python_full_version(python_full_version: str) -> str:
++    """
++    Work around platform.python_version() returning something that is not PEP 440
++    compliant for non-tagged Python builds.
++    """
++    if python_full_version.endswith("+"):
++        return f"{python_full_version}local"
++    return python_full_version
++
++
+ def _repair_python_full_version(
+     env: dict[str, str | AbstractSet[str]],
+ ) -> dict[str, str | AbstractSet[str]]:
+@@ -492,6 +502,5 @@ def _repair_python_full_version(
+     compliant for non-tagged Python builds.
+     """
+     python_full_version = cast("str", env["python_full_version"])
+-    if python_full_version.endswith("+"):
+-        env["python_full_version"] = f"{python_full_version}local"
++    env["python_full_version"] = _pep440_python_full_version(python_full_version)
+     return env
+--- a/src/packaging/pylock.py
++++ b/src/packaging/pylock.py
+@@ -16,7 +16,12 @@
+ )
+ from urllib.parse import urlparse
+ 
+-from .markers import Environment, Marker, default_environment
++from .markers import (
++    Environment,
++    Marker,
++    _pep440_python_full_version,
++    default_environment,
++)
+ from .specifiers import SpecifierSet
+ from .tags import create_compatible_tags_selector, sys_tags
+ from .utils import (
+@@ -782,7 +787,7 @@ def select(
+                 ),
+             ),
+         )
+-        env_python_full_version = (
++        env_python_full_version = _pep440_python_full_version(
+             environment["python_full_version"]
+             if environment
+             else default_environment()["python_full_version"]

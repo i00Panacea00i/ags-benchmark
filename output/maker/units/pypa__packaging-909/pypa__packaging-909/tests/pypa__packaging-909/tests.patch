@@ -1,0 +1,88 @@
+--- a/tests/test_tags.py
++++ b/tests/test_tags.py
+@@ -167,6 +167,35 @@ def test_multi_platform(self) -> None:
+         )
+         assert given == expected
+ 
++    def test_unsorted_interpreter_parses_by_default(self) -> None:
++        # Unsorted tags should parse fine without validate_order
++        result = tags.parse_tag("py3.py2-none-any")
++        assert tags.Tag("py3", "none", "any") in result
++        assert tags.Tag("py2", "none", "any") in result
++
++    def test_unsorted_interpreter_raises_with_validate(self) -> None:
++        with pytest.raises(ValueError, match="not in sorted order"):
++            tags.parse_tag("py3.py2-none-any", validate_order=True)
++
++    def test_unsorted_platform_parses_by_default(self) -> None:
++        result = tags.parse_tag(
++            "cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64"
++        )
++        assert len(result) == 2
++
++    def test_unsorted_platform_raises_with_validate(self) -> None:
++        with pytest.raises(ValueError, match="not in sorted order"):
++            tags.parse_tag(
++                "cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64",
++                validate_order=True,
++            )
++
++    def test_sorted_multi_interpreter_valid(self) -> None:
++        # py2 < py3 alphabetically — should not raise even with validation
++        result = tags.parse_tag("py2.py3-none-any", validate_order=True)
++        assert tags.Tag("py2", "none", "any") in result
++        assert tags.Tag("py3", "none", "any") in result
++
+ 
+ class TestInterpreterName:
+     def test_sys_implementation_name(self, monkeypatch: pytest.MonkeyPatch) -> None:
+--- a/tests/test_utils.py
++++ b/tests/test_utils.py
+@@ -137,6 +137,16 @@ def test_canonicalize_version_no_strip_trailing_zero(version: str) -> None:
+             (1000, "abc"),
+             {Tag("py3", "none", "any")},
+         ),
++        (
++            "pyvirtualcam-0.13.0-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
++            "pyvirtualcam",
++            Version("0.13.0"),
++            (),
++            {
++                Tag("cp310", "cp310", "manylinux2014_x86_64"),
++                Tag("cp310", "cp310", "manylinux_2_17_x86_64"),
++            },
++        ),
+         (
+             "foo_bár-1.0-py3-none-any.whl",
+             "foo-bár",
+@@ -177,6 +187,30 @@ def test_parse_wheel_invalid_filename(filename: str) -> None:
+         parse_wheel_filename(filename)
+ 
+ 
++@pytest.mark.parametrize(
++    "filename",
++    [
++        "pyvirtualcam-0.13.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
++        "foo-1.0-py3.py2-none-any.whl",
++    ],
++)
++def test_parse_wheel_unsorted_tags_valid_by_default(filename: str) -> None:
++    # Unsorted compressed tags should parse fine without validate_order
++    parse_wheel_filename(filename)
++
++
++@pytest.mark.parametrize(
++    "filename",
++    [
++        "pyvirtualcam-0.13.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
++        "foo-1.0-py3.py2-none-any.whl",
++    ],
++)
++def test_parse_wheel_unsorted_tags_invalid_with_validate(filename: str) -> None:
++    with pytest.raises(InvalidWheelFilename):
++        parse_wheel_filename(filename, validate_order=True)
++
++
+ @pytest.mark.parametrize(
+     ("filename", "name", "version"),
+     [("foo-1.0.tar.gz", "foo", Version("1.0")), ("foo-1.0.zip", "foo", Version("1.0"))],

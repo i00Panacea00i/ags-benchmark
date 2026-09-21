@@ -1,0 +1,103 @@
+--- a/news/11948.bugfix.rst
++++ b/news/11948.bugfix.rst
+@@ -0,0 +1,3 @@
++When installing an archive from a direct URL or local file, populate
++``download_info.info.hashes`` in the installation report, in addition to the legacy
++``download_info.info.hash`` key.
+--- a/src/pip/_internal/models/direct_url.py
++++ b/src/pip/_internal/models/direct_url.py
+@@ -105,22 +105,31 @@ def __init__(
+         hash: Optional[str] = None,
+         hashes: Optional[Dict[str, str]] = None,
+     ) -> None:
+-        if hash is not None:
++        # set hashes before hash, since the hash setter will further populate hashes
++        self.hashes = hashes
++        self.hash = hash
++
++    @property
++    def hash(self) -> Optional[str]:
++        return self._hash
++
++    @hash.setter
++    def hash(self, value: Optional[str]) -> None:
++        if value is not None:
+             # Auto-populate the hashes key to upgrade to the new format automatically.
+-            # We don't back-populate the legacy hash key.
++            # We don't back-populate the legacy hash key from hashes.
+             try:
+-                hash_name, hash_value = hash.split("=", 1)
++                hash_name, hash_value = value.split("=", 1)
+             except ValueError:
+                 raise DirectUrlValidationError(
+-                    f"invalid archive_info.hash format: {hash!r}"
++                    f"invalid archive_info.hash format: {value!r}"
+                 )
+-            if hashes is None:
+-                hashes = {hash_name: hash_value}
+-            elif hash_name not in hash:
+-                hashes = hashes.copy()
+-                hashes[hash_name] = hash_value
+-        self.hash = hash
+-        self.hashes = hashes
++            if self.hashes is None:
++                self.hashes = {hash_name: hash_value}
++            elif hash_name not in self.hashes:
++                self.hashes = self.hashes.copy()
++                self.hashes[hash_name] = hash_value
++        self._hash = value
+ 
+     @classmethod
+     def _from_dict(cls, d: Optional[Dict[str, Any]]) -> Optional["ArchiveInfo"]:
+--- a/src/pip/_internal/models/installation_report.py
++++ b/src/pip/_internal/models/installation_report.py
+@@ -14,7 +14,7 @@ def __init__(self, install_requirements: Sequence[InstallRequirement]):
+     def _install_req_to_dict(cls, ireq: InstallRequirement) -> Dict[str, Any]:
+         assert ireq.download_info, f"No download_info for {ireq}"
+         res = {
+-            # PEP 610 json for the download URL. download_info.archive_info.hash may
++            # PEP 610 json for the download URL. download_info.archive_info.hashes may
+             # be absent when the requirement was installed from the wheel cache
+             # and the cache entry was populated by an older pip version that did not
+             # record origin.json.
+--- a/src/pip/_internal/operations/prepare.py
++++ b/src/pip/_internal/operations/prepare.py
+@@ -571,12 +571,15 @@ def _prepare_linked_requirement(
+             # Make sure we have a hash in download_info. If we got it as part of the
+             # URL, it will have been verified and we can rely on it. Otherwise we
+             # compute it from the downloaded file.
++            # FIXME: https://github.com/pypa/pip/issues/11943
+             if (
+                 isinstance(req.download_info.info, ArchiveInfo)
+-                and not req.download_info.info.hash
++                and not req.download_info.info.hashes
+                 and local_file
+             ):
+                 hash = hash_file(local_file.path)[0].hexdigest()
++                # We populate info.hash for backward compatibility.
++                # This will automatically populate info.hashes.
+                 req.download_info.info.hash = f"sha256={hash}"
+ 
+         # For use in later processing,
+--- a/src/pip/_internal/resolution/legacy/resolver.py
++++ b/src/pip/_internal/resolution/legacy/resolver.py
+@@ -436,7 +436,7 @@ def _populate_link(self, req: InstallRequirement) -> None:
+                 req.download_info = cache_entry.origin
+             else:
+                 # Legacy cache entry that does not have origin.json.
+-                # download_info may miss the archive_info.hash field.
++                # download_info may miss the archive_info.hashes field.
+                 req.download_info = direct_url_from_link(
+                     req.link, link_is_in_wheel_cache=cache_entry.persistent
+                 )
+--- a/src/pip/_internal/resolution/resolvelib/candidates.py
++++ b/src/pip/_internal/resolution/resolvelib/candidates.py
+@@ -280,7 +280,7 @@ def __init__(
+                 ireq.download_info = cache_entry.origin
+             else:
+                 # Legacy cache entry that does not have origin.json.
+-                # download_info may miss the archive_info.hash field.
++                # download_info may miss the archive_info.hashes field.
+                 ireq.download_info = direct_url_from_link(
+                     source_link, link_is_in_wheel_cache=cache_entry.persistent
+                 )

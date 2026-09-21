@@ -1,0 +1,11 @@
+--- a/src/virtualenv/create/via_global_ref/builtin/cpython/common.py
++++ b/src/virtualenv/create/via_global_ref/builtin/cpython/common.py
+@@ -59,7 +59,7 @@ def _executables(cls, interpreter):
+         python_w = host.parent / "pythonw.exe"
+         yield (
+             python_w,
+-            [python_w.name, *((f"pythonw3.{minor}t.exe",) if interpreter.free_threaded else ())],
++            [python_w.name, "pythonw3.exe", *((f"pythonw3.{minor}t.exe",) if interpreter.free_threaded else ())],
+             RefMust.COPY,
+             RefWhen.ANY,
+         )

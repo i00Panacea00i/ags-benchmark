@@ -1,0 +1,15 @@
+--- a/news/14074.bugfix.rst
++++ b/news/14074.bugfix.rst
+@@ -0,0 +1 @@
++Make ``pip install`` conflict checks independent of installed distribution iteration order.
+--- a/src/pip/_internal/operations/check.py
++++ b/src/pip/_internal/operations/check.py
+@@ -167,7 +167,7 @@ def _create_whitelist(
+             continue
+ 
+         for req in package_set[package_name].dependencies:
+-            if canonicalize_name(req.name) in packages_affected:
++            if canonicalize_name(req.name) in would_be_installed:
+                 packages_affected.add(package_name)
+                 break
+ 
