@@ -125,15 +125,31 @@ def main():
     problem = os.environ.get("PROBLEM") or IID
     f2p = [t for t in os.environ.get("F2P_TESTS", "").splitlines() if t.strip()]
     system = (
-        "你是一名资深 Python 工程师，在仓库中修复一个 bug。\n"
-        "执行命令的方式：输出 <execute command=\"你的命令\"/>\n"
-        "流程建议：先 cat/grep 探索相关代码 → 运行评分测试复现失败 → 定位根因 → "
-        "用命令修改文件（如 python -c 或 sed）实施最小修复 → 再次运行相关测试确认通过 → "
-        "最后输出简要修复说明（不再执行命令）。"
+        "你是一名资深 Python 工程师，任务是在仓库中修复一个 bug 直至评分测试全部通过。\n\n"
+        "【环境事实（已核实，直接使用，不要猜测）】\n"
+        f"- 仓库绝对路径：{REPO}（run_command 已自动 cd 到此目录）\n"
+        "- Python 与 pytest 已全局安装（直接 python -m pytest），仓库以 editable "
+        "方式安装——修改 src/ 下源码立即生效，无需重装\n"
+        "- 测试已应用到仓库（tests/ 目录就绪），题面与标准测试均在镜像内\n\n"
+        "【工具】run_command（shell 命令）、read_file（读仓库文件）、"
+        "write_file（整文件覆写——实施修复的首选方式，避免 sed 转义出错）。\n\n"
+        "【工作流（严格遵循）】\n"
+        "1. 复现：python -m pytest '<F2P 测试ID>' -x -q 确认失败现状；\n"
+        "2. 探索：read_file/grep 定位相关源码，理解根因；\n"
+        "3. 修复：write_file 写入完整修复文件（其余内容逐字节不变）；\n"
+        "4. 验证：重新运行 F2P 测试；未通过则回到第 2 步——绝不接受未验证的修复；\n"
+        "5. 终验：运行评分 oracle（与最终判分完全一致）：\n"
+        f"   /benchmark/harness/run_tests.sh {IID}\n"
+        "   退出码 0 = 全部通过（F2P+P2P），非 0 则看输出继续修；\n"
+        "6. 收尾：oracle 通过后输出简要修复说明。\n\n"
+        "你有充足轮次，坚持迭代到 oracle 通过为止；若测试因环境报收集错误，先修环境。"
     )
     task = (f"【任务】修复以下问题并让指定测试通过。\n\n{problem}\n\n"
-            f"【通过的判据】这些测试全部通过即算成功：\n"
-            + "\n".join(f"- {t}" for t in f2p[:10]))
+            f"【通过的判据（F2P，全部须通过）】\n"
+            + "\n".join(f"- {t}" for t in f2p[:10]) +
+            f"\n\n第一步：cd {REPO} && python -m pytest '{f2p[0]}' -x -q 复现失败。"
+            if f2p else
+            f"【任务】修复以下问题。\n\n{problem}")
 
     try:
         h = DeepSeekHarness()
@@ -145,21 +161,6 @@ def main():
                      max_turns=int(os.environ.get("MAX_TURNS", "20")))
 
     changed = bsh(f"cd {REPO} && git diff --name-only 2>/dev/null").strip()
-
-    # ★ LLM 使用证据留痕：完整对话轨迹（每轮 LLM 输出 + 工具调用 + 执行结果）
-    #   + 模型名 + 最终答复全文，供审计与回归分析（由 CVM 收集落盘）
-    try:
-        os.makedirs("/output", exist_ok=True)
-        with open("/output/transcript.json", "w") as f:
-            json.dump({
-                "instance_id": IID, "model": h.model,
-                "base_url": os.environ.get("OPENAI_BASE_URL", ""),
-                "turns": out["turns"], "final_answer": out.get("answer") or "",
-                "transcript": out.get("transcript", []),
-            }, f, ensure_ascii=False, indent=1)
-    except Exception:
-        pass
-
     print("RESULT " + json.dumps({
         "result": "done", "turns": out["turns"], "status": out["status"],
         "files_changed": changed.splitlines()[:20],

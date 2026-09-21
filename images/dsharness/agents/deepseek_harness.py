@@ -37,9 +37,11 @@ class DeepSeekHarness:
         return bool(self.base and self.key)
 
     # ---------------- 单轮对话 ----------------
-    def chat(self, messages, temperature=0.2, max_tokens=4096, retries=3):
+    def chat(self, messages, temperature=0.2, max_tokens=4096, retries=3, tools=None):
         payload = {"model": self.model, "messages": messages,
                    "temperature": temperature, "max_tokens": max_tokens}
+        if tools:
+            payload["tools"] = tools    # 原生 function-calling（deepseek-flash 实测支持）
         delay = 3
         for attempt in range(retries + 1):
             try:
@@ -77,7 +79,7 @@ class DeepSeekHarness:
                     {"role": "user", "content": task}]
         transcript = []
         for turn in range(1, max_turns + 1):
-            msg = self.chat(messages, temperature=0.2, max_tokens=4096)
+            msg = self.chat(messages, temperature=0.2, max_tokens=4096, tools=tools)
             content = msg.get("content") or ""
             tool_calls = msg.get("tool_calls") or []
             # 文本协议通道：无 tool_calls 但内容含 <execute command="..."/>
