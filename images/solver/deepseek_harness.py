@@ -29,6 +29,7 @@ class DeepSeekHarness:
         self.model = model or os.environ.get("LLM_MODEL") \
             or os.environ.get("HERMES_MODEL", "deepseek-v4-flash")
         self.timeout = timeout
+        self.usage_log = []          # 逐调用 token 用量（审计/成本归档）
         if not (self.base and self.key):
             raise HarnessError("未配置 OPENAI_BASE_URL / OPENAI_API_KEY")
 
@@ -54,6 +55,15 @@ class DeepSeekHarness:
                     data = json.loads(r.read().decode())
                 choice = data["choices"][0]
                 msg = choice.get("message", {})
+                # token 用量逐调用记录（prompt/completion/reasoning）
+                u = data.get("usage") or {}
+                self.usage_log.append({
+                    "call": len(self.usage_log) + 1,
+                    "prompt_tokens": u.get("prompt_tokens", 0),
+                    "completion_tokens": u.get("completion_tokens", 0),
+                    "reasoning_tokens": (u.get("completion_tokens_details") or {})
+                                          .get("reasoning_tokens", 0),
+                })
                 # 推理型模型（deepseek-v4-flash 等）：reasoning 先消耗 token 预算，
                 # 预算不足时 content 为空且 finish_reason=length → 预算翻倍重试
                 if not (msg.get("content") or "").strip() \

@@ -1,0 +1,2 @@
+RESULT {"result": "done", "turns": 50, "status": "max_turns", "files_changed": ["CHANGES.md", "src/black/concurrency.py", "tests/test_black.py"], "fix_summary": ""}
+

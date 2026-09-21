@@ -401,6 +401,15 @@ def phase_agent(agent_sb, bench_sb, rec):
     r = sh_sbx(agent_sb, "python3 /opt/solver/solver_agent.py",
                timeout=3600, envs=envs)
     out = (r.stdout or "") + "\n" + (r.stderr or "")
+    # ★ solver 完整 stdout 落盘（审计：解题全过程输出）
+    os.makedirs("output/solve-logs", exist_ok=True)
+    with open(f"output/solve-logs/{iid}.solver.log", "w") as f:
+        f.write(out)
+    # ★ bench 侧最终修复 diff 落盘（agent 实际施加的修改）
+    repo_dir = f"/benchmark/repos/{rec['repo'].replace('/', '__')}"
+    d = sh_sbx(bench_sb, f"cd {repo_dir} && git diff", timeout=120)
+    with open(f"output/solve-logs/{iid}.fix.diff", "w") as f:
+        f.write((d.stdout or "")[:20000])
     m = re.findall(r"RESULT (\{.*\})", out)
     solver = json.loads(m[-1]) if m else {"result": "error", "error": out[-300:]}
 
@@ -416,6 +425,15 @@ def phase_agent(agent_sb, bench_sb, rec):
             solver["llm_evidence"] = (f"model={transcript.get('model')} "
                                      f"turns={transcript.get('turns')} "
                                      f"transcript_bytes={len((tr.stdout or ''))}")
+            tu = transcript.get("token_usage") or {}
+            if tu:
+                solver["token_usage"] = tu
+                solver["llm_evidence"] += (f" | tokens={tu.get('total_tokens')}"
+                                           f"（p={tu.get('prompt_tokens')} "
+                                           f"c={tu.get('completion_tokens')} "
+                                           f"r={tu.get('reasoning_tokens')}）")
+            bc = transcript.get("bench_calls") or []
+            solver["bench_calls"] = len(bc)
         except Exception as e:
             solver["llm_evidence"] = f"collect_failed: {str(e)[:80]}"
 

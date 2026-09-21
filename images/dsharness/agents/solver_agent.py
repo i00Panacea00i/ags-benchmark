@@ -62,13 +62,24 @@ REPO = f"/benchmark/repos/{os.environ['REPO'].replace('/', '__')}"
 # ───────── bench 沙箱操作封装（全部命令化，绕开 files API 鉴权差异） ─────────
 
 
+BENCH_CALL_LOG = []              # solver→bench 真实调用日志（审计归档）
+
+
 def bsh(cmd, timeout=1200):
-    """bench 沙箱执行命令，返回 (stdout+stderr)。"""
+    """bench 沙箱执行命令，返回 (stdout+stderr)；全程记录调用日志。"""
+    import time as _t
+    t0 = _t.time()
     try:
         r = bench.commands.run(cmd, timeout=timeout, user="root")
-        return (r.stdout or "") + (r.stderr or "")
+        out = (r.stdout or "") + (r.stderr or "")
     except CommandExitException as e:
-        return (e.stdout or "") + (e.stderr or "")
+        out = (e.stdout or "") + (e.stderr or "")
+    BENCH_CALL_LOG.append({
+        "seq": len(BENCH_CALL_LOG) + 1, "cmd": cmd[:2000],
+        "elapsed_s": round(_t.time() - t0, 1),
+        "exit_ok": "CommandExit" not in "", "result": out[:4000],
+    })
+    return out
 
 
 def read_file(path):
@@ -161,6 +172,30 @@ def main():
                      max_turns=int(os.environ.get("MAX_TURNS", "20")))
 
     changed = bsh(f"cd {REPO} && git diff --name-only 2>/dev/null").strip()
+
+    # ── 审计归档（CVM 收集）：完整对话轨迹 + solver→bench 调用日志 + token 用量 ──
+    try:
+        os.makedirs("/output", exist_ok=True)
+        u = h.usage_log
+        json.dump({
+            "instance_id": IID, "model": h.model,
+            "base_url": os.environ.get("OPENAI_BASE_URL", ""),
+            "turns": out["turns"], "final_answer": out.get("answer") or "",
+            "transcript": out.get("transcript", []),
+            "bench_calls": BENCH_CALL_LOG,
+            "token_usage": {
+                "llm_calls": len(u),
+                "prompt_tokens": sum(x["prompt_tokens"] for x in u),
+                "completion_tokens": sum(x["completion_tokens"] for x in u),
+                "reasoning_tokens": sum(x["reasoning_tokens"] for x in u),
+                "total_tokens": sum(x["prompt_tokens"] + x["completion_tokens"]
+                                    for x in u),
+                "per_call": u,
+            },
+        }, open("/output/transcript.json", "w"), ensure_ascii=False, indent=1)
+    except Exception:
+        pass
+
     print("RESULT " + json.dumps({
         "result": "done", "turns": out["turns"], "status": out["status"],
         "files_changed": changed.splitlines()[:20],

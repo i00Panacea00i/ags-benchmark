@@ -1,0 +1,15 @@
+[20:05:38] [validate] 8 个单元 | 并发 4 | agent full 模式 | 镜像预热 开 | 模式 Image-Override(bench-generic)
+[20:05:44] [preheat] 镜像预热 8/8 完成，耗时 5s
+[20:05:47] [pallets__click-3071] bench 实例就绪（override bench-generic）
+[20:07:26] [pallets__click-3071] agent 解题: pass@1=✅ (1/1, 27 轮)
+[20:07:28] [pallets__click-3071] Phase A: validated
+[20:07:29] [pallets__click-3145] bench 实例就绪（override bench-generic）
+[20:08:54] [pallets__click-3145] agent 解题: pass@1=✅ (1/1, 26 轮)
+[20:08:57] [pallets__click-3145] Phase A: validated
+[20:08:57] [psf__black-5210] bench 实例就绪（override bench-generic）
+[20:12:14] [psf__black-5210] agent 解题: pass@1=✅ (1/1, 40 轮)
+[20:12:19] [psf__black-5210] Phase A: validated
+[20:12:20] [pallets__click-3105] bench 实例就绪（override bench-generic）
+[20:14:20] [pallets__click-3105] agent 解题: pass@1=✅ (1/1, 10 轮)
+[20:14:23] [pallets__click-3105] Phase A: validated
+[20:14:23] [pallets__click-2609] bench 实例就绪（override bench-generic）

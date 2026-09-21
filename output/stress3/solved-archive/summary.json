@@ -1,42 +1,32 @@
-[
- {
-  "instance_id": "pallets__click-3071",
-  "repo": "pallets/click",
-  "issue": "https://github.com/pallets/click/issues/3071",
-  "pass_at_1": true,
-  "f2p_passed": "1/1",
-  "turns": 27,
-  "fix_summary": "修复完成，oracle 全部通过。\n\n## 根因\n\n在 `Parameter.handle_parse_result` 中，参数值写入 `ctx.params` 时做了两件事：\n\n1. 写占位判断条件为 `self.name not in ctx.params`；\n2. 写入时立即把 `UNSET` 归一化成 `None`。\n\n当多个 `flag_value` 选项共享同一个参数名（如 `color`）时，`iter_params_for_processing` 按声明顺序处理：\n\n- 先处理 `--red`（它没有显式 `default`，其值是 `UNSET`），于是 `ctx.params[\"color\"] = None`——槽位被“占住”了；\n- 后处理 `--green`（其 `default=True` 已被解析成 `flag_value=\"green\"`，是真正的值），但因 ",
-  "image": "benchmark-upload-sicheng.tencentcloudcr.com/benchmark-repo/benchmark-click:fix-3071…"
+{
+ "test": "bench-solver 完整解题（两轮复现）",
+ "round1": {
+  "time": "20:05-20:14",
+  "result": "4/4 pass@1",
+  "units": {
+   "pallets__click-3071": 27,
+   "pallets__click-3145": 26,
+   "psf__black-5210": 40,
+   "pallets__click-3105": 10
+  }
  },
- {
-  "instance_id": "pallets__click-3145",
-  "repo": "pallets/click",
-  "issue": "https://github.com/pallets/click/issues/3145",
-  "pass_at_1": true,
-  "f2p_passed": "1/1",
-  "turns": 26,
-  "fix_summary": "Oracle passes with exit code 0, and the full test suite shows no regressions.\n\n## 修复说明\n\n**根因**：`Context.lookup_default()` 使用 `default_map.get(name)` 直接返回映射中的值，当映射里的值本身就是内部哨兵 `UNSET`（如 `{\"port\": UNSET}`）时，该哨兵被当作\"有效默认值\"一路传递到参数解析链，最终在回调中表现为 `None`（`process_value` 会把 `UNSET` 转成 `None`），于是 `--port` 得到 `None` 而不是参数自身默认值 `8000`。同理 `Parameter.get_default()` / `consume_value()` 只判断 `value is not None or na",
-  "image": "benchmark-upload-sicheng.tencentcloudcr.com/benchmark-repo/benchmark-click:fix-3145…"
+ "round2_audit": {
+  "time": "20:26-20:35",
+  "result": "4/4 pass@1",
+  "units": {
+   "pallets__click-3145": 18,
+   "pallets__click-3071": 27,
+   "psf__black-5210": 50,
+   "pallets__click-3105": 9
+  }
  },
- {
-  "instance_id": "psf__black-5210",
-  "repo": "psf/black",
-  "issue": "https://github.com/psf/black/issues/5210",
-  "pass_at_1": true,
-  "f2p_passed": "1/1",
-  "turns": 40,
-  "fix_summary": "修复完成，评分 oracle 通过（退出码 0）。\n\n## 修复说明\n\n**根因**：`src/black/concurrency.py` 的 `reformat_many()` 在 `workers is None` 时直接用 `int(os.environ.get(\"BLACK_NUM_WORKERS\", 0))` 解析环境变量，绕过了 Click 对 `--workers` 使用的 `click.IntRange(min=1)` 校验，因此 `BLACK_NUM_WORKERS=abc`（以及 `0`、`-1`）会抛出裸 `ValueError` traceback，退出码为 1 而非用户级参数错误应有的 2。\n\n**修复**（`src/black/concurrency.py`）：\n- 显式读取 `BLACK_NUM_WORKERS`，对非整数值抛出 `click.BadParam",
-  "image": "benchmark-upload-sicheng.tencentcloudcr.com/benchmark-repo/benchmark-black:20260916-113455…"
+ "token_usage_total": {
+  "llm_calls": 104,
+  "prompt_tokens": 1489017,
+  "completion_tokens": 61054,
+  "reasoning_tokens": 42430,
+  "total_tokens": 1550071,
+  "bench_calls": 139
  },
- {
-  "instance_id": "pallets__click-3105",
-  "repo": "pallets/click",
-  "issue": "https://github.com/pallets/click/issues/3105",
-  "pass_at_1": true,
-  "f2p_passed": "1/1",
-  "turns": 10,
-  "fix_summary": "The fix is verified. The pre-existing errors in `tests/test_utils.py` exist on the unmodified tree too (confirmed via `git stash`), so they're unrelated environment noise — the scoring oracle runs only the relevant tests.\n\n## 修复说明\n\n**根因**：`src/click/types.py` 的 `FuncParamType.convert` 在捕获 `ValueError` 后，把原始输入 `value` 而非异常消息传给 `self.fail(...)`，丢失了 `ValueError` 携带的语义信息。\n\n**修改**（`src/click/types.py`）",
-  "image": "benchmark-upload-sicheng.tencentcloudcr.com/benchmark-repo/benchmark-click:fix-3105…"
- }
-]
+ "model": "deepseek/deepseek-flash (TokenHub)"
+}

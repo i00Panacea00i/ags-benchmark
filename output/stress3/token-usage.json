@@ -1,0 +1,38 @@
+{
+ "pallets__click-3145": {
+  "turns": 18,
+  "llm_calls": 18,
+  "prompt": 133148,
+  "completion": 7578,
+  "reasoning": 5236,
+  "total": 140726,
+  "bench_calls": 19
+ },
+ "pallets__click-3071": {
+  "turns": 27,
+  "llm_calls": 27,
+  "prompt": 501362,
+  "completion": 10428,
+  "reasoning": 6384,
+  "total": 511790,
+  "bench_calls": 46
+ },
+ "pallets__click-3105": {
+  "turns": 9,
+  "llm_calls": 9,
+  "prompt": 45202,
+  "completion": 2772,
+  "reasoning": 1534,
+  "total": 47974,
+  "bench_calls": 13
+ },
+ "psf__black-5210": {
+  "turns": 50,
+  "llm_calls": 50,
+  "prompt": 809305,
+  "completion": 40276,
+  "reasoning": 29276,
+  "total": 849581,
+  "bench_calls": 61
+ }
+}

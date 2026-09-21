@@ -1,0 +1,109 @@
+diff --git a/CHANGES.md b/CHANGES.md
+index ac8438dc..520ef673 100644
+--- a/CHANGES.md
++++ b/CHANGES.md
+@@ -8,6 +8,8 @@
+ - Add support for NO_COLOR environment variable to disable ANSI output (#5129)
+ - No spurious target version warning when runtime version is included in a
+   --target-version flag (#5167)
++- Report an invalid `BLACK_NUM_WORKERS` value as a user-facing parameter error
++  instead of crashing with a `ValueError` (#5210)
+ 
+ ### Highlights
+ 
+diff --git a/src/black/concurrency.py b/src/black/concurrency.py
+index e2c5b1f0..400d20cd 100644
+--- a/src/black/concurrency.py
++++ b/src/black/concurrency.py
+@@ -18,6 +18,7 @@
+ from pathlib import Path
+ from typing import Any
+ 
++import click
+ from mypy_extensions import mypyc_attr
+ 
+ from black import WriteBack, format_file_in_place
+@@ -74,6 +75,40 @@ def shutdown(loop: asyncio.AbstractEventLoop) -> None:
+         loop.close()
+ 
+ 
++def resolve_workers(workers: int | None) -> int:
++    """Resolve the number of workers to use.
++
++    When ``workers`` is not given it is read from the ``BLACK_NUM_WORKERS``
++    environment variable, falling back to the number of CPUs in the system.
++
++    Since ``BLACK_NUM_WORKERS`` is the environment variable form of the
++    ``--workers`` option, invalid values are reported as a user-facing
++    parameter error instead of crashing with an internal ``ValueError``.
++    """
++    if workers is not None:
++        return workers
++
++    env_workers = os.environ.get("BLACK_NUM_WORKERS")
++    if env_workers is None or not env_workers.strip():
++        return os.cpu_count() or 1
++
++    invalid_message = (
++        "BLACK_NUM_WORKERS must be an integer greater than or equal to 1,"
++        f" got {env_workers!r}."
++    )
++    try:
++        resolved = int(env_workers)
++    except ValueError:
++        raise click.BadParameter(
++            invalid_message, param_hint="BLACK_NUM_WORKERS"
++        ) from None
++
++    if resolved < 1:
++        raise click.BadParameter(invalid_message, param_hint="BLACK_NUM_WORKERS")
++
++    return resolved
++
++
+ # diff-shades depends on being to monkeypatch this function to operate. I know it's
+ # not ideal, but this shouldn't cause any issues ... hopefully. ~ichard26
+ @mypyc_attr(patchable=True)
+@@ -87,10 +122,8 @@ def reformat_many(
+     no_cache: bool = False,
+ ) -> None:
+     """Reformat multiple files using a ProcessPoolExecutor."""
++    workers = resolve_workers(workers)
+ 
+-    if workers is None:
+-        workers = int(os.environ.get("BLACK_NUM_WORKERS", 0))
+-        workers = workers or os.cpu_count() or 1
+     if sys.platform == "win32":
+         # Work around https://bugs.python.org/issue26903
+         workers = min(workers, 60)
+diff --git a/tests/test_black.py b/tests/test_black.py
+index 358206b0..aa0c8209 100644
+--- a/tests/test_black.py
++++ b/tests/test_black.py
+@@ -1121,6 +1121,26 @@ def test_works_in_mono_process_only_environment(self) -> None:
+                 f.write_text('print("hello")\n', encoding="utf-8")
+             self.invokeBlack([str(workspace)])
+ 
++    @event_loop()
++    def test_invalid_black_num_workers(self) -> None:
++        for workers in ["abc", "0", "-1"]:
++            with (
++                cache_dir() as workspace,
++                patch.dict(os.environ, {"BLACK_NUM_WORKERS": workers}),
++            ):
++                for f in [
++                    (workspace / "one.py").resolve(),
++                    (workspace / "two.py").resolve(),
++                ]:
++                    f.write_text('print("hello")\n', encoding="utf-8")
++
++                result = BlackRunner().invoke(black.main, [str(workspace)])
++
++            assert result.exit_code == 2
++            assert result.exception is not None
++            assert "BLACK_NUM_WORKERS" in result.stderr
++            assert "Traceback" not in result.stderr
++
+     @event_loop()
+     def test_check_diff_use_together(self) -> None:
+         with cache_dir():
